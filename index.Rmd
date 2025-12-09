@@ -1,0 +1,872 @@
+---
+title: "Bartosz Czech - Portfolio"
+author: "Bartosz Czech"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_depth: 1
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+set.seed(123)
+
+library(tidyr)
+library(rmarkdown)
+library(knitr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DT)
+library(survival)
+library(RColorBrewer)
+library(gridExtra)
+library(fontawesome)
+library(MASS)
+
+```
+
+```{css, echo=FALSE}
+/* --- STYLES --- */
+body { font-family: 'Segoe UI', sans-serif; color: #333; }
+h1, h2, h3 { color: #2c3e50; font-weight: 700; margin-top: 30px; }
+
+/* Badges */
+.my-badge { background-color: #2c3e50 !important; color: white !important; padding: 6px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; margin-right: 5px; margin-bottom: 6px; display: inline-block; text-decoration: none; }
+.my-badge-soft { background-color: #95a5a6 !important; }
+
+/* Boxes */
+.highlight-box { background-color: #f8f9fa; border-left: 5px solid #2c3e50; padding: 20px; margin: 15px 0 30px 0; border-radius: 0 5px 5px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.secondary-box { background-color: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+
+/* --- PUBLICATION CARDS --- */
+details.pub-card { background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: block; overflow: hidden; }
+details.pub-card[open] { border-color: #2c3e50; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+summary.pub-header { padding: 15px 20px; cursor: pointer; list-style: none; display: flex; align-items: center; background-color: #fcfcfc; border-bottom: 1px solid transparent; transition: background 0.2s; }
+details[open] summary.pub-header { border-bottom: 1px solid #eee; background-color: #f8f9fa; }
+summary.pub-header::-webkit-details-marker { display: none; }
+summary.pub-header:hover { background-color: #f0f2f5; }
+
+.pub-year { background-color: #2c3e50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 15px; min-width: 50px; text-align: center; }
+.pub-title { font-weight: 700; color: #2c3e50; flex-grow: 1; font-size: 1.05em; margin-right: 10px; line-height: 1.4; }
+.pub-journal { color: #7f8c8d; font-size: 0.9em; font-style: italic; white-space: nowrap; }
+.pub-arrow { margin-left: 15px; font-size: 0.8em; color: #ccc; transition: transform 0.2s; }
+details[open] .pub-arrow { transform: rotate(180deg); }
+
+/* Content Grid */
+.pub-grid { display: flex; flex-wrap: wrap; gap: 25px; padding: 25px; }
+.pub-info { flex: 2; min-width: 300px; }
+.pub-visuals { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+
+/* Sections */
+.method-section { margin-bottom: 15px; }
+.method-title { font-size: 0.75em; text-transform: uppercase; color: #95a5a6; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+.method-content { font-size: 0.95em; color: #444; line-height: 1.5; }
+
+/* Visuals */
+.pub-img-container { width: 100%; background-color: #eee; border-radius: 6px; overflow: hidden; border: 1px solid #ddd; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
+.pub-img-container img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+/* Button */
+.btn-read { display: inline-block; padding: 10px 20px; background-color: #3498db; color: white !important; text-decoration: none; border-radius: 4px; font-weight: 600; transition: background 0.2s; width: 100%; text-align: center; box-sizing: border-box; cursor: pointer; }
+.btn-read:hover { background-color: #2980b9; }
+
+.tech-tag-small { background-color: #eef2f3; color: #2c3e50; border: 1px solid #bdc3c7; font-size: 0.75em; padding: 2px 8px; border-radius: 10px; margin-right: 4px; display: inline-block; margin-top: 5px; }
+```
+
+# 👋 Professional Summary
+
+I am a **Senior Bioinformatician** and **Product Owner** with over 5 years of experience bridging the gap between computational biology and pharmaceutical R\&D. Currently at **7N**, I lead the development of scalable **R/Shiny applications** and **NGS workflows** for a Big Pharma client.
+
+I hold a **Ph.D. in Biological Sciences** and am currently pursuing an **MBA in Healthcare Management**, combining deep technical expertise with strategic business insight.
+
+-----
+
+# 🛠 Tech Stack
+
+```{r tech_stack, echo=FALSE, results='asis'}
+skills_hard <- c("R & Shiny", "Python", "WDL & Nextflow", "AWS & Cloud", "Docker", "SQL & Snowflake", "NGS Analysis", "Git")
+skills_soft <- c("Agile / Scrum", "Product Ownership")
+
+cat('<div style="margin-bottom: 30px;">')
+for(s in skills_hard) cat(sprintf('<span class="my-badge">%s</span>\n', s))
+for(s in skills_soft) cat(sprintf('<span class="my-badge my-badge-soft">%s</span>\n', s))
+cat('</div>')
+```
+
+-----
+
+# 🚀 Professional Experience
+
+```{r experience_section, echo=FALSE, results='asis'}
+jobs <- list(
+  list(
+    role = "Senior Bioinformatician",
+    company = "7N / Big Pharma Client",
+    location = "Warsaw, Poland",
+    period = "July 2019 - Present",
+    type = "main",
+    desc = "<ul>
+      <li><strong>Sequencing data:</strong> Next-Generation Sequencing (NGS) data analysis: scRNA-seq, bulk RNA-seq, WGS, 16S rRNA sequencing.</li>
+      <li><strong>Proteomics data:</strong> Analysis of mass spectrometry (MS) data for phosphoproteomics.</li>
+      <li><strong>R/Shiny Development:</strong> Developer of interactive dashboards for data analysis.</li>
+      <li><strong>Pipeline Engineering:</strong> Maintaining production-grade WDL workflows for NGS data.</li>
+      <li><strong>Product Ownership:</strong> Bridging scientific needs with IT solutions in an Agile environment.</li>
+    </ul>"
+  ),
+  list(
+  role = "Internship",
+  company = "Center for Quantitative Genetics and Genomics, Aarhus University",
+  location = "Foulum, Denmark",
+  period = "July - August 2016",
+  type = "secondary",
+  desc = "<ul><li>Analysis of NGS data for quantitative genetics projects.</li></ul>"
+  ),
+  list(
+    role = "Internship",
+    company = "Biostat sp. z o.o.",
+    location = "Rybnik, Poland",
+    period = "July - August 2018",
+    type = "secondary",
+    desc = "<ul><li>Statistical analysis of biological and medical data.</li></ul>"
+  )
+)
+
+for(job in jobs) {
+  header_html <- paste0(
+    '<h3>', job$role, '</h3>',
+    '<div style="color: #7f8c8d; margin-bottom: 8px;">',
+    '<strong>', job$company, '</strong> | <em>', job$period, '</em> | ', job$location,
+    '</div>'
+  )
+  if(job$type == "main") {
+    content_html <- paste0('<div class="highlight-box"><strong>Key Responsibilities:</strong>', job$desc, '</div>')
+  } else {
+    content_html <- paste0('<div class="secondary-box">', job$desc, '</div>')
+  }
+  cat(paste0(header_html, content_html, '\n'))
+}
+```
+
+-----
+
+# 📚 Detailed Research Portfolio
+
+*Click on a publication card below to reveal the specific **Bioinformatics** & **Statistics** methods used.*
+
+```{r publications_cards, echo=FALSE, results='asis'}
+# --- DATABASE OF 12 PUBLICATIONS (UPDATED) ---
+
+pubs <- list(
+  # 1. Nature Comms
+  list(
+    year = 2025,
+    title = "Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibition",
+    journal = "Nature Communications",
+    link = "https://doi.org/10.1038/s41467-025-56634-y",
+    problem = "Elucidating molecular mechanisms of acquired resistance to TEAD inhibitors in cancer therapy.",
+    bioinfo = "<ul>
+      <li>High-throughput screens processed with **gDR package** in R.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Dose-response fitting using **4-parameter logistic models**.</li>
+    </ul>",
+    img = "img/img1.png",
+    tags = c("Drug Response", "Modeling", "R", "Synergy")
+  ),
+
+  # 2. snoRNAs Exosomes
+  list(
+    year = 2024,
+    title = "Profiling of snoRNAs in Exosomes Secreted from Cells Infected with Influenza A Virus",
+    journal = "Int. J. Mol. Sci.",
+    link = "https://doi.org/10.3390/ijms26010012",
+    problem = "Characterizing the non-coding RNA cargo of exosomes during viral infection.",
+    bioinfo = "<ul>
+      <li>Small RNA-seq trimmed (**Trimmomatic**) and mapped with **BWA-MEM**.</li>
+      <li>snoRNA annotation using **Ensembl** and **Rfam**.</li>
+      <li>Interaction predictions queried via **RNAInter** and visualized with igraph/VisNetwork.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Differential expression via **DESeq2** (Negative Binomial model).</li>
+      <li>Statistical significance assessed with Wald test.</li>
+      <li>Network enrichment determined by **hypergeometric testing**.</li>
+    </ul>",
+    img = "img/img2.png",
+    tags = c("sRNA-seq", "snoRNA", "BWA-MEM", "Ensembl", "Rfam", "DESeq2")
+  ),
+
+  # 3. Drug Response Modeling
+  list(
+    year = 2024,
+    title = "Computational Modeling of Drug Response Identifies Mutant-Specific Constraints for Dosing panRAF and MEK Inhibitors",
+    journal = "Cancers",
+    link = "https://doi.org/10.3390/cancers16162914",
+    problem = "Optimizing combinatorial drug dosing strategies for melanoma cell lines with specific mutations.",
+    bioinfo = "<ul>
+      <li>High-throughput screens processed with **gDR package** in R.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Dose-response fitting using **4-parameter logistic models**.</li>
+      <li>Synergy scores (**Bliss Independence**) calculated.</li>
+      <li>Significance assessed with bootstrapped confidence intervals.</li>
+    </ul>",
+    img = "img/img3.jpg",
+    tags = c("Drug Response", "Modeling", "R", "Synergy")
+  ),
+
+  # 4. Feline Sperm Morphometry
+  list(
+    year = 2023,
+    title = "Feline sperm head morphometry in relation to male pedigree and fertility",
+    journal = "Theriogenology",
+    link = "https://doi.org/10.1016/j.theriogenology.2023.06.006",
+    problem = "Assessing the impact of genetic background on reproductive traits in felines.",
+    bioinfo = "<ul>
+      <li>Data preprocessed for multivariate analysis in R.</li>
+      <li>K-means clustering.</li>
+      <li>Decision tree analysis.</li>
+    </ul>",
+    stat = "<ul>
+      <li>**PCA** and **k-means clustering** (factoExtra) to identify subpopulations.</li>
+      <li>Group comparisons via ANOVA (Tukey HSD) or Kruskal–Wallis.</li>
+      <li>Shapiro-Wilk tests for normality.</li>
+    </ul>",
+    img = "img/img4.jpg",
+    tags = c("PCA", "Clustering", "ANOVA", "R")
+  ),
+
+  # 5. Exosomes Influenza (Coding Regions)
+  list(
+    year = 2023,
+    title = "Protein-Coding Region Derived Small RNA in Exosomes from Influenza A Virus-Infected Cells",
+    journal = "Int. J. Mol. Sci.",
+    link = "https://doi.org/10.3390/ijms24010867",
+    problem = "Investigating fragments derived from protein-coding regions in exosomal cargo.",
+    bioinfo = "<ul>
+      <li>Alignments to dog/flu genomes (**BWA-MEM**); annotation via Ensembl/Rfam.</li>
+      <li>Functional annotation using **PantherDB** and **STRING** networks.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Differential expression assessed with **DESeq2** (Wald test, FDR).</li>
+      <li>**Non-parametric tests** (Wilcoxon) for coverage enrichment.</li>
+      <li>Co-expression matrices for transcript analysis.</li>
+    </ul>",
+    img = "img/img5.jpg",
+    tags = c("sRNA-seq", "Coding RNA", "Alignment", "STRING", "Non-parametric Tests")
+  ),
+
+  # 6. Holstein Heat Stress (Dual RNA-seq)
+  list(
+    year = 2022,
+    title = "Host transcriptome and microbiome interactions in Holstein cattle under heat stress condition",
+    journal = "Frontiers in Microbiology",
+    link = "https://doi.org/10.3389/fmicb.2022.998093",
+    problem = "Understanding systemic response to heat stress via host-microbiome crosstalk.",
+    bioinfo = "<ul>
+      <li>Host RNA-seq mapped to bovine genome (**STAR**).</li>
+      <li>16S rRNA processed with **QIIME2/DADA2** (SILVA taxonomy).</li>
+      <li>Integrated analysis using **WGCNA** to link gene modules and taxa.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Differential expression/abundance via **DESeq2**.</li>
+      <li>**Pearson correlation** for transcriptome-microbiome integration.</li>
+      <li>Gene set enrichment with goseq/clusterProfiler.</li>
+    </ul>",
+    img = "img/img6.webp",
+    tags = c("RNA-seq", "Microbiome", "QIIME2", "WGCNA", "Co-expression")
+  ),
+
+  # 7. Fecal Microbiota
+  list(
+    year = 2022,
+    title = "Fecal microbiota and their association with heat stress in Bos taurus",
+    journal = "BMC Microbiology",
+    link = "https://doi.org/10.1186/s12866-022-02576-0",
+    problem = "Determining shifts in gut microbial diversity induced by heat stress.",
+    bioinfo = "<ul>
+      <li>16S rRNA QC (Trim Galore) and denoising (**DADA2/QIIME2**).</li>
+      <li>Phylogenetic tree construction.</li>
+    </ul>",
+    stat = "<ul>
+      <li>**Alpha/Beta diversity** metrics calculated (Shannon, Bray-Curtis).</li>
+      <li>**PERMANOVA** for community comparison.</li>
+      <li>Differential abundance tested using **edgeR**.</li>
+      <li>UMAP for visualization.</li>
+    </ul>",
+    img = "img/img7.png",
+    tags = c("QIIME2", "16S rRNA", "Metagenomics", "PERMANOVA", "edgeR")
+  ),
+
+  # 8. Chicken Humoral Immune
+  list(
+    year = 2021,
+    title = "SNP prioritization in targeted sequencing data associated with humoral immune responses in chicken",
+    journal = "Poultry Science",
+    link = "https://doi.org/10.1016/j.psj.2021.101433",
+    problem = "Prioritizing functional variants linked to immune response.",
+    bioinfo = "<ul>
+      <li>Mapped to GRCg6a (**BWA-MEM**); calling with **GATK HaplotypeCaller**.</li>
+      <li>Annotation via **Ensembl VEP**; LD analyses performed.</li>
+    </ul>",
+    stat = "<ul>
+      <li>**Fisher's Exact** and Chi-square tests for association.</li>
+      <li>SNP prioritization model using allelic association and LD parameters.</li>
+      <li>Mixed models for trait association.</li>
+    </ul>",
+    img = "img/img8.png",
+    tags = c("GATK", "Variant Calling", "SNP", "Ensembl VEP", "Association Tests")
+  ),
+
+  # 9. Command Line Tools Review
+  list(
+    year = 2020,
+    title = "Extraordinary Command Line: Basic Data Editing Tools for Biologists Dealing with Sequence Data",
+    journal = "The Open Bioinformatics Journal",
+    link = "https://doi.org/10.2174/1875036202013010137",
+    problem = "Addressing efficiency in manual biological data handling.",
+    bioinfo = "<ul>
+      <li>Demonstrated **sed, awk, grep** and **Bash scripting**.</li>
+      <li>Workflow automation for FASTA/FASTQ/GFF files.</li>
+    </ul>",
+    stat = "N/A (Methodological Tutorial)",
+    tags = c("Linux", "Bash", "Workflow Automation", "Reproducibility")
+  ),
+
+  # 10. Deep Learning SNP Classification
+  list(
+    year = 2020,
+    title = "The application of deep learning for the classification of correct and incorrect SNP genotypes",
+    journal = "Journal of Applied Genetics",
+    link = "https://doi.org/10.1007/s13353-020-00586-0",
+    problem = "Mitigating high False Positive rates in WGS variant calling.",
+    bioinfo = "<ul>
+      <li>Extraction of QC features (Read Depth, MapQ, Strand Bias) from BAMs.</li>
+      <li>**Deep learning** implementation with **Keras/TensorFlow**.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Model evaluation using **ROC curves**, **AUC**, and confusion matrices.</li>
+      <li>Cross-validation for generalizability assessment.</li>
+    </ul>",
+    img = "img/img9.png",
+    tags = c("Deep Learning", "Keras", "TensorFlow", "Feature Engineering", "Python")
+  ),
+
+  # 11. DNA Variation Patterns
+  list(
+    year = 2020,
+    title = "Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome",
+    journal = "Scientific Reports",
+    link = "https://doi.org/10.1038/s41598-020-70380-9",
+    problem = "Comparative analysis of evolutionary pressures on sex chromosomes vs autosomes.",
+    bioinfo = "<ul>
+      <li>WGS mapped (**BWA-MEM**), called via **GATK** and **SAMtools**.</li>
+      <li>Annotation with **snpEff** and SIFT4G.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Diversity statistics (Tajima's D) calculated via **VCFtools**.</li>
+      <li>**Kruskal-Wallis** tests for chromosomal comparisons.</li>
+      <li>Bootstrapping for CIs and Bonferroni correction.</li>
+    </ul>",
+    img = "img/img10.webp",
+    tags = c("Genomics", "GATK", "snpEff", "Diversity Metrics", "R")
+  ),
+
+  # 12. Breed-specific SNPs
+  list(
+    year = 2018,
+    title = "Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomes",
+    journal = "PLOS ONE",
+    link = "https://doi.org/10.1371/journal.pone.0198419",
+    problem = "Discovery of unique genetic markers for breed discrimination.",
+    bioinfo = "<ul>
+      <li>Alignment (**BWA-MEM**), filtering (**VCFtools**, **PyVCF**), realignment (**GATK**).</li>
+      <li>Functional analysis using **KOBAS**, OMIA, and QTLdb.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Overlap and enrichment analyses (Venn diagrams, gene sets).</li>
+      <li>Descriptive analytics of population differentiation.</li>
+    </ul>",
+    img = "img/img11.png",
+    tags = c("WGS", "PyVCF", "Ensembl VEP", "QTLdb", "Population Genetics")
+  )
+)
+
+# --- GENERATOR HTML ---
+for(p in pubs) {
+  # Generate tags HTML
+  tags_html <- paste0(sapply(p$tags, function(t) paste0('<span class="tech-tag-small">', t, '</span>')), collapse = " ")
+  
+  # Conditional Image Rendering:
+  # We check if p$img is not NULL and not an empty string.
+  # If valid, we build the image container HTML. Otherwise, img_html stays empty.
+  img_html <- ""
+  if (!is.null(p$img) && p$img != "") {
+    img_html <- paste0(
+      '<div class="pub-img-container">',
+        '<img src="', p$img, '" alt="Visual Abstract">',
+      '</div>'
+    )
+  }
+  
+  html_string <- paste0(
+    '<details class="pub-card">',
+      '<summary class="pub-header">',
+        '<span class="pub-year">', p$year, '</span>',
+        '<span class="pub-title">', p$title, '</span>',
+        '<span class="pub-journal">', p$journal, '</span>',
+        '<span class="pub-arrow">▼</span>',
+      '</summary>',
+      
+      '<div class="pub-content">',
+        '<div class="pub-grid">',
+        
+          # LEFT COLUMN: Info
+          '<div class="pub-info">',
+            '<div class="method-section">',
+              '<span class="method-title">Bioinformatics</span>',
+              '<div class="method-content">', p$bioinfo, '</div>',
+            '</div>',
+             '<div class="method-section">',
+              '<span class="method-title">Statistics</span>',
+              '<div class="method-content">', p$stat, '</div>',
+            '</div>',
+            '<div style="margin-top: 15px;">', tags_html, '</div>',
+          '</div>',
+          
+          # RIGHT COLUMN: Visuals (Image is now optional)
+          '<div class="pub-visuals">',
+            img_html, # This inserts the image div OR an empty string
+            '<a href="', p$link, '" target="_blank" class="btn-read">Read Publication &rarr;</a>',
+          '</div>',
+          
+        '</div>',
+      '</div>',
+    '</details>'
+  )
+  cat(html_string)
+}
+```
+
+-----
+
+# 💻 Computational Skillset Showcase {.tabset .tabset-pills}
+
+*Below is an interactive gallery of **15 analytical modules** demonstrating my coding expertise using realistic, simulated biological datasets. Click the tabs to explore.*
+
+## 🧬 Genomics
+
+**Focus:** Population structure, GWAS, Variant Quality Control, and Evolution.
+
+### Principal Component Analysis (PCA)
+*Population structure visualization simulating realistic genotype noise.*
+
+```{r demo_pca, fig.align='center', fig.width=9, fig.height=5}
+# Parameters
+n_samples <- 300
+n_snps <- 1000
+
+# Generate base matrix (noise)
+G <- matrix(rnorm(n_samples * n_snps), nrow = n_samples)
+
+# Define 3 populations with subtle shifts in allele frequencies
+# Pop 1 (Rows 1-100): Shift in first 100 SNPs
+G[1:100, 1:100] <- G[1:100, 1:100] + 0.5
+# Pop 2 (Rows 101-200): Shift in SNPs 50-150
+G[101:200, 50:150] <- G[101:200, 50:150] - 0.6
+# Pop 3 (Rows 201-300): Shift in SNPs 800-900
+G[201:300, 800:900] <- G[201:300, 800:900] + 0.7
+
+groups <- c(rep("Holstein", 100), rep("Jersey", 100), rep("Angus", 100))
+
+# Perform PCA
+pca_res <- prcomp(G, scale. = TRUE)
+var_explained <- round(summary(pca_res)$importance[2, 1:2] * 100, 1)
+df_pca <- data.frame(PC1 = pca_res$x[,1], PC2 = pca_res$x[,2], Breed = groups)
+
+ggplot(df_pca, aes(x = PC1, y = PC2, fill = Breed)) +
+  geom_point(size = 3, shape = 21, color = "white", alpha = 0.7) +
+  stat_ellipse(aes(color = Breed), geom = "polygon", alpha = 0.1, level = 0.95, show.legend = FALSE) +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  theme_minimal() +
+  labs(title = "Population Structure (PCA)",
+       subtitle = "Simulated genotype matrix (300 samples x 1k SNPs)",
+       x = paste0("PC1 (", var_explained[1], "% Var)"),
+       y = paste0("PC2 (", var_explained[2], "% Var)"))
+```
+
+### Manhattan Plot (GWAS)
+
+*Genome-Wide Association Study with LD-like signal peaks.*
+
+```{r demo_gwas, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=4}
+n_snps <- 5000
+gwas_df <- data.frame(
+  SNP = paste0("rs", 1:n_snps),
+  Chr = rep(1:5, each = 1000),
+  Pos = rep(1:1000, 5),
+  # Background noise (uniform distribution of p-values)
+  PVal = runif(n_snps)
+)
+
+# Simulate Linkage Disequilibrium (LD) Peak on Chr 2
+center <- 1500
+width <- 50
+peak_signal <- 10^-seq(1, 8, length.out = width)
+gwas_df$PVal[(center-width/2):(center+width/2-1)] <- peak_signal * runif(width, 0.1, 1)
+
+gwas_df <- gwas_df %>% mutate(logP = -log10(PVal))
+
+ggplot(gwas_df, aes(x = Pos, y = logP, color = as.factor(Chr))) +
+  geom_point(alpha = 0.6, size = 1) +
+  scale_color_brewer(palette = "Set1") +
+  geom_hline(yintercept = -log10(5e-8), linetype = "dashed", color = "red", alpha = 0.5) +
+  theme_minimal() +
+  facet_grid(. ~ Chr, scales = "free_x", space = "free_x", switch = "x") +
+  theme(axis.text.x = element_blank(), panel.grid.major.x = element_blank(), legend.position = "none") +
+  labs(title = "Manhattan Plot", y = "-Log10 P-Value", x = "Chromosome")
+```
+
+### Variant QC (Read Depth)
+
+*Quality Control: Realistic skewed distribution of Read Depth.*
+
+```{r demo_vcf, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Simulate sequencing depth (Negative Binomial distribution is common for read counts)
+dp_values <- rnbinom(5000, size = 5, mu = 40)
+
+df_qc <- data.frame(Depth = dp_values)
+
+ggplot(df_qc, aes(x = Depth)) +
+  geom_histogram(aes(y = ..density..), binwidth = 2, fill = "#34495e", color = "white", alpha = 0.8) +
+  geom_density(color = "#e74c3c", size = 1, adjust = 2) +
+  scale_x_continuous(limits = c(0, 150)) +
+  theme_light() +
+  labs(title = "Variant Quality Control (DP)", 
+       subtitle = "Distribution of sequencing depth across variants",
+       x = "Read Depth (DP)", y = "Density") +
+  geom_vline(xintercept = 40, linetype="dashed", color="orange") +
+  annotate("text", x = 60, y = 0.02, label = "Mean Depth ~ 40x", color = "orange")
+```
+
+### Phylogenetic Tree
+
+*Hierarchical clustering of genetic distances.*
+
+```{r demo_tree, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Simulate distance matrix with some structure
+m <- matrix(rnorm(100), nrow = 10)
+rownames(m) <- paste0("Species_", LETTERS[1:10])
+dist_mat <- dist(m)
+hc <- hclust(dist_mat, method = "ward.D2")
+
+par(mar=c(2,2,2,2))
+plot(hc, hang = -1, main = "Phylogenetic Tree Reconstruction", 
+     sub = "Ward's method clustering", xlab = "",
+     col = "#2980b9", lwd = 2)
+rect.hclust(hc, k = 3, border = "red") # Highlight 3 clades
+```
+
+## 🔬 Transcriptomics
+
+**Focus:** Expression profiling, Pathways, and Single-Cell.
+
+### Volcano Plot
+
+*Differential Expression: Realistic relationship between Fold Change and P-value.*
+
+```{r demo_volcano, fig.align='center', fig.width=9, fig.height=5}
+n_genes <- 3000
+# Generate LogFC: mostly close to 0, heavy tails
+logfc <- c(rnorm(2500, 0, 0.5), rnorm(250, 2, 1), rnorm(250, -2, 1))
+# Generate P-values dependent on LogFC (stronger effect -> smaller p-value)
+noise <- rnorm(n_genes, 0, 2)
+log_pval <- -(abs(logfc) * 3) + noise 
+pvals <- 10^log_pval
+pvals[pvals > 1] <- 1
+
+df_vol <- data.frame(
+  Gene = paste0("G", 1:n_genes),
+  log2FoldChange = logfc,
+  padj = p.adjust(pvals, method = "BH")
+) %>%
+  mutate(
+    Group = case_when(
+      log2FoldChange > 1 & padj < 0.05 ~ "Up-regulated",
+      log2FoldChange < -1 & padj < 0.05 ~ "Down-regulated",
+      TRUE ~ "NS"
+    )
+  )
+
+ggplot(df_vol, aes(x = log2FoldChange, y = -log10(padj), color = Group)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  scale_color_manual(values = c("steelblue", "grey85", "firebrick")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", alpha = 0.5) +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed", alpha = 0.5) +
+  theme_minimal() +
+  labs(title = "Differential Expression (Volcano Plot)", 
+       subtitle = "Simulated DESeq2 output with FDR correction",
+       x = "Log2 Fold Change", y = "-Log10 Adjusted P-value")
+```
+
+### Single-Cell UMAP
+
+*Simulating cellular trajectories/clusters.*
+
+```{r demo_sc, fig.align='center', fig.width=9, fig.height=5}
+# Create a "trajectory" shape rather than just blobs
+t <- seq(0, 2*pi, length.out = 300)
+x <- c(cos(t), cos(t) + 2.5, cos(t) + 1.2) + rnorm(900, 0, 0.2)
+y <- c(sin(t), sin(t) + 1, sin(t) - 2) + rnorm(900, 0, 0.2)
+clusters <- c(rep("Stem", 300), rep("Progenitor", 300), rep("Differentiated", 300))
+
+df_umap <- data.frame(UMAP1 = x, UMAP2 = y, CellType = clusters)
+
+ggplot(df_umap, aes(UMAP1, UMAP2, color = CellType)) +
+  geom_point(size = 0.8, alpha = 0.6) +
+  scale_color_manual(values = c("#9b59b6", "#3498db", "#e74c3c")) +
+  theme_void() +
+  theme(legend.position = "right") +
+  labs(title = "Single-Cell UMAP Projection", subtitle = "Developmental Trajectory Simulation")
+```
+
+### Pathway Enrichment
+
+*Dotplot for GSEA results.*
+
+```{r demo_pathway, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+df_path <- data.frame(
+  Pathway = c("Cell Cycle", "DNA Replication", "P53 Signaling", "Apoptosis", "MAPK Signaling", "Ribosome"),
+  Count = c(45, 30, 25, 20, 15, 10),
+  GeneRatio = c(0.15, 0.12, 0.09, 0.08, 0.05, 0.03),
+  p.adjust = c(1e-9, 1e-6, 0.001, 0.01, 0.03, 0.045)
+)
+df_path$Pathway <- factor(df_path$Pathway, levels = df_path$Pathway[order(df_path$GeneRatio)])
+
+ggplot(df_path, aes(x = GeneRatio, y = Pathway)) +
+  geom_point(aes(size = Count, color = p.adjust)) +
+  scale_color_gradient(low = "red", high = "blue") +
+  theme_light() +
+  labs(title = "KEGG Pathway Enrichment", x = "Gene Ratio", y = "")
+```
+
+### Heatmap
+
+*Visualizing co-expression modules.*
+
+```{r demo_heatmap, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Create structured matrix
+mat <- matrix(rnorm(400), nrow = 20, ncol = 20)
+# Add "modules" of correlation
+mat[1:10, 1:10] <- mat[1:10, 1:10] + 2
+mat[11:20, 11:20] <- mat[11:20, 11:20] - 2
+
+df_h <- as.data.frame(mat)
+colnames(df_h) <- paste0("S", 1:20)
+df_h$Gene <- paste0("G", 1:20)
+df_h_long <- pivot_longer(df_h, cols = -Gene, names_to = "Sample", values_to = "Exp")
+
+ggplot(df_h_long, aes(Sample, Gene, fill = Exp)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#2c7bb6", mid = "#ffffbf", high = "#d7191c") +
+  theme_minimal() +
+  theme(axis.text.x = element_blank()) +
+  labs(title = "Gene Expression Heatmap", x = "Samples (n=20)", y = "Genes (n=20)")
+```
+
+## 🏥 Clinical & Stats
+
+**Focus:** Survival, Longitudinal Models, and Correlations.
+
+### Survival Analysis (Kaplan-Meier)
+
+*Time-to-event analysis with realistic censoring.*
+
+```{r demo_km, fig.align='center', fig.width=9, fig.height=5}
+n <- 100
+# Generate Weibull distributed times (more realistic for biological failure)
+T_treat <- rweibull(n, shape = 1.5, scale = 100)
+T_placebo <- rweibull(n, shape = 1.5, scale = 60) # Placebo dies faster
+
+# Combine
+df_surv <- data.frame(
+  Time = c(T_treat, T_placebo),
+  Group = rep(c("Treatment", "Placebo"), each = n)
+)
+
+# Add random censoring (patients leaving study)
+cens_time <- runif(2*n, 0, 150)
+df_surv$Status <- ifelse(df_surv$Time < cens_time, 1, 0) # 1=Event, 0=Censored
+df_surv$TimeObs <- pmin(df_surv$Time, cens_time)
+
+fit <- survfit(Surv(TimeObs, Status) ~ Group, data = df_surv)
+
+# Plot
+plot(fit, col=c("red", "blue"), lwd=3, xlab="Time (Months)", ylab="Survival Probability",
+     main="Kaplan-Meier Analysis (Simulated Clinical Trial)", frame.plot=FALSE)
+legend("topright", levels(factor(df_surv$Group)), col=c("red", "blue"), lwd=3, bty="n")
+grid(col="grey90")
+```
+
+### Linear Mixed Models (LMM)
+
+*Longitudinal data with realistic subject variance.*
+
+```{r demo_lmm, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+subjects <- 20
+times <- 0:5
+# Random intercepts and slopes
+intercepts <- rnorm(subjects, 10, 2)
+slopes <- rnorm(subjects, 0.5, 0.2)
+
+df_lmm <- data.frame()
+for(i in 1:subjects){
+  # Add group effect: Group B increases faster
+  grp <- ifelse(i > 10, "B", "A")
+  slope_eff <- slopes[i] + ifelse(grp=="B", 1.5, 0)
+  
+  y <- intercepts[i] + slope_eff * times + rnorm(length(times), 0, 1)
+  df_lmm <- rbind(df_lmm, data.frame(ID=paste0("S",i), Time=times, Value=y, Group=grp))
+}
+
+ggplot(df_lmm, aes(x=Time, y=Value, group=ID, color=Group)) +
+  geom_line(alpha=0.4) +
+  stat_summary(aes(group=Group), fun=mean, geom="line", size=2) +
+  scale_color_manual(values=c("#95a5a6", "#e74c3c")) +
+  theme_bw() +
+  labs(title="Longitudinal Response (LMM)", subtitle="Group A vs B treatment trajectories")
+```
+
+### Correlation Matrix
+
+*Clinical variable relationships.*
+
+```{r demo_corr, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Simulate correlated multivariate data
+sigma <- matrix(c(1, 0.8, -0.5, 0.8, 1, -0.3, -0.5, -0.3, 1), 3, 3)
+data_corr <- mvrnorm(n = 50, mu = c(0,0,0), Sigma = sigma)
+colnames(data_corr) <- c("BMI", "Insulin", "Activity")
+cormat <- round(cor(data_corr), 2)
+melted <- as.data.frame(as.table(cormat))
+
+ggplot(melted, aes(Var1, Var2, fill=Freq)) + 
+  geom_tile(color="white") + 
+  geom_text(aes(label=Freq)) +
+  scale_fill_gradient2(low="#2980b9", mid="white", high="#c0392b") + 
+  theme_minimal() + labs(title="Clinical Correlations", x="", y="")
+```
+
+## 🦠 Microbiome
+
+**Focus:** Community Diversity and Composition.
+
+### Alpha Diversity
+
+*Comparing species richness (Non-normal distributions).*
+
+```{r demo_alpha, fig.align='center', fig.width=9, fig.height=5}
+# Generate Gamma distributed data (common for counts/diversity)
+grp_a <- rgamma(40, shape=20, scale=0.2)
+grp_b <- rgamma(40, shape=15, scale=0.2)
+
+df_alpha <- data.frame(Index = c(grp_a, grp_b), Group = rep(c("Healthy", "Dysbiosis"), each=40))
+
+ggplot(df_alpha, aes(x=Group, y=Index, fill=Group)) + 
+  geom_violin(alpha=0.3, trim=FALSE) +
+  geom_boxplot(width=0.2, alpha=0.8) +
+  scale_fill_manual(values=c("#e74c3c", "#2ecc71")) + 
+  theme_classic() + 
+  labs(title="Microbiome Alpha Diversity (Shannon)", y="Diversity Index")
+```
+
+### Beta Diversity (PCoA)
+
+*Visualizing community separation.*
+
+```{r demo_beta, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Create two multivariate normal distributions
+g1 <- mvrnorm(25, mu=c(2, 2), Sigma=matrix(c(1,0.5,0.5,1),2))
+g2 <- mvrnorm(25, mu=c(-1, -1), Sigma=matrix(c(1,-0.2,-0.2,1),2))
+df_beta <- rbind(data.frame(g1, Grp="Ctrl"), data.frame(g2, Grp="Treat"))
+colnames(df_beta)[1:2] <- c("PCoA1", "PCoA2")
+
+ggplot(df_beta, aes(PCoA1, PCoA2, color=Grp)) + 
+  geom_point(size=3) + 
+  stat_ellipse() + 
+  theme_minimal() + 
+  labs(title="Beta Diversity (Bray-Curtis PCoA)", subtitle="Clustering of microbial communities")
+```
+
+## 🤖 Pharma & ML
+
+**Focus:** Drug Discovery and Machine Learning.
+
+### Dose-Response (S-Curve)
+
+*Pharmacodynamics using 4-Parameter Logistic Model.*
+
+```{r demo_dose, fig.align='center', fig.width=9, fig.height=5}
+# Define 4-Parameter Logistic Function
+f_4pl <- function(x, b, c, d, e) { c + (d - c) / (1 + exp(b * (log(x) - log(e)))) }
+
+concs <- c(0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)
+# Parameters: b=Slope, c=Bottom, d=Top, e=IC50
+true_y <- f_4pl(concs, b = -1.5, c = 5, d = 100, e = 50) 
+
+# Add biological replicates and noise
+df_dr <- data.frame(
+  Conc = rep(concs, each=3)
+)
+df_dr$Resp <- rep(true_y, each=3) + rnorm(nrow(df_dr), 0, 5) # Noise
+
+ggplot(df_dr, aes(x=Conc, y=Resp)) + 
+  geom_point(size=2.5, alpha=0.6, color="#8e44ad") + 
+  geom_function(fun = function(x) f_4pl(x, -1.5, 5, 100, 50), color="#2c3e50", size=1) +
+  scale_x_log10() + 
+  theme_bw() + 
+  labs(title="Drug Dose-Response (Sigmoidal)", 
+       subtitle="IC50 = 50 nM (4-Parameter Logistic Fit)",
+       x="Concentration (nM) [Log]", y="Cell Viability (%)") +
+  geom_vline(xintercept=50, linetype="dashed", color="red")
+```
+
+### ROC Curve (Classification)
+
+*Model performance metrics.*
+
+```{r demo_roc, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Simulate scores for Positive and Negative classes
+neg_scores <- rnorm(500, mean=0.3, sd=0.15)
+pos_scores <- rnorm(500, mean=0.7, sd=0.15) # Better separation
+
+# Calculate ROC points manually
+thresholds <- seq(0, 1, 0.01)
+tpr <- sapply(thresholds, function(t) mean(pos_scores > t))
+fpr <- sapply(thresholds, function(t) mean(neg_scores > t))
+
+df_roc <- data.frame(FPR=fpr, TPR=tpr)
+
+ggplot(df_roc, aes(x=FPR, y=TPR)) + 
+  geom_path(color="#27ae60", size=1.5) +
+  geom_abline(linetype="dashed", color="grey") +
+  theme_light() + 
+  annotate("text", x=0.75, y=0.25, label="AUC = 0.96", size=6, color="#27ae60") +
+  labs(title="ROC Analysis: SNP Classifier", x="1 - Specificity (FPR)", y="Sensitivity (TPR)")
+```
+
+# 🎓 Education
+
+  * **MBA in Healthcare Management** | Poznan Univ. of Medical Sciences (2024-Current)
+  * **Ph.D. in Biological Sciences** | Wroclaw Univ. of Env. and Life Sciences (2019-2024)
+  * **M.Sc. in Bioinformatics** | Wroclaw Univ. of Env. and Life Sciences (2017-2019)
+
+-----
+
+### Contact
+
+📧 bartosz.w.czech@gmail.com
