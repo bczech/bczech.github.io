@@ -80,7 +80,7 @@ details[open] .pub-arrow { transform: rotate(180deg); }
 
 # 👋 Professional Summary
 
-I am a **Senior Bioinformatician** and **Product Owner** with over 5 years of experience bridging the gap between computational biology and pharmaceutical R\&D. Currently at **7N**, I lead the development of scalable **R/Shiny applications** and **NGS workflows** for a Big Pharma client.
+I am a **Senior Bioinformatician** with over 6 years of experience bridging the gap between computational biology and pharmaceutical R\&D. Currently at **7N**, I develop of scalable **R/Shiny applications** and analyze NGS and MS data for a Big Pharma client.
 
 I hold a **Ph.D. in Biological Sciences** and am currently pursuing an **MBA in Healthcare Management**, combining deep technical expertise with strategic business insight.
 
@@ -89,8 +89,8 @@ I hold a **Ph.D. in Biological Sciences** and am currently pursuing an **MBA in 
 # 🛠 Tech Stack
 
 ```{r tech_stack, echo=FALSE, results='asis'}
-skills_hard <- c("R & Shiny", "Python", "WDL & Nextflow", "AWS & Cloud", "Docker", "SQL & Snowflake", "NGS Analysis", "Git")
-skills_soft <- c("Agile / Scrum", "Product Ownership")
+skills_hard <- c("R & Shiny", "Python", "WDL & Nextflow", "Docker", "SQL & Snowflake", "NGS Analysis", "Bash", "Mass Spectrometry", "Git")
+skills_soft <- c("Agile / Scrum", "Reproducible work")
 
 cat('<div style="margin-bottom: 30px;">')
 for(s in skills_hard) cat(sprintf('<span class="my-badge">%s</span>\n', s))
@@ -115,7 +115,6 @@ jobs <- list(
       <li><strong>Proteomics data:</strong> Analysis of mass spectrometry (MS) data for phosphoproteomics.</li>
       <li><strong>R/Shiny Development:</strong> Developer of interactive dashboards for data analysis.</li>
       <li><strong>Pipeline Engineering:</strong> Maintaining production-grade WDL workflows for NGS data.</li>
-      <li><strong>Product Ownership:</strong> Bridging scientific needs with IT solutions in an Agile environment.</li>
     </ul>"
   ),
   list(
