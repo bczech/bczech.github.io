@@ -1103,9 +1103,10 @@ ggplot(df_beta, aes(PCoA1, PCoA2, color=Grp)) +
 
 # 🎓 Education
 
-  * **MBA in Healthcare Management** | Poznan Univ. of Medical Sciences (2024-Current)
+  * **MBA in Healthcare Management** | Poznan Univ. of Medical Sciences (2025-Current)
   * **Ph.D. in Biological Sciences** | Wroclaw Univ. of Env. and Life Sciences (2019-2024)
   * **M.Sc. in Bioinformatics** | Wroclaw Univ. of Env. and Life Sciences (2017-2019)
+  * **B.Sc. in Bioinformatics** | Wroclaw Univ. of Env. and Life Sciences (2014-2017)
 
 -----
 
