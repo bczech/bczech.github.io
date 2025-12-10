@@ -678,9 +678,308 @@ ggplot(df_h_long, aes(Sample, Gene, fill = Exp)) +
   labs(title = "Gene Expression Heatmap", x = "Samples (n=20)", y = "Genes (n=20)")
 ```
 
+### scRNA Pseudotime Trajectory
+
+*Differentiation analysis (Monocle style).*
+  
+```{r demo_pseudo, fig.align='center', fig.width=9, fig.height=5}
+set.seed(101)
+t <- seq(0, 10, length.out=400)
+branch1 <- data.frame(Time=t, Expr=sin(t) + rnorm(400, 0, 0.2), Branch="Lineage A")
+branch2 <- data.frame(Time=t, Expr=sin(t) + 0.5*t + rnorm(400, 0, 0.2), Branch="Lineage B")
+pseudo <- rbind(branch1, branch2)
+
+ggplot(pseudo, aes(Time, Expr, color=Branch)) +
+  geom_point(alpha=0.4) + geom_smooth(se=FALSE, size=1.5) +
+  theme_classic() + scale_color_manual(values=c("#8e44ad", "#27ae60")) +
+  labs(title="Pseudotime Trajectory", subtitle="Gene Expression during Differentiation", x="Pseudotime", y="Expression Level")
+```
+
+### DotPlot (Gene Markers)
+
+*Expression intensity and percentage (Seurat style).*
+  
+```{r demo_dot, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+genes <- c("CD3D", "CD19", "CD14", "MS4A1", "GNLY", "NKG7")
+clusters <- c("T-Cells", "B-Cells", "Monocytes", "NK-Cells")
+df_dot <- expand.grid(Gene=genes, Cluster=clusters)
+set.seed(5)
+df_dot$AvgExp <- runif(nrow(df_dot), 0, 3)
+df_dot$Pct <- runif(nrow(df_dot), 0, 100)
+
+df_dot$AvgExp[df_dot$Gene=="CD3D" & df_dot$Cluster=="T-Cells"] <- 2.8
+df_dot$Pct[df_dot$Gene=="CD3D" & df_dot$Cluster=="T-Cells"] <- 90
+
+ggplot(df_dot, aes(Gene, Cluster)) +
+  geom_point(aes(size=Pct, color=AvgExp)) +
+  scale_color_gradient(low="lightgrey", high="blue") +
+  theme_bw() + labs(title="Marker Gene Expression (DotPlot)", size="% Expressed", color="Avg Exp")
+```
+
+## 🧪 Proteomics & Epigenomics (ATAC/Methyl)
+
+**Focus:** Mass Spec Intensity, Motif Analysis, Chromatin Accessibility, and Methylation.
+
+### Proteome Dynamic Range
+
+*Rank-Abundance plot typical for Mass Spectrometry data.*
+  
+```{r demo_dynamic_range, fig.align='center', fig.width=9, fig.height=5}
+n_prot <- 2000
+# Simulate log-normal intensities typical for MS
+intensities <- rlnorm(n_prot, meanlog = 10, sdlog = 2)
+intensities <- sort(intensities, decreasing = TRUE)
+
+df_range <- data.frame(
+  Rank = 1:n_prot,
+  Intensity = intensities,
+  Label = NA
+)
+
+# Highlight high abundance (e.g. Albumin) and low abundance (Biomarkers)
+df_range$Label[c(1, 50, 1950, 2000)] <- c("Albumin", "ApoA1", "IL-6", "TP53")
+
+ggplot(df_range, aes(x = Rank, y = Intensity)) +
+  geom_line(color = "grey", size = 0.5) +
+  geom_point(alpha = 0.6, color = "#34495e") +
+  scale_y_log10() +
+  geom_text(aes(label = Label), vjust = -0.5, hjust = -0.1, color = "#e74c3c", fontface="bold") +
+  theme_bw() +
+  labs(title = "Proteome Dynamic Range", 
+       subtitle = "Mass Spec Intensity Distribution (Rank-Abundance)",
+       x = "Protein Rank", y = "Intensity (Log10 LFQ)")
+```
+
+### Proteomics Volcano
+
+*Differential Protein Abundance.*
+  
+```{r demo_prot, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+df_p <- data.frame(FC=rnorm(1000), P=runif(1000))
+df_p$P[1:5] <- c(1e-6, 1e-5, 1e-5, 1e-4, 1e-4); df_p$FC[1:5] <- c(3, -3, 2.5, -2.5, 4)
+df_p$Label <- NA; df_p$Label[1:5] <- c("TP53", "KRAS", "MYC", "PTEN", "EGFR")
+
+ggplot(df_p, aes(FC, -log10(P))) +
+  geom_point(aes(color=P<0.01), alpha=0.5) +
+  scale_color_manual(values=c("grey", "purple")) +
+  geom_text(aes(label=Label), vjust=-1, size=3) +
+  theme_minimal() + theme(legend.position="none") + labs(title="Proteomics Differential Abundance")
+```
+
+### Motif Sequence Logo (ATAC-seq)
+
+*Transcription Factor Binding Motif (CTCF-like).*
+  
+```{r demo_seqlogo, fig.align='center', fig.width=9, fig.height=4}
+# NOTE: Requires 'ggseqlogo' package
+if(requireNamespace("ggseqlogo", quietly=TRUE)){
+  library(ggseqlogo)
+  # Simulated Position Weight Matrix (PWM) for a CTCF-like motif
+  # Rows: A, C, G, T; Cols: Positions
+  pwm_matrix <- matrix(c(
+    0.1, 0.9, 0.0, 0.0,  # Pos 1: C dominant
+    0.0, 0.1, 0.0, 0.9,  # Pos 2: T dominant
+    0.8, 0.1, 0.1, 0.0,  # Pos 3: A dominant
+    0.9, 0.0, 0.1, 0.0,  # Pos 4: A dominant
+    0.0, 0.0, 1.0, 0.0,  # Pos 5: G conserved
+    0.1, 0.8, 0.1, 0.0,  # Pos 6: C dominant
+    0.0, 0.0, 0.9, 0.1,  # Pos 7: G dominant
+    0.0, 0.1, 0.0, 0.9   # Pos 8: T dominant
+  ), nrow=4, dimnames=list(c("A","C","G","T")))
+  
+  ggseqlogo(pwm_matrix) + 
+    theme_minimal() + 
+    labs(title="Transcription Factor Motif (SeqLogo)", subtitle="Enriched in ATAC-seq peaks (CTCF-like)")
+} else {
+  print("Please install 'ggseqlogo' to view this plot.")
+}
+```
+
+### Differential Methylation
+
+*Volcano plot for CpG sites.*
+  
+```{r demo_methyl, fig.align='center', fig.width=9, fig.height=5}
+# Simulate Delta Beta values (-1 to 1)
+delta_beta <- rnorm(5000, 0, 0.1)
+# Add some hyper/hypo methylated sites
+delta_beta[1:50] <- runif(50, 0.2, 0.6)
+delta_beta[51:100] <- runif(50, -0.6, -0.2)
+pvals <- runif(5000)
+pvals[1:100] <- 10^-runif(100, 3, 10) # Significant
+
+df_meth <- data.frame(DeltaBeta=delta_beta, P=pvals)
+df_meth$Sig <- ifelse(df_meth$P < 0.01 & abs(df_meth$DeltaBeta) > 0.2, "DMR", "NS")
+
+ggplot(df_meth, aes(DeltaBeta, -log10(P), color=Sig)) +
+  geom_point(alpha=0.5, size=1.2) +
+  scale_color_manual(values=c("orange", "grey")) +
+  geom_vline(xintercept=c(-0.2, 0.2), linetype="dashed") +
+  theme_classic() +
+  labs(title="Differential Methylation Analysis", x="Delta Beta (Methylation Difference)", y="-Log10 P-value")
+```
+
+### TSS Enrichment Profile
+
+*Chromatin accessibility around Transcription Start Sites.*
+  
+```{r demo_tss, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=4}
+x <- seq(-2000, 2000, 20)
+# Gaussian peak for accessible chromatin
+y <- 60 * exp(-x^2 / (2*300^2)) + rnorm(length(x), 5, 2) 
+
+ggplot(data.frame(x,y), aes(x,y)) + 
+  geom_area(fill="#27ae60", alpha=0.5) + 
+  geom_line(color="#2c3e50") +
+  theme_classic() + 
+  labs(title="TSS Enrichment Profile (ATAC-seq)", x="Distance from TSS (bp)", y="Normalized Signal")
+```
+
+### Chromatin States
+
+*ChromHMM style heatmap.*
+  
+```{r demo_chromhmm, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+states <- c("Promoter", "Enhancer", "Transcribed", "Repressed", "Heterochrom")
+samples <- paste0("Sample_", 1:10)
+df_chrom <- expand.grid(State=states, Sample=samples)
+df_chrom$Enrichment <- runif(50, 0, 10)
+df_chrom$Enrichment[df_chrom$State=="Promoter"] <- df_chrom$Enrichment[df_chrom$State=="Promoter"] + 5
+
+ggplot(df_chrom, aes(Sample, State, fill=Enrichment)) +
+  geom_tile() +
+  scale_fill_viridis_c(option="magma") +
+  theme_minimal() +
+  labs(title="Chromatin State Enrichment (ChromHMM)", x="", y="")
+```
+
+## 💊 Pharma & CRISPR & ML
+
+**Focus:** Drug Discovery, CRISPR Screens, and Machine Learning.
+
+### CRISPR Gene Rank Plot
+
+*Genome-wide ranking of gene essentiality (MAGeCK style).*
+  
+```{r demo_crispr, fig.align='center', fig.width=9, fig.height=5}
+n_genes <- 2000
+
+scores <- c(rnorm(1800, mean = 0, sd = 0.3),
+            rnorm(150, mean = -1.5, sd = 0.6),
+            rnorm(50, mean = 1.2, sd = 0.5)) 
+
+df_rank <- data.frame(Score = scores)
+df_rank <- df_rank[order(df_rank$Score), , drop = FALSE]
+df_rank$Rank <- 1:nrow(df_rank)
+
+df_rank$Type <- "Neutral"
+df_rank$Type[df_rank$Score < -1] <- "Essential"
+df_rank$Type[df_rank$Score > 1] <- "Resistance"
+
+df_rank$Label <- NA
+df_rank$Label[1:5] <- c("RPA1", "PCNA", "POLR2A", "MYC", "MCM2")
+n <- nrow(df_rank)
+df_rank$Label[(n-4):n] <- c("PTEN", "NF1", "KEAP1", "TP53", "RB1")
+
+ggplot(df_rank, aes(x = Rank, y = Score, color = Type)) +
+  geom_point(size = 1.5, alpha = 0.7) +
+  scale_color_manual(values = c("firebrick", "grey85", "dodgerblue")) +
+  geom_text(aes(label = Label), vjust = ifelse(df_rank$Score > 0, -1, 1.5), 
+            size = 3, fontface = "bold", color = "black", check_overlap = TRUE) +
+  geom_hline(yintercept = c(-1, 1), linetype = "dashed", color = "grey50") +
+  theme_classic() +
+  labs(title = "CRISPR Screen Gene Ranking", 
+       subtitle = "Genome-wide Essentiality (Negative Selection) vs Resistance (Positive Selection)",
+       x = "Gene Rank", 
+       y = "Beta Score (Log2FC)",
+       color = "Gene Category") +
+  theme(legend.position = "top")
+```
+### Feature Importance (RF)
+
+*Biomarker discovery.*
+  
+```{r demo_imp, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+imp <- data.frame(Feat=paste0("M_", 1:10), Val=sort(rnorm(10, 10, 2)))
+ggplot(imp, aes(reorder(Feat, Val), Val)) + geom_col(fill="steelblue") + coord_flip() +
+  theme_minimal() + labs(title="Feature Importance (Random Forest)", x="", y="Mean Decrease Gini")
+```
+
+### Dose-Response (S-Curve)
+
+*Pharmacodynamics using 4-Parameter Logistic Model.*
+
+```{r demo_dose, fig.align='center', fig.width=9, fig.height=5}
+# Define 4-Parameter Logistic Function
+f_4pl <- function(x, b, c, d, e) { c + (d - c) / (1 + exp(b * (log(x) - log(e)))) }
+
+concs <- c(0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)
+# Parameters: b=Slope, c=Bottom, d=Top, e=IC50
+true_y <- f_4pl(concs, b = -1.5, c = 5, d = 100, e = 50) 
+
+# Add biological replicates and noise
+df_dr <- data.frame(
+  Conc = rep(concs, each=3)
+)
+df_dr$Resp <- rep(true_y, each=3) + rnorm(nrow(df_dr), 0, 5) # Noise
+
+ggplot(df_dr, aes(x=Conc, y=Resp)) + 
+  geom_point(size=2.5, alpha=0.6, color="#8e44ad") + 
+  geom_function(fun = function(x) f_4pl(x, -1.5, 5, 100, 50), color="#2c3e50", size=1) +
+  scale_x_log10() + 
+  theme_bw() + 
+  labs(title="Drug Dose-Response (Sigmoidal)", 
+       subtitle="IC50 = 50 nM (4-Parameter Logistic Fit)",
+       x="Concentration (nM) [Log]", y="Cell Viability (%)") +
+  geom_vline(xintercept=50, linetype="dashed", color="red")
+```
+
+### ROC Curve (Classification)
+
+*Model performance metrics.*
+
+```{r demo_roc, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
+# Simulate scores for Positive and Negative classes
+neg_scores <- rnorm(500, mean=0.3, sd=0.15)
+pos_scores <- rnorm(500, mean=0.7, sd=0.15) # Better separation
+
+# Calculate ROC points manually
+thresholds <- seq(0, 1, 0.01)
+tpr <- sapply(thresholds, function(t) mean(pos_scores > t))
+fpr <- sapply(thresholds, function(t) mean(neg_scores > t))
+
+df_roc <- data.frame(FPR=fpr, TPR=tpr)
+
+ggplot(df_roc, aes(x=FPR, y=TPR)) + 
+  geom_path(color="#27ae60", size=1.5) +
+  geom_abline(linetype="dashed", color="grey") +
+  theme_light() + 
+  annotate("text", x=0.75, y=0.25, label="AUC = 0.96", size=6, color="#27ae60") +
+  labs(title="ROC Analysis: SNP Classifier", x="1 - Specificity (FPR)", y="Sensitivity (TPR)")
+```
+
+
 ## 🏥 Clinical & Stats
 
-**Focus:** Survival, Longitudinal Models, and Correlations.
+**Focus:** Survival, Longitudinal Models, Meta-Analysis, and Correlations.
+
+### Forest Plot (Meta-analysis)
+
+*Odds Ratios visualization.*
+  
+```{r demo_forest, fig.align='center', fig.width=9, fig.height=4}
+df_f <- data.frame(
+  Study=c("Study A", "Study B", "Study C", "Pooled"),
+  OR=c(1.2, 0.8, 1.5, 1.1),
+  Low=c(0.9, 0.5, 1.1, 0.95),
+  High=c(1.5, 1.2, 2.0, 1.3)
+)
+ggplot(df_f, aes(y=Study, x=OR, xmin=Low, xmax=High)) +
+  geom_point(size=3, shape=15) + geom_errorbarh(height=0.2) +
+  geom_vline(xintercept=1, linetype="dashed", color="red") +
+  theme_bw() + labs(title="Forest Plot (Meta-Analysis)", x="Odds Ratio (95% CI)", y="")
+```
+
 
 ### Survival Analysis (Kaplan-Meier)
 
@@ -801,62 +1100,6 @@ ggplot(df_beta, aes(PCoA1, PCoA2, color=Grp)) +
   labs(title="Beta Diversity (Bray-Curtis PCoA)", subtitle="Clustering of microbial communities")
 ```
 
-## 🤖 Pharma & ML
-
-**Focus:** Drug Discovery and Machine Learning.
-
-### Dose-Response (S-Curve)
-
-*Pharmacodynamics using 4-Parameter Logistic Model.*
-
-```{r demo_dose, fig.align='center', fig.width=9, fig.height=5}
-# Define 4-Parameter Logistic Function
-f_4pl <- function(x, b, c, d, e) { c + (d - c) / (1 + exp(b * (log(x) - log(e)))) }
-
-concs <- c(0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)
-# Parameters: b=Slope, c=Bottom, d=Top, e=IC50
-true_y <- f_4pl(concs, b = -1.5, c = 5, d = 100, e = 50) 
-
-# Add biological replicates and noise
-df_dr <- data.frame(
-  Conc = rep(concs, each=3)
-)
-df_dr$Resp <- rep(true_y, each=3) + rnorm(nrow(df_dr), 0, 5) # Noise
-
-ggplot(df_dr, aes(x=Conc, y=Resp)) + 
-  geom_point(size=2.5, alpha=0.6, color="#8e44ad") + 
-  geom_function(fun = function(x) f_4pl(x, -1.5, 5, 100, 50), color="#2c3e50", size=1) +
-  scale_x_log10() + 
-  theme_bw() + 
-  labs(title="Drug Dose-Response (Sigmoidal)", 
-       subtitle="IC50 = 50 nM (4-Parameter Logistic Fit)",
-       x="Concentration (nM) [Log]", y="Cell Viability (%)") +
-  geom_vline(xintercept=50, linetype="dashed", color="red")
-```
-
-### ROC Curve (Classification)
-
-*Model performance metrics.*
-
-```{r demo_roc, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
-# Simulate scores for Positive and Negative classes
-neg_scores <- rnorm(500, mean=0.3, sd=0.15)
-pos_scores <- rnorm(500, mean=0.7, sd=0.15) # Better separation
-
-# Calculate ROC points manually
-thresholds <- seq(0, 1, 0.01)
-tpr <- sapply(thresholds, function(t) mean(pos_scores > t))
-fpr <- sapply(thresholds, function(t) mean(neg_scores > t))
-
-df_roc <- data.frame(FPR=fpr, TPR=tpr)
-
-ggplot(df_roc, aes(x=FPR, y=TPR)) + 
-  geom_path(color="#27ae60", size=1.5) +
-  geom_abline(linetype="dashed", color="grey") +
-  theme_light() + 
-  annotate("text", x=0.75, y=0.25, label="AUC = 0.96", size=6, color="#27ae60") +
-  labs(title="ROC Analysis: SNP Classifier", x="1 - Specificity (FPR)", y="Sensitivity (TPR)")
-```
 
 # 🎓 Education
 
