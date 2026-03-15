@@ -1,12 +1,12 @@
 ---
-title: "Bartosz Czech - Portfolio"
+title: "Bartosz Czech - Interactive Portfolio"
 author: "Bartosz Czech"
 date: "`r Sys.Date()`"
 output:
   html_document:
     theme: flatly
     toc: true
-    toc_depth: 1
+    toc_depth: 2
     toc_float: true
     code_folding: hide
 ---
@@ -19,86 +19,231 @@ library(tidyr)
 library(rmarkdown)
 library(knitr)
 library(dplyr)
-library(tidyr)
 library(ggplot2)
 library(DT)
 library(survival)
 library(RColorBrewer)
 library(gridExtra)
-library(fontawesome)
 library(MASS)
 
 ```
 
 ```{css, echo=FALSE}
-/* --- STYLES --- */
-body { font-family: 'Segoe UI', sans-serif; color: #333; }
-h1, h2, h3 { color: #2c3e50; font-weight: 700; margin-top: 30px; }
+/* --- GLOBAL LAYOUT & TYPOGRAPHY --- */
+@import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)');
 
-/* Badges */
-.my-badge { background-color: #2c3e50 !important; color: white !important; padding: 6px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; margin-right: 5px; margin-bottom: 6px; display: inline-block; text-decoration: none; }
-.my-badge-soft { background-color: #95a5a6 !important; }
+body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; color: #333; scroll-behavior: smooth; }
 
-/* Boxes */
-.highlight-box { background-color: #f8f9fa; border-left: 5px solid #2c3e50; padding: 20px; margin: 15px 0 30px 0; border-radius: 0 5px 5px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.secondary-box { background-color: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+#header { display: none !important; }
+
+.main-container { 
+  max-width: 1150px !important;
+  background-color: #ffffff; 
+  padding: 50px 60px; 
+  border-radius: 12px; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06); 
+  margin-top: 40px; 
+  margin-bottom: 40px; 
+}
+
+.toc-content {
+  padding-left: 50px !important;
+}
+
+h1 { color: #2c3e50; font-weight: 800; margin-top: 40px; border-bottom: 2px solid #f1f3f5; padding-bottom: 12px; font-size: 2em; }
+h2, h3 { color: #2c3e50; font-weight: 700; margin-top: 30px; }
+
+/* --- PROFILE HERO SECTION --- */
+.hero-container { display: flex; align-items: center; gap: 40px; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #f1f3f5; flex-wrap: wrap; }
+.hero-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 8px 20px rgba(0,0,0,0.12); flex-shrink: 0; }
+.hero-content { flex: 1; min-width: 300px; }
+.hero-name { font-size: 2.5em; font-weight: 800; color: #1a252f; margin: 0 0 5px 0; letter-spacing: -0.5px; }
+.hero-title { font-size: 1.2em; font-weight: 500; color: #7f8c8d; margin: 0 0 20px 0; }
+
+/* Download CV Button */
+.btn-download { display: inline-flex; align-items: center; padding: 10px 20px; background-color: #27ae60; color: white !important; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.9em; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2); transition: all 0.2s; margin-top: 10px; }
+.btn-download:hover { background-color: #219653; transform: translateY(-1px); box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3); }
+
+/* --- TECH STACK BADGES --- */
+.my-badge { background-color: #f1f3f5 !important; color: #2c3e50 !important; padding: 6px 12px; border-radius: 6px; font-size: 0.85em; font-weight: 600; margin-right: 6px; margin-bottom: 8px; display: inline-block; text-decoration: none; border: 1px solid #e9ecef; transition: background-color 0.2s; }
+.my-badge:hover { background-color: #e2e6ea !important; }
+.skill-category { margin-top: 20px; margin-bottom: 8px; font-weight: 700; color: #34495e; font-size: 1em; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* --- EXPERIENCE BOXES --- */
+.highlight-box { background-color: #f8f9fa; border-left: 4px solid #3498db; padding: 20px 25px; margin: 15px 0 30px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+.secondary-box { background-color: #ffffff; border: 1px solid #e9ecef; padding: 20px 25px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+
+/* --- MODERN SOCIAL PILLS --- */
+.social-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+.social-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background-color: #ffffff; color: #2c3e50 !important; border: 1px solid #e2e8f0; border-radius: 30px; font-size: 0.9em; font-weight: 600; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.social-btn:hover { background-color: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.06); text-decoration: none; }
+
+/* Kolory ikon */
+.social-btn i { font-size: 1.1em; }
+.social-btn.email i { color: #D14836; }
+.social-btn.linkedin i { color: #0A66C2; }
+.social-btn.github i { color: #181717; }
+.social-btn.scholar i { color: #4285F4; }
+.social-btn.researchgate i { color: #00CCBB; }
+.social-btn.orcid i { color: #A6CE39; }
+.social-btn.wos i { color: #5E33BF; } 
+.social-btn.scopus i { color: #E75A0D; }
+
+/* --- PREMIUM STAT CARDS --- */
+.stats-row { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+.stat-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 10px; text-align: center; flex: 1; min-width: 120px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+.stat-num { display: block; font-size: 2.4em; font-weight: 800; color: #2c3e50; line-height: 1; margin-bottom: 8px; letter-spacing: -1px; }
+.stat-label { font-size: 0.8em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
 
 /* --- PUBLICATION CARDS --- */
-details.pub-card { background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: block; overflow: hidden; }
-details.pub-card[open] { border-color: #2c3e50; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-summary.pub-header { padding: 15px 20px; cursor: pointer; list-style: none; display: flex; align-items: center; background-color: #fcfcfc; border-bottom: 1px solid transparent; transition: background 0.2s; }
-details[open] summary.pub-header { border-bottom: 1px solid #eee; background-color: #f8f9fa; }
+details.pub-card { background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: block; overflow: hidden; }
+details.pub-card[open] { border-color: #bdc3c7; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+summary.pub-header { padding: 18px 20px; cursor: pointer; list-style: none; display: flex; align-items: center; background-color: #fcfcfc; transition: background 0.2s; }
+details[open] summary.pub-header { border-bottom: 1px solid #e9ecef; background-color: #f8f9fa; }
 summary.pub-header::-webkit-details-marker { display: none; }
-summary.pub-header:hover { background-color: #f0f2f5; }
-
-.pub-year { background-color: #2c3e50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 15px; min-width: 50px; text-align: center; }
+summary.pub-header:hover { background-color: #f1f3f5; }
+.pub-year { background-color: #34495e; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 700; margin-right: 15px; text-align: center; }
 .pub-title { font-weight: 700; color: #2c3e50; flex-grow: 1; font-size: 1.05em; margin-right: 10px; line-height: 1.4; }
-.pub-journal { color: #7f8c8d; font-size: 0.9em; font-style: italic; white-space: nowrap; }
-.pub-arrow { margin-left: 15px; font-size: 0.8em; color: #ccc; transition: transform 0.2s; }
-details[open] .pub-arrow { transform: rotate(180deg); }
-
-/* Content Grid */
-.pub-grid { display: flex; flex-wrap: wrap; gap: 25px; padding: 25px; }
+.pub-journal { color: #7f8c8d; font-size: 0.9em; font-style: italic; }
+.pub-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 25px; }
 .pub-info { flex: 2; min-width: 300px; }
-.pub-visuals { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.method-section { margin-bottom: 20px; }
+.method-title { font-size: 0.75em; text-transform: uppercase; color: #95a5a6; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+.method-content { font-size: 0.95em; color: #444; line-height: 1.6; }
 
-/* Sections */
-.method-section { margin-bottom: 15px; }
-.method-title { font-size: 0.75em; text-transform: uppercase; color: #95a5a6; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; display: block; }
-.method-content { font-size: 0.95em; color: #444; line-height: 1.5; }
+/* --- PUBLICATION TAGS (MODERN PILLS) --- */
+.tech-tag-small { 
+  background-color: #f1f5f9; 
+  color: #3b82f6; 
+  border: 1px solid #bfdbfe; 
+  font-size: 0.75em; 
+  font-weight: 600; 
+  padding: 6px 14px; 
+  border-radius: 20px; 
+  margin-right: 8px; 
+  margin-bottom: 8px; 
+  display: inline-block; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+.tech-tag-small:hover {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
 
-/* Visuals */
-.pub-img-container { width: 100%; background-color: #eee; border-radius: 6px; overflow: hidden; border: 1px solid #ddd; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
-.pub-img-container img { width: 100%; height: auto; display: block; object-fit: cover; }
+#end h1 { display: none !important; }
+#end { padding-top: 0 !important; margin-top: 0 !important; }
 
-/* Button */
-.btn-read { display: inline-block; padding: 10px 20px; background-color: #3498db; color: white !important; text-decoration: none; border-radius: 4px; font-weight: 600; transition: background 0.2s; width: 100%; text-align: center; box-sizing: border-box; cursor: pointer; }
-.btn-read:hover { background-color: #2980b9; }
+/* --- ELEGANT BACK TO TOP BUTTON --- */
+#backToTop { 
+  display: none; 
+  position: fixed; 
+  bottom: 40px; 
+  right: 40px; 
+  z-index: 99; 
+  border: 1px solid #e2e8f0; 
+  background-color: #ffffff; 
+  color: #64748b; 
+  cursor: pointer; 
+  width: 46px; 
+  height: 46px; 
+  border-radius: 50%; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06); 
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
 
-.tech-tag-small { background-color: #eef2f3; color: #2c3e50; border: 1px solid #bdc3c7; font-size: 0.75em; padding: 2px 8px; border-radius: 10px; margin-right: 4px; display: inline-block; margin-top: 5px; }
+#backToTop:hover { 
+  background-color: #f8fafc; 
+  color: #3b82f6; 
+  border-color: #cbd5e1;
+  transform: translateY(-4px); 
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
 ```
+
+<div class="hero-container">
+<img src="https://github.com/bczech.png" alt="Bartosz Czech" class="hero-img">
+<div class="hero-content">
+<h1 class="hero-name">Bartosz Czech, PhD, Eng.</h1>
+<h3 class="hero-title">Bioinformatician & Computational Biologist</h3>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+<div class="social-row">
+<a href="mailto:bartosz.w.czech@gmail.com" class="social-btn email"><i class="fas fa-envelope"></i> Email</a>
+<a href="https://pl.linkedin.com/in/bczech" target="_blank" class="social-btn linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>
+<a href="https://github.com/bczech" target="_blank" class="social-btn github"><i class="fab fa-github"></i> GitHub</a>
+<a href="https://scholar.google.com/citations?user=JYaz528AAAAJ&hl=en" target="_blank" class="social-btn scholar"><i class="fas fa-graduation-cap"></i> Scholar</a>
+<a href="https://www.researchgate.net/profile/Bartosz-Czech" target="_blank" class="social-btn researchgate"><i class="fab fa-researchgate"></i> ResearchGate</a>
+<a href="https://orcid.org/0000-0002-9908-3007" target="_blank" class="social-btn orcid"><i class="fab fa-orcid"></i> ORCID</a>
+<a href="https://www.webofscience.com/wos/author/record/AAZ-4115-2020" target="_blank" class="social-btn wos"><i class="fas fa-file-contract"></i> Web of Science</a>
+<a href="https://www.scopus.com/authid/detail.uri?authorId=57202362761" target="_blank" class="social-btn scopus"><i class="fas fa-book-open"></i> Scopus</a>
+</div>
+
+<div class="stats-row">
+<div class="stat-card">
+<span class="stat-num">12</span>
+<span class="stat-label">Publications</span>
+</div>
+<div class="stat-card">
+<span class="stat-num">100+</span>
+<span class="stat-label">Citations</span>
+</div>
+<div class="stat-card">
+<span class="stat-num">5</span>
+<span class="stat-label">h-index</span>
+</div>
+</div>
+
+<!-- <a href="CV_Bartosz_Czech_2025.pdf" target="_blank" class="btn-download"> -->
+<!-- 📄 Download Full CV (PDF) -->
+<!-- </a> -->
+</div>
+</div>
 
 # 👋 Professional Summary
 
-I am a **Senior Bioinformatician** with over 6 years of experience bridging the gap between computational biology and pharmaceutical R\&D. Currently at **7N**, I develop of scalable **R/Shiny applications** and analyze NGS and MS data for a Big Pharma client.
+I am a **Senior Bioinformatician**, **Computational Biologist**, and **R/Shiny developer** with over 7 years of experience bridging the gap between computational biology and pharmaceutical R&D. Currently at **7N**, I develop scalable **R/Shiny applications** and analyze complex NGS and MS data for a Big Pharma client.
 
-I hold a **Ph.D. in Biological Sciences** and am currently pursuing an **MBA in Healthcare Management**, combining deep technical expertise with strategic business insight.
+I hold a **Ph.D. in Biological Sciences** and am currently pursuing an **MBA in Healthcare Management** (with elements of Clinical Research), combining deep technical expertise with strategic business insight.
 
------
+* **Location:** Wroclaw, Poland
+* **Languages:** Polish (Native), English (Upper-intermediate), Spanish (Basic)
+
+---
 
 # 🛠 Tech Stack
 
 ```{r tech_stack, echo=FALSE, results='asis'}
-skills_hard <- c("R & Shiny", "Python", "WDL & Nextflow", "Docker", "SQL & Snowflake", "NGS Analysis", "Bash", "Mass Spectrometry", "Git")
-skills_soft <- c("Agile / Scrum", "Reproducible work")
+skills <- list(
+  "Programming & Dev" = c("R", "Python", "SQL", "WDL", "Bash", "Git", "LaTeX"),
+  "Data Science & ML" = c("Statistical Modeling", "Machine Learning", "Predictive Modeling", "EDA", "Reproducible Research"),
+  "Bioinformatics" = c("NGS Data Analysis", "WGS & WES", "RNA-seq & scRNA-seq", "ATAC-seq", "16S rRNA", "Variant Calling", "Drug Dose-Response"),
+  "Genetics & Specialized" = c("CRISPR Data Analysis", "Epigenomics", "Multi-omics Integration", "Microbiome", "Statistical Genetics", "Structural Biology"),
+  "Visualization & Reporting" = c("Shiny", "Dash", "ggplot2", "Plotly", "Seaborn", "R Markdown", "Jupyter"),
+  "Infrastructure & DB" = c("AWS", "HPC", "Snowflake", "Docker", "Kubernetes", "Database Design", "FAIR Data"),
+  "Agile & Workflow" = c("Scrum", "Product Ownership", "Jira", "Trello")
+)
 
 cat('<div style="margin-bottom: 30px;">')
-for(s in skills_hard) cat(sprintf('<span class="my-badge">%s</span>\n', s))
-for(s in skills_soft) cat(sprintf('<span class="my-badge my-badge-soft">%s</span>\n', s))
+for(category in names(skills)) {
+  cat(sprintf('<div class="skill-category">%s</div>', category))
+  for(s in skills[[category]]) {
+    cat(sprintf('<span class="my-badge">%s</span>\n', s))
+  }
+}
 cat('</div>')
+
 ```
 
------
+---
 
 # 🚀 Professional Experience
 
@@ -106,7 +251,7 @@ cat('</div>')
 jobs <- list(
   list(
     role = "Senior Bioinformatician",
-    company = "7N / Big Pharma Client",
+    company = "7N (Big Pharma Client)",
     location = "Warsaw, Poland",
     period = "July 2019 - Present",
     type = "main",
@@ -118,19 +263,19 @@ jobs <- list(
     </ul>"
   ),
   list(
-  role = "Internship",
+  role = "NGS Data Analysis Internship",
   company = "Center for Quantitative Genetics and Genomics, Aarhus University",
   location = "Foulum, Denmark",
-  period = "July - August 2016",
-  type = "secondary",
+  period = "July - August 2018",
+  type = "main",
   desc = "<ul><li>Analysis of NGS data for quantitative genetics projects.</li></ul>"
   ),
   list(
-    role = "Internship",
-    company = "Biostat sp. z o.o.",
+    role = "Statistical Analysis Internship",
+    company = "Biostat sp. z o.o. - Department of Statistics",
     location = "Rybnik, Poland",
-    period = "July - August 2018",
-    type = "secondary",
+    period = "July - August 2016",
+    type = "main",
     desc = "<ul><li>Statistical analysis of biological and medical data.</li></ul>"
   )
 )
@@ -149,24 +294,58 @@ for(job in jobs) {
   }
   cat(paste0(header_html, content_html, '\n'))
 }
+
 ```
 
------
+---
+
+# 🎓 Education & Affiliations
+
+### Education
+
+* **Master of Business Administration (MBA)** in Healthcare Management with elements of Clinical Research | *Poznan University of Medical Sciences* (2024-Current)
+* **Ph.D. in Biological Sciences** | *Wroclaw University of Environmental and Life Sciences* (2019-2024)
+* **M.Sc. in Bioinformatics** (Specialization: Biostatistics and Bioinformatics Programming) | *Wroclaw University of Environmental and Life Sciences* (2017-2019)
+* **B.Sc. in Bioinformatics** | *Wroclaw University of Environmental and Life Sciences* (2014-2017)
+
+### Professional Affiliations
+
+* **Member**, European Federation of Animal Science (2018-Present)
+* **Member**, Polish Bioinformatics Society (2018-Present)
+
+---
 
 # 📚 Detailed Research Portfolio
 
 *Click on a publication card below to reveal the specific **Bioinformatics** & **Statistics** methods used.*
 
 ```{r publications_cards, echo=FALSE, results='asis'}
-# --- DATABASE OF 12 PUBLICATIONS (UPDATED) ---
+# --- DATABASE OF 13 PUBLICATIONS (UPDATED) ---
 
 pubs <- list(
-  # 1. Nature Comms
+  list(
+    year = 2026,
+    title = "Motile sperm head morphometry in relation to sperm kinematics and freezability in cats",
+    journal = "Theriogenology",
+    link = "[https://doi.org/10.1016/j.theriogenology.2026.117839](https://doi.org/10.1016/j.theriogenology.2026.117839)",
+    problem = "Evaluating whether sperm head morphometry affects sperm kinematics and freezability (cryotolerance) in domestic cats.",
+    bioinfo = "<ul>
+      <li>High-throughput data processing of single-spermatozoon kinematics and morphometry from the CASA system (>10,000 cells).</li>
+      <li>Feature engineering for motility and morphological parameters.</li>
+    </ul>",
+    stat = "<ul>
+      <li>Dimensionality reduction using **Principal Component Analysis (PCA)**.</li>
+      <li>Unsupervised machine learning (**Clustering analysis**) to identify distinct morpho-kinetic subpopulations.</li>
+      <li>Predictive modeling using **Classification Trees** to predict post-thaw semen quality (Good vs. Bad freezing groups).</li>
+    </ul>",
+    img = "",
+    tags = c("Machine Learning", "Classification Trees", "PCA", "Clustering", "CASA", "Predictive Modeling")
+  ),
   list(
     year = 2025,
     title = "Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibition",
     journal = "Nature Communications",
-    link = "https://doi.org/10.1038/s41467-025-56634-y",
+    link = "[https://doi.org/10.1038/s41467-025-56634-y](https://doi.org/10.1038/s41467-025-56634-y)",
     problem = "Elucidating molecular mechanisms of acquired resistance to TEAD inhibitors in cancer therapy.",
     bioinfo = "<ul>
       <li>High-throughput screens processed with **gDR package** in R.</li>
@@ -177,13 +356,11 @@ pubs <- list(
     img = "img/img1.png",
     tags = c("Drug Response", "Modeling", "R", "Synergy")
   ),
-
-  # 2. snoRNAs Exosomes
   list(
     year = 2024,
     title = "Profiling of snoRNAs in Exosomes Secreted from Cells Infected with Influenza A Virus",
     journal = "Int. J. Mol. Sci.",
-    link = "https://doi.org/10.3390/ijms26010012",
+    link = "[https://doi.org/10.3390/ijms26010012](https://doi.org/10.3390/ijms26010012)",
     problem = "Characterizing the non-coding RNA cargo of exosomes during viral infection.",
     bioinfo = "<ul>
       <li>Small RNA-seq trimmed (**Trimmomatic**) and mapped with **BWA-MEM**.</li>
@@ -198,13 +375,11 @@ pubs <- list(
     img = "img/img2.png",
     tags = c("sRNA-seq", "snoRNA", "BWA-MEM", "Ensembl", "Rfam", "DESeq2")
   ),
-
-  # 3. Drug Response Modeling
   list(
     year = 2024,
     title = "Computational Modeling of Drug Response Identifies Mutant-Specific Constraints for Dosing panRAF and MEK Inhibitors",
     journal = "Cancers",
-    link = "https://doi.org/10.3390/cancers16162914",
+    link = "[https://doi.org/10.3390/cancers16162914](https://doi.org/10.3390/cancers16162914)",
     problem = "Optimizing combinatorial drug dosing strategies for melanoma cell lines with specific mutations.",
     bioinfo = "<ul>
       <li>High-throughput screens processed with **gDR package** in R.</li>
@@ -217,13 +392,11 @@ pubs <- list(
     img = "img/img3.jpg",
     tags = c("Drug Response", "Modeling", "R", "Synergy")
   ),
-
-  # 4. Feline Sperm Morphometry
   list(
     year = 2023,
     title = "Feline sperm head morphometry in relation to male pedigree and fertility",
     journal = "Theriogenology",
-    link = "https://doi.org/10.1016/j.theriogenology.2023.06.006",
+    link = "[https://doi.org/10.1016/j.theriogenology.2023.06.006](https://doi.org/10.1016/j.theriogenology.2023.06.006)",
     problem = "Assessing the impact of genetic background on reproductive traits in felines.",
     bioinfo = "<ul>
       <li>Data preprocessed for multivariate analysis in R.</li>
@@ -238,13 +411,11 @@ pubs <- list(
     img = "img/img4.jpg",
     tags = c("PCA", "Clustering", "ANOVA", "R")
   ),
-
-  # 5. Exosomes Influenza (Coding Regions)
   list(
     year = 2023,
     title = "Protein-Coding Region Derived Small RNA in Exosomes from Influenza A Virus-Infected Cells",
     journal = "Int. J. Mol. Sci.",
-    link = "https://doi.org/10.3390/ijms24010867",
+    link = "[https://doi.org/10.3390/ijms24010867](https://doi.org/10.3390/ijms24010867)",
     problem = "Investigating fragments derived from protein-coding regions in exosomal cargo.",
     bioinfo = "<ul>
       <li>Alignments to dog/flu genomes (**BWA-MEM**); annotation via Ensembl/Rfam.</li>
@@ -258,13 +429,11 @@ pubs <- list(
     img = "img/img5.jpg",
     tags = c("sRNA-seq", "Coding RNA", "Alignment", "STRING", "Non-parametric Tests")
   ),
-
-  # 6. Holstein Heat Stress (Dual RNA-seq)
   list(
     year = 2022,
     title = "Host transcriptome and microbiome interactions in Holstein cattle under heat stress condition",
     journal = "Frontiers in Microbiology",
-    link = "https://doi.org/10.3389/fmicb.2022.998093",
+    link = "[https://doi.org/10.3389/fmicb.2022.998093](https://doi.org/10.3389/fmicb.2022.998093)",
     problem = "Understanding systemic response to heat stress via host-microbiome crosstalk.",
     bioinfo = "<ul>
       <li>Host RNA-seq mapped to bovine genome (**STAR**).</li>
@@ -279,13 +448,11 @@ pubs <- list(
     img = "img/img6.webp",
     tags = c("RNA-seq", "Microbiome", "QIIME2", "WGCNA", "Co-expression")
   ),
-
-  # 7. Fecal Microbiota
   list(
     year = 2022,
     title = "Fecal microbiota and their association with heat stress in Bos taurus",
     journal = "BMC Microbiology",
-    link = "https://doi.org/10.1186/s12866-022-02576-0",
+    link = "[https://doi.org/10.1186/s12866-022-02576-0](https://doi.org/10.1186/s12866-022-02576-0)",
     problem = "Determining shifts in gut microbial diversity induced by heat stress.",
     bioinfo = "<ul>
       <li>16S rRNA QC (Trim Galore) and denoising (**DADA2/QIIME2**).</li>
@@ -300,13 +467,11 @@ pubs <- list(
     img = "img/img7.png",
     tags = c("QIIME2", "16S rRNA", "Metagenomics", "PERMANOVA", "edgeR")
   ),
-
-  # 8. Chicken Humoral Immune
   list(
     year = 2021,
     title = "SNP prioritization in targeted sequencing data associated with humoral immune responses in chicken",
     journal = "Poultry Science",
-    link = "https://doi.org/10.1016/j.psj.2021.101433",
+    link = "[https://doi.org/10.1016/j.psj.2021.101433](https://doi.org/10.1016/j.psj.2021.101433)",
     problem = "Prioritizing functional variants linked to immune response.",
     bioinfo = "<ul>
       <li>Mapped to GRCg6a (**BWA-MEM**); calling with **GATK HaplotypeCaller**.</li>
@@ -320,28 +485,25 @@ pubs <- list(
     img = "img/img8.png",
     tags = c("GATK", "Variant Calling", "SNP", "Ensembl VEP", "Association Tests")
   ),
-
-  # 9. Command Line Tools Review
   list(
     year = 2020,
     title = "Extraordinary Command Line: Basic Data Editing Tools for Biologists Dealing with Sequence Data",
     journal = "The Open Bioinformatics Journal",
-    link = "https://doi.org/10.2174/1875036202013010137",
+    link = "[https://doi.org/10.2174/1875036202013010137](https://doi.org/10.2174/1875036202013010137)",
     problem = "Addressing efficiency in manual biological data handling.",
     bioinfo = "<ul>
       <li>Demonstrated **sed, awk, grep** and **Bash scripting**.</li>
       <li>Workflow automation for FASTA/FASTQ/GFF files.</li>
     </ul>",
     stat = "N/A (Methodological Tutorial)",
+    img = "",
     tags = c("Linux", "Bash", "Workflow Automation", "Reproducibility")
   ),
-
-  # 10. Deep Learning SNP Classification
   list(
     year = 2020,
     title = "The application of deep learning for the classification of correct and incorrect SNP genotypes",
     journal = "Journal of Applied Genetics",
-    link = "https://doi.org/10.1007/s13353-020-00586-0",
+    link = "[https://doi.org/10.1007/s13353-020-00586-0](https://doi.org/10.1007/s13353-020-00586-0)",
     problem = "Mitigating high False Positive rates in WGS variant calling.",
     bioinfo = "<ul>
       <li>Extraction of QC features (Read Depth, MapQ, Strand Bias) from BAMs.</li>
@@ -354,13 +516,11 @@ pubs <- list(
     img = "img/img9.png",
     tags = c("Deep Learning", "Keras", "TensorFlow", "Feature Engineering", "Python")
   ),
-
-  # 11. DNA Variation Patterns
   list(
     year = 2020,
     title = "Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome",
     journal = "Scientific Reports",
-    link = "https://doi.org/10.1038/s41598-020-70380-9",
+    link = "[https://doi.org/10.1038/s41598-020-70380-9](https://doi.org/10.1038/s41598-020-70380-9)",
     problem = "Comparative analysis of evolutionary pressures on sex chromosomes vs autosomes.",
     bioinfo = "<ul>
       <li>WGS mapped (**BWA-MEM**), called via **GATK** and **SAMtools**.</li>
@@ -374,13 +534,11 @@ pubs <- list(
     img = "img/img10.webp",
     tags = c("Genomics", "GATK", "snpEff", "Diversity Metrics", "R")
   ),
-
-  # 12. Breed-specific SNPs
   list(
     year = 2018,
     title = "Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomes",
     journal = "PLOS ONE",
-    link = "https://doi.org/10.1371/journal.pone.0198419",
+    link = "[https://doi.org/10.1371/journal.pone.0198419](https://doi.org/10.1371/journal.pone.0198419)",
     problem = "Discovery of unique genetic markers for breed discrimination.",
     bioinfo = "<ul>
       <li>Alignment (**BWA-MEM**), filtering (**VCFtools**, **PyVCF**), realignment (**GATK**).</li>
@@ -397,12 +555,8 @@ pubs <- list(
 
 # --- GENERATOR HTML ---
 for(p in pubs) {
-  # Generate tags HTML
   tags_html <- paste0(sapply(p$tags, function(t) paste0('<span class="tech-tag-small">', t, '</span>')), collapse = " ")
   
-  # Conditional Image Rendering:
-  # We check if p$img is not NULL and not an empty string.
-  # If valid, we build the image container HTML. Otherwise, img_html stays empty.
   img_html <- ""
   if (!is.null(p$img) && p$img != "") {
     img_html <- paste0(
@@ -437,9 +591,9 @@ for(p in pubs) {
             '<div style="margin-top: 15px;">', tags_html, '</div>',
           '</div>',
           
-          # RIGHT COLUMN: Visuals (Image is now optional)
+          # RIGHT COLUMN: Visuals
           '<div class="pub-visuals">',
-            img_html, # This inserts the image div OR an empty string
+            img_html,
             '<a href="', p$link, '" target="_blank" class="btn-read">Read Publication &rarr;</a>',
           '</div>',
           
@@ -449,9 +603,10 @@ for(p in pubs) {
   )
   cat(html_string)
 }
+
 ```
 
------
+---
 
 # 💻 Computational Skillset Showcase {.tabset .tabset-pills}
 
@@ -462,6 +617,7 @@ for(p in pubs) {
 **Focus:** Population structure, GWAS, Variant Quality Control, and Evolution.
 
 ### Principal Component Analysis (PCA)
+
 *Population structure visualization simulating realistic genotype noise.*
 
 ```{r demo_pca, fig.align='center', fig.width=9, fig.height=5}
@@ -497,6 +653,7 @@ ggplot(df_pca, aes(x = PC1, y = PC2, fill = Breed)) +
        subtitle = "Simulated genotype matrix (300 samples x 1k SNPs)",
        x = paste0("PC1 (", var_explained[1], "% Var)"),
        y = paste0("PC2 (", var_explained[2], "% Var)"))
+
 ```
 
 ### Manhattan Plot (GWAS)
@@ -529,6 +686,7 @@ ggplot(gwas_df, aes(x = Pos, y = logP, color = as.factor(Chr))) +
   facet_grid(. ~ Chr, scales = "free_x", space = "free_x", switch = "x") +
   theme(axis.text.x = element_blank(), panel.grid.major.x = element_blank(), legend.position = "none") +
   labs(title = "Manhattan Plot", y = "-Log10 P-Value", x = "Chromosome")
+
 ```
 
 ### Variant QC (Read Depth)
@@ -551,6 +709,7 @@ ggplot(df_qc, aes(x = Depth)) +
        x = "Read Depth (DP)", y = "Density") +
   geom_vline(xintercept = 40, linetype="dashed", color="orange") +
   annotate("text", x = 60, y = 0.02, label = "Mean Depth ~ 40x", color = "orange")
+
 ```
 
 ### Phylogenetic Tree
@@ -569,6 +728,7 @@ plot(hc, hang = -1, main = "Phylogenetic Tree Reconstruction",
      sub = "Ward's method clustering", xlab = "",
      col = "#2980b9", lwd = 2)
 rect.hclust(hc, k = 3, border = "red") # Highlight 3 clades
+
 ```
 
 ## 🔬 Transcriptomics
@@ -611,6 +771,7 @@ ggplot(df_vol, aes(x = log2FoldChange, y = -log10(padj), color = Group)) +
   labs(title = "Differential Expression (Volcano Plot)", 
        subtitle = "Simulated DESeq2 output with FDR correction",
        x = "Log2 Fold Change", y = "-Log10 Adjusted P-value")
+
 ```
 
 ### Single-Cell UMAP
@@ -632,6 +793,7 @@ ggplot(df_umap, aes(UMAP1, UMAP2, color = CellType)) +
   theme_void() +
   theme(legend.position = "right") +
   labs(title = "Single-Cell UMAP Projection", subtitle = "Developmental Trajectory Simulation")
+
 ```
 
 ### Pathway Enrichment
@@ -652,6 +814,7 @@ ggplot(df_path, aes(x = GeneRatio, y = Pathway)) +
   scale_color_gradient(low = "red", high = "blue") +
   theme_light() +
   labs(title = "KEGG Pathway Enrichment", x = "Gene Ratio", y = "")
+
 ```
 
 ### Heatmap
@@ -676,12 +839,13 @@ ggplot(df_h_long, aes(Sample, Gene, fill = Exp)) +
   theme_minimal() +
   theme(axis.text.x = element_blank()) +
   labs(title = "Gene Expression Heatmap", x = "Samples (n=20)", y = "Genes (n=20)")
+
 ```
 
 ### scRNA Pseudotime Trajectory
 
 *Differentiation analysis (Monocle style).*
-  
+
 ```{r demo_pseudo, fig.align='center', fig.width=9, fig.height=5}
 set.seed(101)
 t <- seq(0, 10, length.out=400)
@@ -693,12 +857,13 @@ ggplot(pseudo, aes(Time, Expr, color=Branch)) +
   geom_point(alpha=0.4) + geom_smooth(se=FALSE, size=1.5) +
   theme_classic() + scale_color_manual(values=c("#8e44ad", "#27ae60")) +
   labs(title="Pseudotime Trajectory", subtitle="Gene Expression during Differentiation", x="Pseudotime", y="Expression Level")
+
 ```
 
 ### DotPlot (Gene Markers)
 
 *Expression intensity and percentage (Seurat style).*
-  
+
 ```{r demo_dot, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
 genes <- c("CD3D", "CD19", "CD14", "MS4A1", "GNLY", "NKG7")
 clusters <- c("T-Cells", "B-Cells", "Monocytes", "NK-Cells")
@@ -714,6 +879,7 @@ ggplot(df_dot, aes(Gene, Cluster)) +
   geom_point(aes(size=Pct, color=AvgExp)) +
   scale_color_gradient(low="lightgrey", high="blue") +
   theme_bw() + labs(title="Marker Gene Expression (DotPlot)", size="% Expressed", color="Avg Exp")
+
 ```
 
 ## 🧪 Proteomics & Epigenomics (ATAC/Methyl)
@@ -723,7 +889,7 @@ ggplot(df_dot, aes(Gene, Cluster)) +
 ### Proteome Dynamic Range
 
 *Rank-Abundance plot typical for Mass Spectrometry data.*
-  
+
 ```{r demo_dynamic_range, fig.align='center', fig.width=9, fig.height=5}
 n_prot <- 2000
 # Simulate log-normal intensities typical for MS
@@ -748,12 +914,13 @@ ggplot(df_range, aes(x = Rank, y = Intensity)) +
   labs(title = "Proteome Dynamic Range", 
        subtitle = "Mass Spec Intensity Distribution (Rank-Abundance)",
        x = "Protein Rank", y = "Intensity (Log10 LFQ)")
+
 ```
 
 ### Proteomics Volcano
 
 *Differential Protein Abundance.*
-  
+
 ```{r demo_prot, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
 df_p <- data.frame(FC=rnorm(1000), P=runif(1000))
 df_p$P[1:5] <- c(1e-6, 1e-5, 1e-5, 1e-4, 1e-4); df_p$FC[1:5] <- c(3, -3, 2.5, -2.5, 4)
@@ -764,12 +931,13 @@ ggplot(df_p, aes(FC, -log10(P))) +
   scale_color_manual(values=c("grey", "purple")) +
   geom_text(aes(label=Label), vjust=-1, size=3) +
   theme_minimal() + theme(legend.position="none") + labs(title="Proteomics Differential Abundance")
+
 ```
 
 ### Motif Sequence Logo (ATAC-seq)
 
 *Transcription Factor Binding Motif (CTCF-like).*
-  
+
 ```{r demo_seqlogo, fig.align='center', fig.width=9, fig.height=4}
 # NOTE: Requires 'ggseqlogo' package
 if(requireNamespace("ggseqlogo", quietly=TRUE)){
@@ -793,12 +961,13 @@ if(requireNamespace("ggseqlogo", quietly=TRUE)){
 } else {
   print("Please install 'ggseqlogo' to view this plot.")
 }
+
 ```
 
 ### Differential Methylation
 
 *Volcano plot for CpG sites.*
-  
+
 ```{r demo_methyl, fig.align='center', fig.width=9, fig.height=5}
 # Simulate Delta Beta values (-1 to 1)
 delta_beta <- rnorm(5000, 0, 0.1)
@@ -817,12 +986,13 @@ ggplot(df_meth, aes(DeltaBeta, -log10(P), color=Sig)) +
   geom_vline(xintercept=c(-0.2, 0.2), linetype="dashed") +
   theme_classic() +
   labs(title="Differential Methylation Analysis", x="Delta Beta (Methylation Difference)", y="-Log10 P-value")
+
 ```
 
 ### TSS Enrichment Profile
 
 *Chromatin accessibility around Transcription Start Sites.*
-  
+
 ```{r demo_tss, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=4}
 x <- seq(-2000, 2000, 20)
 # Gaussian peak for accessible chromatin
@@ -833,12 +1003,13 @@ ggplot(data.frame(x,y), aes(x,y)) +
   geom_line(color="#2c3e50") +
   theme_classic() + 
   labs(title="TSS Enrichment Profile (ATAC-seq)", x="Distance from TSS (bp)", y="Normalized Signal")
+
 ```
 
 ### Chromatin States
 
 *ChromHMM style heatmap.*
-  
+
 ```{r demo_chromhmm, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
 states <- c("Promoter", "Enhancer", "Transcribed", "Repressed", "Heterochrom")
 samples <- paste0("Sample_", 1:10)
@@ -851,6 +1022,7 @@ ggplot(df_chrom, aes(Sample, State, fill=Enrichment)) +
   scale_fill_viridis_c(option="magma") +
   theme_minimal() +
   labs(title="Chromatin State Enrichment (ChromHMM)", x="", y="")
+
 ```
 
 ## 💊 Pharma & CRISPR & ML
@@ -860,7 +1032,7 @@ ggplot(df_chrom, aes(Sample, State, fill=Enrichment)) +
 ### CRISPR Gene Rank Plot
 
 *Genome-wide ranking of gene essentiality (MAGeCK style).*
-  
+
 ```{r demo_crispr, fig.align='center', fig.width=9, fig.height=5}
 n_genes <- 2000
 
@@ -894,15 +1066,18 @@ ggplot(df_rank, aes(x = Rank, y = Score, color = Type)) +
        y = "Beta Score (Log2FC)",
        color = "Gene Category") +
   theme(legend.position = "top")
+
 ```
+
 ### Feature Importance (RF)
 
 *Biomarker discovery.*
-  
+
 ```{r demo_imp, class.source = 'fold-hide', fig.align='center', fig.width=9, fig.height=5}
 imp <- data.frame(Feat=paste0("M_", 1:10), Val=sort(rnorm(10, 10, 2)))
 ggplot(imp, aes(reorder(Feat, Val), Val)) + geom_col(fill="steelblue") + coord_flip() +
   theme_minimal() + labs(title="Feature Importance (Random Forest)", x="", y="Mean Decrease Gini")
+
 ```
 
 ### Dose-Response (S-Curve)
@@ -932,6 +1107,7 @@ ggplot(df_dr, aes(x=Conc, y=Resp)) +
        subtitle="IC50 = 50 nM (4-Parameter Logistic Fit)",
        x="Concentration (nM) [Log]", y="Cell Viability (%)") +
   geom_vline(xintercept=50, linetype="dashed", color="red")
+
 ```
 
 ### ROC Curve (Classification)
@@ -956,8 +1132,8 @@ ggplot(df_roc, aes(x=FPR, y=TPR)) +
   theme_light() + 
   annotate("text", x=0.75, y=0.25, label="AUC = 0.96", size=6, color="#27ae60") +
   labs(title="ROC Analysis: SNP Classifier", x="1 - Specificity (FPR)", y="Sensitivity (TPR)")
-```
 
+```
 
 ## 🏥 Clinical & Stats
 
@@ -966,7 +1142,7 @@ ggplot(df_roc, aes(x=FPR, y=TPR)) +
 ### Forest Plot (Meta-analysis)
 
 *Odds Ratios visualization.*
-  
+
 ```{r demo_forest, fig.align='center', fig.width=9, fig.height=4}
 df_f <- data.frame(
   Study=c("Study A", "Study B", "Study C", "Pooled"),
@@ -978,8 +1154,8 @@ ggplot(df_f, aes(y=Study, x=OR, xmin=Low, xmax=High)) +
   geom_point(size=3, shape=15) + geom_errorbarh(height=0.2) +
   geom_vline(xintercept=1, linetype="dashed", color="red") +
   theme_bw() + labs(title="Forest Plot (Meta-Analysis)", x="Odds Ratio (95% CI)", y="")
-```
 
+```
 
 ### Survival Analysis (Kaplan-Meier)
 
@@ -1009,6 +1185,7 @@ plot(fit, col=c("red", "blue"), lwd=3, xlab="Time (Months)", ylab="Survival Prob
      main="Kaplan-Meier Analysis (Simulated Clinical Trial)", frame.plot=FALSE)
 legend("topright", levels(factor(df_surv$Group)), col=c("red", "blue"), lwd=3, bty="n")
 grid(col="grey90")
+
 ```
 
 ### Linear Mixed Models (LMM)
@@ -1038,6 +1215,7 @@ ggplot(df_lmm, aes(x=Time, y=Value, group=ID, color=Group)) +
   scale_color_manual(values=c("#95a5a6", "#e74c3c")) +
   theme_bw() +
   labs(title="Longitudinal Response (LMM)", subtitle="Group A vs B treatment trajectories")
+
 ```
 
 ### Correlation Matrix
@@ -1057,6 +1235,7 @@ ggplot(melted, aes(Var1, Var2, fill=Freq)) +
   geom_text(aes(label=Freq)) +
   scale_fill_gradient2(low="#2980b9", mid="white", high="#c0392b") + 
   theme_minimal() + labs(title="Clinical Correlations", x="", y="")
+
 ```
 
 ## 🦠 Microbiome
@@ -1080,6 +1259,7 @@ ggplot(df_alpha, aes(x=Group, y=Index, fill=Group)) +
   scale_fill_manual(values=c("#e74c3c", "#2ecc71")) + 
   theme_classic() + 
   labs(title="Microbiome Alpha Diversity (Shannon)", y="Diversity Index")
+
 ```
 
 ### Beta Diversity (PCoA)
@@ -1098,18 +1278,60 @@ ggplot(df_beta, aes(PCoA1, PCoA2, color=Grp)) +
   stat_ellipse() + 
   theme_minimal() + 
   labs(title="Beta Diversity (Bray-Curtis PCoA)", subtitle="Clustering of microbial communities")
+
 ```
 
+---
 
-# 🎓 Education
+# 🎤 Conferences & Presentations {.tabset .tabset-pills}
 
-  * **MBA in Healthcare Management** | Poznan Univ. of Medical Sciences (2025-Current)
-  * **Ph.D. in Biological Sciences** | Wroclaw Univ. of Env. and Life Sciences (2019-2024)
-  * **M.Sc. in Bioinformatics** | Wroclaw Univ. of Env. and Life Sciences (2017-2019)
-  * **B.Sc. in Bioinformatics** | Wroclaw Univ. of Env. and Life Sciences (2014-2017)
+## 🗣️ Talks
 
------
+* **Jaśkowski, B., Czech, B., & Niżański, W. (2023)** Evaluation of the size of the recipient's corpus luteum after synchronization as an additional criterion for increasing the pregnancy rate after an embryo transfer in cattle. *Japan-Poland Joint Seminar in Morioka, Japan.*
+* **Czech, B., Szyda, J., & Wang, Y. (2022)** Host transcriptome and microbiome data integration in Chinese Holstein cattle under heat stress. *73rd Annual Meeting of the European Federation of Animal Science in Porto, Portugal.*
+* **Czech, B., Wang, K., Chen, S., Wang, Y., & Szyda, J. (2021)** Faecal microbiota and their association with heat stress in Bos taurus. *72nd Annual Meeting of the European Federation of Animal Science in Davos, Switzerland.*
+* **Suchocki, T., Czech, B., Siwek, M., & Szyda, J. (2019)** Breed specific reference genomes in cattle. *70th Annual Meeting of the European Federation of Animal Science in Ghent, Belgium.*
+* **Czech, B., Suchocki, T., & Szyda, J. (2019)** SNP prioritisation in GWAS with dense marker sets. *70th Annual Meeting of the European Federation of Animal Science in Ghent, Belgium.*
+* **Czech, B., Zając, M., Wasyl, D., Mielczarek, M., & Sztromwasser, P. (2019)** Optimization of de novo assembly of genomes based on second and third generation sequencing data. *XXIV International Conference of Student Scientific Circles, Wroclaw, Poland.*
+* **Czech, B., Mielczarek, M., Frąszczak, M., & Szyda, J. (2018)** Breed specific reference genomes in cattle. *69th Annual Meeting of the European Federation of Animal Science in Dubrovnik, Croatia.*
+* **Czech, B. (2018)** Construction of Bos taurus breed specific reference genomes. *XXIII International Conference of Student Scientific Circles, Wroclaw, Poland.*
+* **Czech, B., Dobkowski, E., Mielczarek, M., Frąszczak, M., & Szyda, J. (2017)** Construction of Bos taurus breed specific reference genomes for Fleckvieh, Simmental, Guernsey and Brown Swiss. *Vorttragstagung der DGfZ und GfT, Stuttgart, Germany.*
+* **Czech, B., Dobkowski, E., Barski, P., & Odziemczyk, M. (2017)** Creating of the Brown Swiss breed specific reference genome. *XXII International Conference of Student Scientific Circles, Wroclaw, Poland.*
 
-### Contact
+## 🖼️ Posters
 
-📧 bartosz.w.czech@gmail.com
+* **Stępień, R., Szyda, J., Czech, B., Mielczarek M. (2023)** The effect of transcriptomic annotations in breast cancer differential gene expression study. *17th Int. Symposium on Integrative Bioinformatics, Wroclaw, Poland.*
+* **Czech, B., Szyda, J., & Wang, Y. (2022)** Host transcriptome and microbiome data integration in Chinese Holstein cattle under heat stress. *73rd Annual Meeting EAAP, Porto, Portugal.*
+* **Czech, B., Wang, K., Chen, S., Wang, Y., & Szyda, J. (2021)** Challenges of 16S rRNA gene analysis in Chinese Holstein cows under heat stress condition. *72nd Annual Meeting EAAP, Davos, Switzerland.*
+* **Kotlarz, K., Mielczarek, M., Suchocki, T., Czech, B., Guldbrandtsen, B., & Szyda, J. (2020)** Don't play too much! Deep learning to classify true and false positive SNPs in whole genome sequence. *71st Annual Meeting EAAP, Porto, Portugal.*
+* **Czech, B., Szyda, J., Wang, K., Chen, S., & Wang, Y. (2020)** The effect of pipelines and databases on the analysis of the fecal microbiota of dairy cattle. *71st Annual Meeting EAAP, Porto, Portugal.*
+* **Szyda, J., Czech, B., Wang, K., Chen, S., & Wang, Y. (2020)** The application of mixed linear models for the analysis of microbiome influence on heat stress in Chinese Holstein cows. *71st Annual Meeting EAAP, Porto, Portugal.*
+* **Czech, B., Szyda, J., & Guldbrandtsen, B. (2020)** Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome in Bos taurus genome. *Conference of Polish Bioinformatics Society, Warsaw, Poland.*
+* **Kotlarz, K., Mielczarek, M., Suchocki, T., Czech, B., Guldbrandtsen, B., & Szyda, J. (2020)** Deep learning algorithms for the imbalanced classification of correct and incorrect SNP genotypes from WGS pipeline. *Conference of Polish Bioinformatics Society, Warsaw, Poland.*
+* **Czech, B., Guldbrandtsen, B., & Szyda, J. (2019)** Pattern of genetic variation between autosomes and sex chromosomes in Bos taurus genome. *70th Annual Meeting EAAP, Ghent, Belgium.*
+
+# End {- .toc-ignore}
+
+<button onclick="topFunction()" id="backToTop" title="Go to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+</button>
+
+<script>
+let mybutton = document.getElementById("backToTop");
+window.onscroll = function() {scrollFunction()};
+function scrollFunction() {
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+    mybutton.style.display = "flex";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+function topFunction() {
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+<div style="margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; color: #64748b; font-size: 0.85em; margin-bottom: -20px;">
+  <p style="margin-bottom: 4px;">&copy; 2026 Bartosz Czech. All rights reserved.</p>
+  <p style="margin-bottom: 0;">Built with R Markdown. Let's connect: <a href="mailto:bartosz.w.czech@gmail.com" style="color: #3b82f6; text-decoration: none; font-weight: 600;">bartosz.w.czech@gmail.com</a></p>
+</div>
