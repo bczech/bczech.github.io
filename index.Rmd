@@ -202,9 +202,9 @@ summary.pub-header:hover { background-color: #f1f3f5; }
 </div>
 </div>
 
-<!-- <a href="CV_Bartosz_Czech_2025.pdf" target="_blank" class="btn-download"> -->
-<!-- 📄 Download Full CV (PDF) -->
-<!-- </a> -->
+<a href="CV_Bartosz_Czech_2026.pdf" target="_blank" class="btn-download">
+📄 Download Full CV (PDF)
+</a>
 </div>
 </div>
 
@@ -320,14 +320,13 @@ for(job in jobs) {
 *Click on a publication card below to reveal the specific **Bioinformatics** & **Statistics** methods used.*
 
 ```{r publications_cards, echo=FALSE, results='asis'}
-# --- DATABASE OF 13 PUBLICATIONS (UPDATED) ---
 
 pubs <- list(
   list(
     year = 2026,
     title = "Motile sperm head morphometry in relation to sperm kinematics and freezability in cats",
     journal = "Theriogenology",
-    link = "[https://doi.org/10.1016/j.theriogenology.2026.117839](https://doi.org/10.1016/j.theriogenology.2026.117839)",
+    link = "https://doi.org/10.1016/j.theriogenology.2026.117839",
     problem = "Evaluating whether sperm head morphometry affects sperm kinematics and freezability (cryotolerance) in domestic cats.",
     bioinfo = "<ul>
       <li>High-throughput data processing of single-spermatozoon kinematics and morphometry from the CASA system (>10,000 cells).</li>
@@ -345,7 +344,7 @@ pubs <- list(
     year = 2025,
     title = "Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibition",
     journal = "Nature Communications",
-    link = "[https://doi.org/10.1038/s41467-025-56634-y](https://doi.org/10.1038/s41467-025-56634-y)",
+    link = "https://doi.org/10.1038/s41467-025-56634-y",
     problem = "Elucidating molecular mechanisms of acquired resistance to TEAD inhibitors in cancer therapy.",
     bioinfo = "<ul>
       <li>High-throughput screens processed with **gDR package** in R.</li>
@@ -360,7 +359,7 @@ pubs <- list(
     year = 2024,
     title = "Profiling of snoRNAs in Exosomes Secreted from Cells Infected with Influenza A Virus",
     journal = "Int. J. Mol. Sci.",
-    link = "[https://doi.org/10.3390/ijms26010012](https://doi.org/10.3390/ijms26010012)",
+    link = "https://doi.org/10.3390/ijms26010012",
     problem = "Characterizing the non-coding RNA cargo of exosomes during viral infection.",
     bioinfo = "<ul>
       <li>Small RNA-seq trimmed (**Trimmomatic**) and mapped with **BWA-MEM**.</li>
@@ -379,7 +378,7 @@ pubs <- list(
     year = 2024,
     title = "Computational Modeling of Drug Response Identifies Mutant-Specific Constraints for Dosing panRAF and MEK Inhibitors",
     journal = "Cancers",
-    link = "[https://doi.org/10.3390/cancers16162914](https://doi.org/10.3390/cancers16162914)",
+    link = "https://doi.org/10.3390/cancers16162914",
     problem = "Optimizing combinatorial drug dosing strategies for melanoma cell lines with specific mutations.",
     bioinfo = "<ul>
       <li>High-throughput screens processed with **gDR package** in R.</li>
@@ -396,7 +395,7 @@ pubs <- list(
     year = 2023,
     title = "Feline sperm head morphometry in relation to male pedigree and fertility",
     journal = "Theriogenology",
-    link = "[https://doi.org/10.1016/j.theriogenology.2023.06.006](https://doi.org/10.1016/j.theriogenology.2023.06.006)",
+    link = "https://doi.org/10.1016/j.theriogenology.2023.06.006",
     problem = "Assessing the impact of genetic background on reproductive traits in felines.",
     bioinfo = "<ul>
       <li>Data preprocessed for multivariate analysis in R.</li>
@@ -415,7 +414,7 @@ pubs <- list(
     year = 2023,
     title = "Protein-Coding Region Derived Small RNA in Exosomes from Influenza A Virus-Infected Cells",
     journal = "Int. J. Mol. Sci.",
-    link = "[https://doi.org/10.3390/ijms24010867](https://doi.org/10.3390/ijms24010867)",
+    link = "https://doi.org/10.3390/ijms24010867",
     problem = "Investigating fragments derived from protein-coding regions in exosomal cargo.",
     bioinfo = "<ul>
       <li>Alignments to dog/flu genomes (**BWA-MEM**); annotation via Ensembl/Rfam.</li>
@@ -433,7 +432,7 @@ pubs <- list(
     year = 2022,
     title = "Host transcriptome and microbiome interactions in Holstein cattle under heat stress condition",
     journal = "Frontiers in Microbiology",
-    link = "[https://doi.org/10.3389/fmicb.2022.998093](https://doi.org/10.3389/fmicb.2022.998093)",
+    link = "https://doi.org/10.3389/fmicb.2022.998093",
     problem = "Understanding systemic response to heat stress via host-microbiome crosstalk.",
     bioinfo = "<ul>
       <li>Host RNA-seq mapped to bovine genome (**STAR**).</li>
@@ -452,7 +451,7 @@ pubs <- list(
     year = 2022,
     title = "Fecal microbiota and their association with heat stress in Bos taurus",
     journal = "BMC Microbiology",
-    link = "[https://doi.org/10.1186/s12866-022-02576-0](https://doi.org/10.1186/s12866-022-02576-0)",
+    link = "https://doi.org/10.1186/s12866-022-02576-0",
     problem = "Determining shifts in gut microbial diversity induced by heat stress.",
     bioinfo = "<ul>
       <li>16S rRNA QC (Trim Galore) and denoising (**DADA2/QIIME2**).</li>
@@ -471,7 +470,7 @@ pubs <- list(
     year = 2021,
     title = "SNP prioritization in targeted sequencing data associated with humoral immune responses in chicken",
     journal = "Poultry Science",
-    link = "[https://doi.org/10.1016/j.psj.2021.101433](https://doi.org/10.1016/j.psj.2021.101433)",
+    link = "https://doi.org/10.1016/j.psj.2021.101433",
     problem = "Prioritizing functional variants linked to immune response.",
     bioinfo = "<ul>
       <li>Mapped to GRCg6a (**BWA-MEM**); calling with **GATK HaplotypeCaller**.</li>
@@ -489,7 +488,7 @@ pubs <- list(
     year = 2020,
     title = "Extraordinary Command Line: Basic Data Editing Tools for Biologists Dealing with Sequence Data",
     journal = "The Open Bioinformatics Journal",
-    link = "[https://doi.org/10.2174/1875036202013010137](https://doi.org/10.2174/1875036202013010137)",
+    link = "https://doi.org/10.2174/1875036202013010137",
     problem = "Addressing efficiency in manual biological data handling.",
     bioinfo = "<ul>
       <li>Demonstrated **sed, awk, grep** and **Bash scripting**.</li>
@@ -503,7 +502,7 @@ pubs <- list(
     year = 2020,
     title = "The application of deep learning for the classification of correct and incorrect SNP genotypes",
     journal = "Journal of Applied Genetics",
-    link = "[https://doi.org/10.1007/s13353-020-00586-0](https://doi.org/10.1007/s13353-020-00586-0)",
+    link = "https://doi.org/10.1007/s13353-020-00586-0",
     problem = "Mitigating high False Positive rates in WGS variant calling.",
     bioinfo = "<ul>
       <li>Extraction of QC features (Read Depth, MapQ, Strand Bias) from BAMs.</li>
@@ -520,7 +519,7 @@ pubs <- list(
     year = 2020,
     title = "Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome",
     journal = "Scientific Reports",
-    link = "[https://doi.org/10.1038/s41598-020-70380-9](https://doi.org/10.1038/s41598-020-70380-9)",
+    link = "https://doi.org/10.1038/s41598-020-70380-9",
     problem = "Comparative analysis of evolutionary pressures on sex chromosomes vs autosomes.",
     bioinfo = "<ul>
       <li>WGS mapped (**BWA-MEM**), called via **GATK** and **SAMtools**.</li>
@@ -538,7 +537,7 @@ pubs <- list(
     year = 2018,
     title = "Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomes",
     journal = "PLOS ONE",
-    link = "[https://doi.org/10.1371/journal.pone.0198419](https://doi.org/10.1371/journal.pone.0198419)",
+    link = "https://doi.org/10.1371/journal.pone.0198419",
     problem = "Discovery of unique genetic markers for breed discrimination.",
     bioinfo = "<ul>
       <li>Alignment (**BWA-MEM**), filtering (**VCFtools**, **PyVCF**), realignment (**GATK**).</li>
@@ -594,7 +593,7 @@ for(p in pubs) {
           # RIGHT COLUMN: Visuals
           '<div class="pub-visuals">',
             img_html,
-            '<a href="', p$link, '" target="_blank" class="btn-read">Read Publication &rarr;</a>',
+              '<a href="', p$link, '" target="_blank" class="btn-read"><i class="fas fa-external-link-alt"></i> Read Publication</a>',
           '</div>',
           
         '</div>',
