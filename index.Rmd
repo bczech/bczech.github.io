@@ -247,24 +247,13 @@ cat('</div>')
 
 # 📦 Open Source
 
-```{r ggwas_section, echo=FALSE, results='asis'}
-cat('
-<div style="display: flex; align-items: center; gap: 30px; padding: 25px; background: linear-gradient(135deg, #0D1B2A 0%, #1A3A5C 100%); border-radius: 12px; margin: 20px 0;">
-  <a href="https://github.com/bczech/ggwas">
-    <img src="https://raw.githubusercontent.com/bczech/ggwas/main/man/figures/logo.png" height="140" alt="ggwas logo" style="border-radius: 8px;" />
-  </a>
-  <div>
-    <h3 style="margin: 0 0 8px 0; color: #FFFFFF;">ggwas</h3>
-    <p style="margin: 0 0 12px 0; color: #B0C4DE; font-size: 1.05em;">
-      Modern ggplot2 visualizations for GWAS summary statistics. 15 plot types including Manhattan, QQ, Miami, PheWAS, colocalization, fine-mapping credible sets, and genetic correlation matrices. Built-in journal themes, colorblind-safe palettes, and smart downsampling for 10M+ variant datasets.
-    </p>
-    <a href="https://github.com/bczech/ggwas" style="text-decoration: none;"><img src="https://img.shields.io/badge/GitHub-ggwas-1A5276?style=flat--square&logo=github" /></a>
-    <a href="https://bczech.github.io/ggwas/" style="text-decoration: none;"><img src="https://img.shields.io/badge/Docs-Website-38EBC1?style=flat--square" /></a>
-    <a href="https://doi.org/10.5281/zenodo.20815110" style="text-decoration: none;"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20815110-blue?style=flat--square" /></a>
-  </div>
-</div>
-')
-```
+<a href="https://github.com/bczech/ggwas"><img src="https://raw.githubusercontent.com/bczech/ggwas/main/man/figures/logo.png" align="left" height="120" style="margin-right: 20px;" /></a>
+
+**[ggwas](https://github.com/bczech/ggwas)** — Modern ggplot2 visualizations for GWAS summary statistics. 15 plot types including Manhattan, QQ, Miami, PheWAS, colocalization, fine-mapping credible sets, and genetic correlation matrices. Built-in journal themes, colorblind-safe palettes, and smart downsampling for 10M+ variant datasets.
+
+[![GitHub](https://img.shields.io/badge/GitHub-ggwas-1A5276?style=flat-square&logo=github)](https://github.com/bczech/ggwas) [![Docs](https://img.shields.io/badge/Docs-Website-38EBC1?style=flat-square)](https://bczech.github.io/ggwas/) [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20815110-blue?style=flat-square)](https://doi.org/10.5281/zenodo.20815110)
+
+<div style="clear: both;"></div>
 
 ---
 
