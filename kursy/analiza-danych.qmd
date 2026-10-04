@@ -1,0 +1,21 @@
+---
+title: "Analiza danych"
+subtitle: "Bioinformatyka, III rok · Uniwersytet Przyrodniczy we Wrocławiu"
+---
+
+[III rok bioinformatyki]{.badge-soft} [uczenie maszynowe]{.badge-soft} [semestr zimowy 2026/2027]{.badge-soft}
+
+## O kursie
+
+Uczenie maszynowe na danych biologicznych w R i Pythonie: przygotowanie danych,
+budowa modelu i jego ocena.
+
+## Materiały
+
+::: {.status-soon}
+W przygotowaniu
+:::
+
+Materiały pojawią się wkrótce.
+
+<!-- PLACEHOLDER — do podpięcia materiały z ~/analiza_danych_bioinf/wyklady/ -->

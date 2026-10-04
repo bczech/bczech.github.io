@@ -1,0 +1,119 @@
+---
+pagetitle: "Bartosz Czech — Dydaktyka"
+toc: false
+---
+
+## Kursy — semestr zimowy 2026/2027
+
+::: {.column-margin}
+::: {#kontakt .contact-card}
+[Kontakt]{.cc-label}
+
+[[]{.bi .bi-envelope-fill}[bartosz.czech@upwr.edu.pl](mailto:bartosz.czech@upwr.edu.pl)]{.cc-row}
+
+[[]{.bi .bi-geo-alt-fill}[Katedra Genetyki<br>[Wydział Biologii i Hodowli Zwierząt]{.cc-dim}<br>[Uniwersytet Przyrodniczy we Wrocławiu]{.cc-dim}]{.cc-grp}[ul. Kożuchowska 7, 51-631 Wrocław]{.cc-grp .cc-dim}[budynek E5, II piętro, pokój 306]{.cc-grp .cc-dim}]{.cc-row}
+
+[Konsultacje]{.cc-label .second}
+
+[[]{.bi .bi-clock-fill}poniedziałek 14:00–15:30<br>[pokój 306 · proszę o wcześniejszy kontakt mailowy]{.cc-dim}]{.cc-row}
+:::
+:::
+
+::: {.card-grid}
+::: {.course-card}
+<span class="card-flag" role="img" aria-label="Zajęcia w języku polskim" title="Zajęcia po polsku"><svg viewBox="0 0 60 30"><rect width="60" height="15" fill="#fff"/><rect y="15" width="60" height="15" fill="#D4213D"/></svg></span>
+[]{.card-icon .bi .bi-terminal}
+
+::: {.kicker}
+[III rok]{.c-year} [Bioinformatyka]{.c-field}
+:::
+### [Pracownia Informatyczna](kursy/pracownia-informatyczna.qmd){.stretched-link}
+:::
+
+::: {.course-card}
+<span class="card-flag" role="img" aria-label="Zajęcia w języku polskim" title="Zajęcia po polsku"><svg viewBox="0 0 60 30"><rect width="60" height="15" fill="#fff"/><rect y="15" width="60" height="15" fill="#D4213D"/></svg></span>
+[]{.card-icon .bi .bi-cpu}
+
+::: {.kicker}
+[III rok]{.c-year} [Bioinformatyka]{.c-field}
+:::
+### [Analiza danych](kursy/analiza-danych.qmd){.stretched-link}
+:::
+
+::: {.course-card}
+<span class="card-flag" role="img" aria-label="Zajęcia w języku polskim" title="Zajęcia po polsku"><svg viewBox="0 0 60 30"><rect width="60" height="15" fill="#fff"/><rect y="15" width="60" height="15" fill="#D4213D"/></svg></span>
+[]{.card-icon .bi .bi-bar-chart-line}
+
+::: {.kicker}
+[III rok]{.c-year} [Biologia]{.c-field}
+:::
+### [Biostatystyka](kursy/biostatystyka.qmd){.stretched-link}
+:::
+
+::: {.course-card}
+<span class="card-flag" role="img" aria-label="Course taught in English" title="Taught in English"><svg viewBox="0 0 60 30"><clipPath id="ukc1"><path d="M0,0 v30 h60 v-30 z"/></clipPath><clipPath id="ukc2"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><g clip-path="url(#ukc1)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#ukc2)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg></span>
+[]{.card-icon .bi .bi-code-slash}
+
+::: {.kicker}
+[Erasmus+]{.c-year} [&nbsp;]{.c-field}
+:::
+### [Coding Lab](kursy/coding-lab.qmd){.stretched-link}
+:::
+:::
+
+## Prace dyplomowe {#prace-dyplomowe}
+
+Zapraszam do realizacji prac dyplomowych (licencjackich, inżynierskich
+i magisterskich) z bioinformatyki i biologii obliczeniowej. Zakres tematów jest szeroki:
+analiza danych omicznych (genomika, transkryptomika, mikrobiom, dane wieloomiczne),
+uczenie maszynowe, a także programowanie i metody algorytmiczne. Temat ustalamy wspólnie,
+pod kątem zainteresowań studenta. Szczegóły:
+[bartosz.czech@upwr.edu.pl](mailto:bartosz.czech@upwr.edu.pl).
+
+## Plan zajęć {#plan}
+
+Semestr zimowy 2026/2027. Konsultacje po wcześniejszym kontakcie mailowym.
+
+<div class="timetable-wrap">
+<div class="timetable">
+  <div class="corner"></div>
+  <div class="day-head" style="grid-column:2">Poniedziałek</div>
+  <div class="day-head" style="grid-column:3">Wtorek</div>
+  <div class="day-head" style="grid-column:4">Środa</div>
+  <div class="day-head" style="grid-column:5">Czwartek</div>
+  <div class="day-head" style="grid-column:6">Piątek</div>
+
+  <div class="time-label" style="grid-row:2">8:00</div>
+  <div class="time-label" style="grid-row:6">9:00</div>
+  <div class="time-label" style="grid-row:10">10:00</div>
+  <div class="time-label" style="grid-row:14">11:00</div>
+  <div class="time-label" style="grid-row:18">12:00</div>
+  <div class="time-label" style="grid-row:22">13:00</div>
+  <div class="time-label" style="grid-row:26">14:00</div>
+  <div class="time-label" style="grid-row:30">15:00</div>
+  <div class="time-label" style="grid-row:34">16:00</div>
+  <div class="time-label end" style="grid-row:37">17:00</div>
+
+  <div class="hour-line" style="grid-row:6"></div>
+  <div class="hour-line" style="grid-row:10"></div>
+  <div class="hour-line" style="grid-row:14"></div>
+  <div class="hour-line" style="grid-row:18"></div>
+  <div class="hour-line" style="grid-row:22"></div>
+  <div class="hour-line" style="grid-row:26"></div>
+  <div class="hour-line" style="grid-row:30"></div>
+  <div class="hour-line" style="grid-row:34"></div>
+
+  <div class="ev wyklad" style="grid-column:2;grid-row:22/25"><span class="t">13:00–13:45</span><span class="n">Biostatystyka</span><span class="r">sala 14O</span></div>
+  <div class="ev konsultacje" style="grid-column:2;grid-row:26/32"><span class="t">14:00–15:30</span><span class="n">Konsultacje</span><span class="r">pok. 306</span></div>
+  <div class="ev wyklad" style="grid-column:2;grid-row:32/38"><span class="t">15:30–17:00</span><span class="n">Analiza danych</span><span class="r">sala AB · I poł.</span></div>
+  <div class="ev cwiczenia" style="grid-column:4;grid-row:8/17"><span class="t">9:30–11:45</span><span class="n">Pracownia informatyczna</span><span class="r">sala AB</span></div>
+  <div class="ev cwiczenia" style="grid-column:6;grid-row:2/16"><span class="t">8:00–11:30</span><span class="n">Analiza danych</span><span class="r">sala 366</span></div>
+</div>
+</div>
+
+<div class="tt-legend">
+<span><i style="background:#3498db"></i> Wykład</span>
+<span><i style="background:#16a34a"></i> Ćwiczenia</span>
+<span><i style="background:#e67e22"></i> Konsultacje</span>
+</div>
+

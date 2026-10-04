@@ -1,0 +1,25 @@
+---
+title: "Pracownia Informatyczna"
+subtitle: "Bioinformatyka, III rok · Uniwersytet Przyrodniczy we Wrocławiu"
+---
+
+[III rok bioinformatyki]{.badge-soft} [forma blended]{.badge-soft} [semestr zimowy 2026/2027]{.badge-soft}
+
+## O kursie
+
+Narzędzia codziennej pracy bioinformatyka: powłoka, Git, Conda, Docker, SLURM,
+Python i Snakemake.
+
+## Materiały
+
+::: {.status-soon}
+W przygotowaniu
+:::
+
+Materiały pojawią się wkrótce.
+
+<!-- PLACEHOLDER — materiały dosypiemy później, np.:
+| Moduł | Temat | Wykład | Zadania |
+|-------|-------|:------:|:-------:|
+| M1 | Powłoka, potoki i filtry tekstowe | [HTML](...) · [PDF](...) | [HTML](...) |
+-->

@@ -1,0 +1,47 @@
+project:
+  type: website
+  output-dir: teaching
+  render:
+    - "*.qmd"
+    - "kursy/*.qmd"
+
+website:
+  title: "dr inż. Bartosz Czech"
+  description: "Dydaktyka — wykłady i listy zadań do kursów bioinformatyki i biostatystyki na Uniwersytecie Przyrodniczym we Wrocławiu."
+  site-url: "https://bczech.github.io/teaching/"
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    pinned: true
+    left:
+      - href: index.qmd
+        text: "Start"
+    right:
+      - href: index.qmd#kontakt
+        text: "Kontakt"
+      - text: "Portfolio ↗"
+        href: https://bczech.github.io
+      - icon: envelope
+        href: mailto:bartosz.czech@upwr.edu.pl
+        aria-label: Email
+      - icon: github
+        href: https://github.com/bczech
+        aria-label: GitHub
+  page-footer:
+    border: true
+    left: "© 2026 Bartosz Czech · Uniwersytet Przyrodniczy we Wrocławiu"
+    right: "[Pełne portfolio ↗](https://bczech.github.io)"
+
+format:
+  html:
+    theme: [flatly, brand.scss]
+    toc: true
+    toc-title: "Na tej stronie"
+    anchor-sections: true
+    smooth-scroll: true
+    link-external-newwindow: true
+    grid:
+      sidebar-width: 250px
+      body-width: 860px
+      margin-width: 300px

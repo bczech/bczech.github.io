@@ -1,0 +1,21 @@
+---
+title: "Biostatystyka"
+subtitle: "Biologia, III rok · Uniwersytet Przyrodniczy we Wrocławiu"
+---
+
+[III rok kierunku biologia]{.badge-soft} [10 wykładów]{.badge-soft} [semestr zimowy 2026/2027]{.badge-soft}
+
+## O kursie
+
+Statystyka dla biologów: statystyka opisowa, rozkłady prawdopodobieństwa,
+testowanie hipotez i interpretacja wyników.
+
+## Materiały
+
+::: {.status-soon}
+W przygotowaniu
+:::
+
+Materiały pojawią się wkrótce.
+
+<!-- PLACEHOLDER — do podpięcia PDF-y wykładów z ~/biostatystyka_v3/ -->

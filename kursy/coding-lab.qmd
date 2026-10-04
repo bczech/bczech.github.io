@@ -1,0 +1,25 @@
+---
+title: "Coding Lab"
+subtitle: "Erasmus+ · Wrocław University of Environmental and Life Sciences"
+lang: en
+---
+
+[Erasmus+]{.badge-soft} [taught in English]{.badge-soft} [winter semester 2026/2027]{.badge-soft}
+
+## About the course
+
+A bioinformatician's everyday toolkit: the shell, Git, Conda, Docker,
+SLURM, Python and Snakemake.
+
+::: {.status-soon}
+Coming soon
+:::
+
+Materials will appear here shortly.
+
+<!-- PLACEHOLDER — fill in once confirmed with Bartosz:
+     programme/year, total hours, form (lecture/lab), topics, assessment.
+| Week | Topic | Slides | Exercises |
+|------|-------|:------:|:---------:|
+| 1 | ... | [HTML](...) · [PDF](...) | [HTML](...) |
+-->
