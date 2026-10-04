@@ -17,6 +17,34 @@ toc: false
 
 [[]{.bi .bi-clock-fill}poniedziałek 14:00–15:30<br>[pokój 306 · proszę o wcześniejszy kontakt mailowy]{.cc-dim}]{.cc-row}
 :::
+
+::: {#plan .mini-plan}
+[Plan zajęć]{.mp-label}
+
+::: {.mp-cols}
+::: {.mp-dayblock}
+[poniedziałek]{.mp-day}
+
+[[13:00–13:45]{.mp-t}[Biostatystyka]{.mp-n}[wykład · sala 14O]{.mp-r}]{.mp-item .wyklad}
+
+[[14:00–15:30]{.mp-t}[Konsultacje]{.mp-n}[pok. 306]{.mp-r}]{.mp-item .konsultacje}
+
+[[15:30–17:00]{.mp-t}[Analiza danych]{.mp-n}[wykład · sala AB, I poł.]{.mp-r}]{.mp-item .wyklad}
+:::
+
+::: {.mp-dayblock}
+[środa]{.mp-day}
+
+[[9:30–11:45]{.mp-t}[Pracownia informatyczna]{.mp-n}[ćwiczenia · sala AB]{.mp-r}]{.mp-item .cwiczenia}
+:::
+
+::: {.mp-dayblock}
+[piątek]{.mp-day}
+
+[[8:00–11:30]{.mp-t}[Analiza danych]{.mp-n}[ćwiczenia · sala 366]{.mp-r}]{.mp-item .cwiczenia}
+:::
+:::
+:::
 :::
 
 ::: {.card-grid}
@@ -69,51 +97,4 @@ analiza danych omicznych (genomika, transkryptomika, mikrobiom, dane wieloomiczn
 uczenie maszynowe, a także programowanie i metody algorytmiczne. Temat ustalamy wspólnie,
 pod kątem zainteresowań studenta. Szczegóły:
 [bartosz.czech@upwr.edu.pl](mailto:bartosz.czech@upwr.edu.pl).
-
-## Plan zajęć {#plan}
-
-Semestr zimowy 2026/2027. Konsultacje po wcześniejszym kontakcie mailowym.
-
-<div class="timetable-wrap">
-<div class="timetable">
-  <div class="corner"></div>
-  <div class="day-head" style="grid-column:2">Poniedziałek</div>
-  <div class="day-head" style="grid-column:3">Wtorek</div>
-  <div class="day-head" style="grid-column:4">Środa</div>
-  <div class="day-head" style="grid-column:5">Czwartek</div>
-  <div class="day-head" style="grid-column:6">Piątek</div>
-
-  <div class="time-label" style="grid-row:2">8:00</div>
-  <div class="time-label" style="grid-row:6">9:00</div>
-  <div class="time-label" style="grid-row:10">10:00</div>
-  <div class="time-label" style="grid-row:14">11:00</div>
-  <div class="time-label" style="grid-row:18">12:00</div>
-  <div class="time-label" style="grid-row:22">13:00</div>
-  <div class="time-label" style="grid-row:26">14:00</div>
-  <div class="time-label" style="grid-row:30">15:00</div>
-  <div class="time-label" style="grid-row:34">16:00</div>
-  <div class="time-label end" style="grid-row:37">17:00</div>
-
-  <div class="hour-line" style="grid-row:6"></div>
-  <div class="hour-line" style="grid-row:10"></div>
-  <div class="hour-line" style="grid-row:14"></div>
-  <div class="hour-line" style="grid-row:18"></div>
-  <div class="hour-line" style="grid-row:22"></div>
-  <div class="hour-line" style="grid-row:26"></div>
-  <div class="hour-line" style="grid-row:30"></div>
-  <div class="hour-line" style="grid-row:34"></div>
-
-  <div class="ev wyklad" style="grid-column:2;grid-row:22/25"><span class="t">13:00–13:45</span><span class="n">Biostatystyka</span><span class="r">sala 14O</span></div>
-  <div class="ev konsultacje" style="grid-column:2;grid-row:26/32"><span class="t">14:00–15:30</span><span class="n">Konsultacje</span><span class="r">pok. 306</span></div>
-  <div class="ev wyklad" style="grid-column:2;grid-row:32/38"><span class="t">15:30–17:00</span><span class="n">Analiza danych</span><span class="r">sala AB · I poł.</span></div>
-  <div class="ev cwiczenia" style="grid-column:4;grid-row:8/17"><span class="t">9:30–11:45</span><span class="n">Pracownia informatyczna</span><span class="r">sala AB</span></div>
-  <div class="ev cwiczenia" style="grid-column:6;grid-row:2/16"><span class="t">8:00–11:30</span><span class="n">Analiza danych</span><span class="r">sala 366</span></div>
-</div>
-</div>
-
-<div class="tt-legend">
-<span><i style="background:#3498db"></i> Wykład</span>
-<span><i style="background:#16a34a"></i> Ćwiczenia</span>
-<span><i style="background:#e67e22"></i> Konsultacje</span>
-</div>
 
