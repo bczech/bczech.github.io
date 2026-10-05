@@ -12,10 +12,8 @@ testowanie hipotez i interpretacja wyników.
 
 ## Materiały
 
-::: {.status-soon}
-W przygotowaniu
+::: {.mat-list}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 1: Wprowadzenie[51 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-01-wprowadzenie.pdf){.mat-item}
 :::
 
-Materiały pojawią się wkrótce.
-
-<!-- PLACEHOLDER — do podpięcia PDF-y wykładów z ~/biostatystyka_v3/ -->
+Kolejne wykłady pojawią się wkrótce.

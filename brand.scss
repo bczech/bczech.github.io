@@ -313,6 +313,21 @@ main h3 { color: #2c3e50; font-weight: 700; }
   .contact-card { margin: 20px 0 6px; }
   .mini-plan { margin: 16px 0 6px; }
 }
+
+// ——— Lista materiałów (PDF-y wykładów) ———
+.mat-list { display: flex; flex-direction: column; gap: 10px; margin: 18px 0 10px; }
+.mat-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 17px; border: 1px solid #e2e8f0; border-radius: 10px;
+  background: #fff; color: #2c3e50 !important; text-decoration: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.mat-item:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.07); }
+.mat-item .mat-ic { font-size: 1.5rem; line-height: 1; color: #B5342E; }
+.mat-item .mat-tt { font-weight: 700; line-height: 1.2; }
+.mat-item .mat-meta { display: block; font-size: 0.8rem; font-weight: 500; color: #94a3b8; margin-top: 2px; }
+.mat-item .mat-dl { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: #3498db; white-space: nowrap; }
 @media (max-width: 600px) {
   .info-card dl { grid-template-columns: 1fr; gap: 2px 0; }
   .info-card dt { margin-top: 10px; }
