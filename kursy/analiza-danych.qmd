@@ -12,10 +12,8 @@ budowa modelu i jego ocena.
 
 ## Materiały
 
-::: {.status-soon}
-W przygotowaniu
+::: {.mat-list}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 1: Wprowadzenie do uczenia maszynowego[69 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-01-wprowadzenie-do-ml.pdf){.mat-item}
 :::
 
-Materiały pojawią się wkrótce.
-
-<!-- PLACEHOLDER — do podpięcia materiały z ~/analiza_danych_bioinf/wyklady/ -->
+Kolejne wykłady pojawią się wkrótce.
