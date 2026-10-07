@@ -12,14 +12,8 @@ Python i Snakemake.
 
 ## Materiały
 
-::: {.status-soon}
-W przygotowaniu
+::: {.mat-list}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 1: Wiersz poleceń i filozofia Uniksa[98 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](pracownia-informatyczna/wyklad-01-wiersz-polecen.pdf){.mat-item}
 :::
 
-Materiały pojawią się wkrótce.
-
-<!-- PLACEHOLDER — materiały dosypiemy później, np.:
-| Moduł | Temat | Wykład | Zadania |
-|-------|-------|:------:|:-------:|
-| M1 | Powłoka, potoki i filtry tekstowe | [HTML](...) · [PDF](...) | [HTML](...) |
--->
+Kolejne wykłady pojawią się wkrótce.
