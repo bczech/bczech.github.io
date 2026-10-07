@@ -30,7 +30,9 @@ capstone that ties the tools together.
 
 ::: {.mat-list}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Course handbook[83 pages · PDF]{.mat-meta}]{.mat-tt}[Download]{.mat-dl}](coding-lab/coding-lab-handbook.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-zip-fill}[Course dataset[ZIP · 4.2 MB]{.mat-meta}]{.mat-tt}[Download]{.mat-dl}](coding-lab/coding-lab-data.zip){.mat-item}
 :::
 
-The handbook covers the full course; the accompanying dataset is shared through
-Google Classroom.
+Download both: the exercises and the capstone in the handbook work on the files
+in the dataset (`transcripts.fa`, `annotation.gtf`, `expression.tsv` and
+others).
