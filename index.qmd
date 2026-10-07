@@ -91,10 +91,16 @@ toc: false
 
 ## Prace dyplomowe {#prace-dyplomowe}
 
-Zapraszam do realizacji prac dyplomowych (licencjackich, inżynierskich
-i magisterskich) z bioinformatyki i biologii obliczeniowej. Zakres tematów jest szeroki:
-analiza danych omicznych (genomika, transkryptomika, mikrobiom, dane wieloomiczne),
-uczenie maszynowe, a także programowanie i metody algorytmiczne. Temat ustalamy wspólnie,
-pod kątem zainteresowań studenta. Szczegóły:
-[bartosz.czech@upwr.edu.pl](mailto:bartosz.czech@upwr.edu.pl).
+Zapraszam do realizacji prac dyplomowych — licencjackich, inżynierskich
+i magisterskich — z bioinformatyki i biologii obliczeniowej.
+
+Tematy obejmują m.in. genetykę i genomikę (zmienność genetyczna, GWAS),
+transkryptomikę (RNA-seq, ekspresja genów), proteomikę i fosfoproteomikę (analiza
+aktywności kinaz, KSEA), analizę mikrobiomu i metagenomikę, integrację danych
+wieloomicznych, genomikę nowotworów oraz uczenie maszynowe i statystyczną analizę danych.
+
+Pracę można poprowadzić bardziej biologicznie albo bardziej obliczeniowo. Temat
+dobieramy wspólnie, pod zainteresowania studenta.
+
+Szczegóły: [bartosz.czech@upwr.edu.pl](mailto:bartosz.czech@upwr.edu.pl).
 
