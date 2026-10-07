@@ -8,18 +8,29 @@ lang: en
 
 ## About the course
 
-A bioinformatician's everyday toolkit: the shell, Git, Conda, Docker,
-SLURM, Python and Snakemake.
+A hands-on introduction to the Linux command line for bioinformatics. The
+course handbook works through eight chapters, moving from the shell and
+everyday text-processing tools to AWK, Bash scripting and reproducible
+software environments, and closing with a pipeline that turns raw biological
+data into a report. Each chapter ends with exercises; the final chapter is a
+capstone that ties the tools together.
 
-::: {.status-soon}
-Coming soon
+## Topics
+
+1. The Linux command line
+2. Overview of command-line tools
+3. The VIM text editor
+4. Biological data: databases and formats
+5. The AWK programming language
+6. Bash as a scripting language
+7. Software in the Linux environment (Conda, Docker)
+8. Writing custom scripts for biological data processing
+
+## Materials
+
+::: {.mat-list}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Course handbook[83 pages · PDF]{.mat-meta}]{.mat-tt}[Download]{.mat-dl}](coding-lab/coding-lab-handbook.pdf){.mat-item}
 :::
 
-Materials will appear here shortly.
-
-<!-- PLACEHOLDER — fill in once confirmed with Bartosz:
-     programme/year, total hours, form (lecture/lab), topics, assessment.
-| Week | Topic | Slides | Exercises |
-|------|-------|:------:|:---------:|
-| 1 | ... | [HTML](...) · [PDF](...) | [HTML](...) |
--->
+The handbook covers the full course; the accompanying dataset is shared through
+Google Classroom.
