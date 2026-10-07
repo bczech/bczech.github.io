@@ -95,6 +95,20 @@
     "href": "kursy/coding-lab.html#about-the-course",
     "title": "Coding Lab",
     "section": "About the course",
-    "text": "About the course\nA bioinformatician’s everyday toolkit: the shell, Git, Conda, Docker, SLURM, Python and Snakemake.\n\nComing soon\n\nMaterials will appear here shortly."
+    "text": "About the course\nA hands-on introduction to the Linux command line for bioinformatics. The course handbook works through eight chapters, moving from the shell and everyday text-processing tools to AWK, Bash scripting and reproducible software environments, and closing with a pipeline that turns raw biological data into a report. Each chapter ends with exercises; the final chapter is a capstone that ties the tools together."
+  },
+  {
+    "objectID": "kursy/coding-lab.html#topics",
+    "href": "kursy/coding-lab.html#topics",
+    "title": "Coding Lab",
+    "section": "Topics",
+    "text": "Topics\n\nThe Linux command line\nOverview of command-line tools\nThe VIM text editor\nBiological data: databases and formats\nThe AWK programming language\nBash as a scripting language\nSoftware in the Linux environment (Conda, Docker)\nWriting custom scripts for biological data processing"
+  },
+  {
+    "objectID": "kursy/coding-lab.html#materials",
+    "href": "kursy/coding-lab.html#materials",
+    "title": "Coding Lab",
+    "section": "Materials",
+    "text": "Materials\n\nCourse handbook83 pages · PDFDownload\n\nThe handbook covers the full course; the accompanying dataset is shared through Google Classroom."
   }
 ]
