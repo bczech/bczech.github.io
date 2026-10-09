@@ -1,0 +1,160 @@
+---
+title: "Ćwiczenia 1 — Środowisko, dane i kształt p ≫ n (wersja R)"
+subtitle: "Dane demo: mikrobiom jelitowy w cukrzycy typu 2 (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# 1. Środowisko i wczytanie kohorty demo
+
+Kohortę pobieramy wprost z `curatedMetagenomicData`. Konwencja jest ta sama we
+wszystkich materiałach: macierz `X` to próbki (wiersze) × taksony (kolumny),
+wektor `y` to etykieta kliniczna, a `md` to metadane kliniczne próbek.
+
+```{r load}
+library(curatedMetagenomicData)
+library(SummarizedExperiment)
+
+tse <- curatedMetagenomicData("QinJ_2012.relative_abundance",
+                              dryrun = FALSE, rownames = "short")[[1]]
+X <- as.data.frame(t(assay(tse)))
+y <- factor(colData(tse)$study_condition)
+md <- as.data.frame(colData(tse))
+
+dim(X)
+table(y, useNA = "ifany")
+```
+
+W kohorcie są też próbki spoza interesującego nas porównania (etykieta `NA` lub
+inna niż `control`/`T2D`). Ograniczamy analizę do dwóch klas — to zadanie
+klasyfikacji binarnej. Operator `%in%` zwraca `FALSE` dla `NA`, więc odrzuca je
+przy okazji. Metadane `md` tniemy tym samym wektorem, żeby wiersze `X`, `y` i `md`
+odpowiadały tym samym próbkom.
+
+```{r filter}
+keep <- y %in% c("control", "T2D")
+X <- X[keep, ]
+md <- md[keep, ]
+y <- droplevels(y[keep])
+
+# Klasę "control" ustawiamy jako referencyjną; klasą pozytywną jest "T2D"
+y <- relevel(y, ref = "control")
+
+dim(X)        # liczba próbek i liczba cech po ograniczeniu do dwóch klas
+table(y)      # rozkład klas
+levels(y)     # [1] "control" [2] "T2D" — pozycja 2 to klasa pozytywna
+```
+
+Dane mają kształt `p ≫ n`: cech (taksonów) jest znacznie więcej niż próbek. To
+pierwsza i najważniejsza cecha problemu — wraca w każdej kolejnej sekcji kursu.
+
+> **✏️ Zadanie 1 — Kształt danych.** Odczytać kodem (nie „na oko"):
+>
+> 1. Ile jest próbek, a ile taksonów? Który wymiar jest większy?
+> 2. Jaki jest rozkład klas? Czy klasy są zbalansowane?
+> 3. Jakiego typu są wartości cech i w jakim mieszczą się zakresie?
+> 4. Jaki odsetek macierzy cech to zera? Co to mówi o danych?
+
+```{r zad-1}
+# TODO: odczytać wymiary, rozkład klas, typ i zakres wartości oraz odsetek zer
+```
+
+# 2. Eksport do wspólnego źródła (wersja Python)
+
+Wersja Python pracuje na tych samych danych wczytanych z plików CSV. Eksportujemy je
+raz, tutaj; notatnik `lab_01.ipynb` czyta dokładnie te pliki. Kolejność jest
+istotna: **CSV eksportuje wersja R, a wersja Python go czyta.** Oprócz macierzy cech
+i etykiet eksportujemy wybrane metadane kliniczne — będą potrzebne do eksploracji
+w sekcji 4.
+
+```{r export}
+dir.create("dane", showWarnings = FALSE)
+
+kolumny_md <- c("study_condition", "age", "age_category", "gender",
+                "BMI", "number_reads", "country", "non_westernized")
+
+write.csv(X, "dane/t2d_features.csv")
+write.csv(data.frame(grupa = y), "dane/t2d_labels.csv", row.names = FALSE)
+write.csv(md[, kolumny_md], "dane/t2d_metadata.csv")
+
+list.files("dane")
+```
+
+> **✏️ Zadanie 2 — Zgodność wersji.** Wczytać wyeksportowany CSV w Pythonie
+> (`lab_01.ipynb`) i potwierdzić, że wymiary oraz rozkład klas zgadzają się
+> z wersją R. Od tego spotkania obie wersje operują na tych samych danych.
+
+# 3. Eksploracja cech
+
+Po otwarciu danych warto najpierw je poznać, zanim zaczniemy modelować. Macierz
+cech to **liczebności względne** (procenty profilu taksonomicznego), więc suma
+w każdej próbce jest w przybliżeniu stała. Rozkład pojedynczego taksonu jest
+zwykle silnie skośny: kilka taksonów dominuje profil, większość występuje
+śladowo lub wcale.
+
+> **✏️ Zadanie 3 — Dominujące taksony i kompozycyjność.** Zbadać strukturę
+> macierzy cech:
+>
+> 1. Policzyć sumę każdego wiersza `X` (`rowSums(X)`). Jaką wartość przyjmuje i co
+>    z tego wynika o naturze danych?
+> 2. Wyznaczyć 5 taksonów o najwyższej średniej liczebności w całej kohorcie
+>    (`colMeans(X)`). Jaki udział profilu zajmuje sam najliczniejszy takson?
+> 3. Narysować histogram liczebności najliczniejszego taksonu. Czy rozkład jest
+>    symetryczny, czy skośny? (zapowiedź transformacji CLR ze spotkania 3)
+
+```{r zad-3}
+# TODO: policzyć sumy wierszy, 5 najliczniejszych taksonów i histogram najliczniejszego
+```
+
+# 4. Metadane kohorty i zmienne zakłócające
+
+Eksploracja to nie tylko macierz cech — to także pytanie, czy grupy `control`
+i `T2D` różnią się czymś **poza mikrobiomem**. Jeśli różnią się wiekiem, płcią
+czy głębokością sekwencjonowania, model może nauczyć się sygnału związanego z tymi
+zmiennymi, a nie z chorobą. Takie zmienne nazywamy **zakłócającymi** (confounders).
+
+> **✏️ Zadanie 4 — Metadane i zmienne zakłócające.** Na podstawie `md`:
+>
+> 1. Które zmienne są stałe w całej kohorcie (ta sama wartość u wszystkich próbek)?
+>    Co z nich wynika dla modelu?
+> 2. Porównać wiek (`age`) między grupami: mediany i test Wilcoxona. Czy grupy są
+>    pod tym względem podobne?
+> 3. Porównać płeć (`gender`) między grupami: tabela liczności i test chi-kwadrat.
+> 4. Porównać głębokość sekwencjonowania (`number_reads`) między grupami.
+> 5. Która z badanych zmiennych **nie** różni grup istotnie?
+> 6. Jednym–dwoma zdaniami: dlaczego różnica wieku i płci między grupami jest
+>    problemem przy budowie klasyfikatora na mikrobiomie?
+
+```{r zad-4}
+# TODO: wskazać zmienne stałe; porównać age, gender, number_reads i BMI między grupami
+```
+
+# 5. Konsekwencje kształtu `p ≫ n` i wersje środowiska
+
+Wersje pakietów zapisujemy od początku — to podstawa reprodukowalności i ten sam
+zapis trafia później do raportu projektowego.
+
+```{r sessioninfo}
+sessionInfo()
+```
+
+> **✏️ Zadanie 5 — Konsekwencje kształtu `p ≫ n`.** Policzyć kodem:
+>
+> 1. Stosunek liczby cech do liczby próbek (`ncol(X) / nrow(X)`).
+> 2. Ile taksonów ma zerową lub bliską zeru wariancję (`apply(X, 2, var)`).
+> 3. Ile taksonów występuje w mniej niż 10% próbek (`colMeans(X > 0)`).
+> 4. Jednym zdaniem: dlaczego regresji logistycznej (właściwej dla binarnej etykiety)
+>    nie da się jednoznacznie dopasować na wszystkich cechach naraz, gdy `p > n`.
+
+```{r zad-5}
+# TODO: policzyć stosunek p/n, liczbę cech o zerowej wariancji i liczbę cech rzadkich
+```
+
+> **★ Zadanie rozszerzające.** Spróbować dopasować regresję logistyczną wiążącą etykietę ze wszystkimi taksonami jednocześnie. Sprawdzić, dla ilu współczynników procedura nie zwraca wartości, oraz policzyć odsetek trafnych klasyfikacji na tym samym zbiorze, który posłużył do dopasowania modelu. Rozstrzygnąć, czy taki wynik świadczy o jakości modelu, czy wynika z relacji `p > n`.
