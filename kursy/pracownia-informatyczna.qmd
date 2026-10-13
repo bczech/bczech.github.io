@@ -17,4 +17,3 @@ Python i Snakemake.
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 2: Reprodukowalność analizy i narzędzia pracy[96 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](pracownia-informatyczna/wyklad-02-reprodukowalnosc.pdf){.mat-item}
 :::
 
-Kolejne wykłady pojawią się wkrótce.
