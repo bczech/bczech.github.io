@@ -14,6 +14,7 @@ Python i Snakemake.
 
 ::: {.mat-list}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 1: Wiersz poleceń i filozofia Uniksa[97 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](pracownia-informatyczna/wyklad-01-wiersz-polecen.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 2: Reprodukowalność analizy i narzędzia pracy[96 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](pracownia-informatyczna/wyklad-02-reprodukowalnosc.pdf){.mat-item}
 :::
 
 Kolejne wykłady pojawią się wkrótce.
