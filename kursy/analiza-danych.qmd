@@ -18,8 +18,12 @@ budowa modelu i jego ocena.
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 3: Uczenie nienadzorowane[85 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-03-uczenie-nienadzorowane.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-code-fill}[Ćwiczenia 1 — arkusz R: środowisko, dane i kształt p ≫ n[R Markdown · .Rmd]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_01.Rmd){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-code-fill}[Ćwiczenia 1 — arkusz Python: środowisko, dane i kształt p ≫ n[Jupyter · .ipynb]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_01.ipynb){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-check-fill}[Ćwiczenia 1 — arkusz R z rozwiązaniami[R Markdown · .Rmd]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_01_rozwiazania.Rmd){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-check-fill}[Ćwiczenia 1 — arkusz Python z rozwiązaniami[Jupyter · .ipynb]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_01_rozwiazania.ipynb){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-code-fill}[Ćwiczenia 2 — arkusz R: eksploracja danych przed modelowaniem[R Markdown · .Rmd]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_02.Rmd){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-code-fill}[Ćwiczenia 2 — arkusz Python: eksploracja danych przed modelowaniem[Jupyter · .ipynb]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_02.ipynb){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-check-fill}[Ćwiczenia 2 — arkusz R z rozwiązaniami[R Markdown · .Rmd]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_02_rozwiazania.Rmd){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-check-fill}[Ćwiczenia 2 — arkusz Python z rozwiązaniami[Jupyter · .ipynb]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/lab_02_rozwiazania.ipynb){.mat-item}
 :::
 
 Kolejne materiały pojawią się wkrótce.
