@@ -1,0 +1,232 @@
+---
+title: "Ćwiczenia 1 — Środowisko, dane i kształt p ≫ n (wersja R, z rozwiązaniami)"
+subtitle: "Dane demo: mikrobiom jelitowy w cukrzycy typu 2 (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# 1. Środowisko i wczytanie kohorty demo
+
+Kohortę pobieramy wprost z `curatedMetagenomicData`. Konwencja jest ta sama we
+wszystkich materiałach: macierz `X` to próbki (wiersze) × taksony (kolumny),
+wektor `y` to etykieta kliniczna, a `md` to metadane kliniczne próbek.
+
+```{r load}
+library(curatedMetagenomicData)
+library(SummarizedExperiment)
+
+tse <- curatedMetagenomicData("QinJ_2012.relative_abundance",
+                              dryrun = FALSE, rownames = "short")[[1]]
+X <- as.data.frame(t(assay(tse)))
+y <- factor(colData(tse)$study_condition)
+md <- as.data.frame(colData(tse))
+
+dim(X)
+table(y, useNA = "ifany")
+```
+
+W kohorcie są też próbki spoza interesującego nas porównania (etykieta `NA` lub
+inna niż `control`/`T2D`). Ograniczamy analizę do dwóch klas — to zadanie
+klasyfikacji binarnej. Operator `%in%` zwraca `FALSE` dla `NA`, więc odrzuca je
+przy okazji. Metadane `md` tniemy tym samym wektorem, żeby wiersze `X`, `y` i `md`
+odpowiadały tym samym próbkom.
+
+```{r filter}
+keep <- y %in% c("control", "T2D")
+X <- X[keep, ]
+md <- md[keep, ]
+y <- droplevels(y[keep])
+
+# Klasę "control" ustawiamy jako referencyjną; klasą pozytywną jest "T2D"
+y <- relevel(y, ref = "control")
+
+dim(X)        # liczba próbek i liczba cech po ograniczeniu do dwóch klas
+table(y)      # rozkład klas
+levels(y)     # [1] "control" [2] "T2D" — pozycja 2 to klasa pozytywna
+```
+
+Dane mają kształt `p ≫ n`: cech (taksonów) jest znacznie więcej niż próbek. To
+pierwsza i najważniejsza cecha problemu — wraca w każdej kolejnej sekcji kursu.
+
+> **✏️ Zadanie 1 — Kształt danych.** Odczytać kodem (nie „na oko"):
+>
+> 1. Ile jest próbek, a ile taksonów? Który wymiar jest większy?
+> 2. Jaki jest rozkład klas? Czy klasy są zbalansowane?
+> 3. Jakiego typu są wartości cech i w jakim mieszczą się zakresie?
+> 4. Jaki odsetek macierzy cech to zera? Co to mówi o danych?
+
+```{r zad-1}
+dim(X)                                  # liczba próbek i liczba taksonów
+table(y)                                # liczba próbek w każdej klasie
+round(prop.table(table(y)), 3)          # prop.table(): udziały klas; round(..., 3): trzy miejsca po przecinku
+class(as.matrix(X)[1, 1])               # typ wartości cech ("numeric" = liczby rzeczywiste)
+range(as.matrix(X))                     # najmniejsza i największa wartość w całej macierzy
+mean(as.matrix(X) == 0)                 # odsetek komórek równych zero (średnia z TRUE/FALSE)
+```
+
+**Rozwiązanie.** Próbek jest 344, taksonów 650, więc cech jest więcej niż próbek (`p > n`).
+Klasy są prawie równoliczne (control 174, T2D 170; udziały 0,506 i 0,494). Wartości to liczby
+rzeczywiste od 0 do 87,8: liczebności względne w procentach profilu (w Pythonie 11 kolumn
+złożonych z samych zer ma typ liczb całkowitych `int64`). Zera stanowią 86,1%
+macierzy, czyli większość taksonów w większości próbek nie występuje.
+
+# 2. Eksport do wspólnego źródła (wersja Python)
+
+Wersja Python pracuje na tych samych danych wczytanych z plików CSV. Eksportujemy je
+raz, tutaj; notatnik `lab_01.ipynb` czyta dokładnie te pliki. Kolejność jest
+istotna: **CSV eksportuje wersja R, a wersja Python go czyta.** Oprócz macierzy cech
+i etykiet eksportujemy wybrane metadane kliniczne — będą potrzebne do eksploracji
+w sekcji 4.
+
+```{r export}
+dir.create("dane", showWarnings = FALSE)
+
+kolumny_md <- c("study_condition", "age", "age_category", "gender",
+                "BMI", "number_reads", "country", "non_westernized")
+
+write.csv(X, "dane/t2d_features.csv")
+write.csv(data.frame(grupa = y), "dane/t2d_labels.csv", row.names = FALSE)
+write.csv(md[, kolumny_md], "dane/t2d_metadata.csv")
+
+list.files("dane")
+```
+
+> **✏️ Zadanie 2 — Zgodność wersji.** Wczytać wyeksportowany CSV w Pythonie
+> (`lab_01.ipynb`) i potwierdzić, że wymiary oraz rozkład klas zgadzają się
+> z wersją R. Od tego spotkania obie wersje operują na tych samych danych.
+
+**Rozwiązanie.** W obu wersjach macierz ma wymiary 344 × 650, a klasy liczą control 174
+i T2D 170. Wyniki są identyczne, bo notatnik Python czyta te same pliki CSV, które
+wyeksportowała wersja R.
+
+# 3. Eksploracja cech
+
+Po otwarciu danych warto najpierw je poznać, zanim zaczniemy modelować. Macierz
+cech to **liczebności względne** (procenty profilu taksonomicznego), więc suma
+w każdej próbce jest w przybliżeniu stała. Rozkład pojedynczego taksonu jest
+zwykle silnie skośny: kilka taksonów dominuje profil, większość występuje
+śladowo lub wcale.
+
+> **✏️ Zadanie 3 — Dominujące taksony i kompozycyjność.** Zbadać strukturę
+> macierzy cech:
+>
+> 1. Policzyć sumę każdego wiersza `X` (`rowSums(X)`). Jaką wartość przyjmuje i co
+>    z tego wynika o naturze danych?
+> 2. Wyznaczyć 5 taksonów o najwyższej średniej liczebności w całej kohorcie
+>    (`colMeans(X)`). Jaki udział profilu zajmuje sam najliczniejszy takson?
+> 3. Narysować histogram liczebności najliczniejszego taksonu. Czy rozkład jest
+>    symetryczny, czy skośny? (zapowiedź transformacji CLR ze spotkania 3)
+
+```{r zad-3}
+summary(rowSums(X))                               # suma każdego wiersza (próbki): minimum, kwartyle, maksimum
+top5 <- sort(colMeans(X), decreasing = TRUE)[1:5] # średnia każdego taksonu, od największej; pierwsze 5
+round(top5, 2)                                    # 5 najliczniejszych taksonów i ich średni udział (%)
+round(sum(top5), 1)                               # łączny udział 5 taksonów w profilu (%)
+top1 <- names(top5)[1]                            # nazwa najliczniejszego taksonu
+hist(X[[top1]], breaks = 30, main = top1,         # histogram jego liczebności, około 30 przedziałów
+     xlab = "liczebność względna (%)", ylab = "liczba próbek")   # podpisy osi
+c(mean = mean(X[[top1]]), median = median(X[[top1]]), max = max(X[[top1]]))   # średnia, mediana, maksimum
+```
+
+**Rozwiązanie.** Suma każdego wiersza wynosi prawie dokładnie 100 (od 98,45 do 100,00), więc
+dane są kompozycyjne: wartości to udziały w profilu, a wzrost jednego taksonu musi oznaczać
+spadek innych. Pięć najliczniejszych taksonów (*Phocaeicola vulgatus*, *Prevotella copri*,
+*Bacteroides uniformis*, *B. stercoris*, *Faecalibacterium prausnitzii*) zajmuje łącznie około
+35% profilu, a sam najliczniejszy średnio 9,7%. Jego rozkład jest silnie prawostronnie skośny:
+średnia (9,71) jest większa od mediany (6,87), a pojedyncze próbki sięgają 66%. Skośność
+i kompozycyjność są powodem przekształcenia CLR wprowadzanego na Ćwiczeniach 3.
+
+# 4. Metadane kohorty i zmienne zakłócające
+
+Eksploracja to nie tylko macierz cech — to także pytanie, czy grupy `control`
+i `T2D` różnią się czymś **poza mikrobiomem**. Jeśli różnią się wiekiem, płcią
+czy głębokością sekwencjonowania, model może nauczyć się sygnału związanego z tymi
+zmiennymi, a nie z chorobą. Takie zmienne nazywamy **zakłócającymi** (confounders).
+
+> **✏️ Zadanie 4 — Metadane i zmienne zakłócające.** Na podstawie `md`:
+>
+> 1. Które zmienne są stałe w całej kohorcie (ta sama wartość u wszystkich próbek)?
+>    Co z nich wynika dla modelu?
+> 2. Porównać wiek (`age`) między grupami: mediany i test Wilcoxona. Czy grupy są
+>    pod tym względem podobne?
+> 3. Porównać płeć (`gender`) między grupami: tabela liczności i test chi-kwadrat.
+> 4. Porównać głębokość sekwencjonowania (`number_reads`) między grupami.
+> 5. Która z badanych zmiennych **nie** różni grup istotnie?
+> 6. Jednym–dwoma zdaniami: dlaczego różnica wieku i płci między grupami jest
+>    problemem przy budowie klasyfikatora na mikrobiomie?
+
+```{r zad-4}
+sapply(md[, kolumny_md], function(v) length(unique(v)))   # liczba różnych wartości w każdej kolumnie; 1 = stała
+tapply(md$age, y, median)                       # mediana wieku w każdej klasie
+wilcox.test(md$age ~ y)$p.value                 # test Wilcoxona: wartość p dla różnicy wieku
+table(md$gender, y)                             # tabela liczności: płeć × klasa
+chisq.test(table(md$gender, y))$p.value         # test chi-kwadrat: wartość p dla różnicy płci
+tapply(md$number_reads, y, median) / 1e6        # mediana liczby odczytów w każdej klasie (mln)
+wilcox.test(md$number_reads ~ y)$p.value        # wartość p dla różnicy liczby odczytów
+tapply(md$BMI, y, median)                       # mediana BMI w każdej klasie
+wilcox.test(md$BMI ~ y)$p.value                 # wartość p dla różnicy BMI
+```
+
+**Rozwiązanie.** Stałe w całej kohorcie są `country` (wszystkie próbki z Chin)
+i `non_westernized` (wszędzie „no”); nie niosą żadnej informacji, która mogłaby różnić klasy.
+Grupy wyraźnie różnią się wiekiem (mediana 42 wobec 54,5 roku, p ≈ 6·10⁻¹⁴) i płcią (w T2D
+więcej mężczyzn: 106 wobec 64 kobiet, p ≈ 0,012), a także liczbą odczytów (mediana 36,3 wobec
+41,0 mln, p ≈ 0,004). Grup nie różni istotnie tylko BMI (mediana 23,7 wobec 24,1, p ≈ 0,098).
+Skoro chorzy są starsi i częściej są mężczyznami, różnice w mikrobiomie mogą częściowo
+odzwierciedlać wiek i płeć, a nie samą cukrzycę; model „rozpoznający T2D” mógłby w rzeczywistości
+rozpoznawać starszy wiek.
+
+# 5. Konsekwencje kształtu `p ≫ n` i wersje środowiska
+
+Wersje pakietów zapisujemy od początku — to podstawa reprodukowalności i ten sam
+zapis trafia później do raportu projektowego.
+
+```{r sessioninfo}
+sessionInfo()
+```
+
+> **✏️ Zadanie 5 — Konsekwencje kształtu `p ≫ n`.** Policzyć kodem:
+>
+> 1. Stosunek liczby cech do liczby próbek (`ncol(X) / nrow(X)`).
+> 2. Ile taksonów ma zerową lub bliską zeru wariancję (`apply(X, 2, var)`).
+> 3. Ile taksonów występuje w mniej niż 10% próbek (`colMeans(X > 0)`).
+> 4. Jednym zdaniem: dlaczego regresji logistycznej (właściwej dla binarnej etykiety)
+>    nie da się jednoznacznie dopasować na wszystkich cechach naraz, gdy `p > n`.
+
+```{r zad-5}
+ncol(X) / nrow(X)                       # stosunek liczby cech do liczby próbek
+sum(apply(X, 2, var) == 0)              # apply(X, 2, var): wariancja każdej kolumny; ile równych zero
+sum(colMeans(X > 0) < 0.10)             # ile taksonów występuje w mniej niż 10% próbek
+```
+
+**Rozwiązanie.** Na jedną próbkę przypada około 1,9 cechy. 11 taksonów ma zerową wariancję
+(tę samą wartość we wszystkich próbkach), więc nic nie wnosi. 460 z 650 taksonów występuje
+w mniej niż 10% próbek. Regresji logistycznej nie da się jednoznacznie dopasować na wszystkich
+cechach naraz, bo parametrów jest więcej niż próbek: istnieje nieskończenie wiele zestawów
+współczynników, które idealnie pasują do danych, także do szumu.
+
+> **★ Zadanie rozszerzające.** Spróbować dopasować regresję logistyczną wiążącą etykietę ze wszystkimi taksonami jednocześnie. Sprawdzić, dla ilu współczynników procedura nie zwraca wartości, oraz policzyć odsetek trafnych klasyfikacji na tym samym zbiorze, który posłużył do dopasowania modelu. Rozstrzygnąć, czy taki wynik świadczy o jakości modelu, czy wynika z relacji `p > n`.
+
+```{r zad-gwiazdka}
+# y ~ . : wszystkie kolumny tabeli poza y jako cechy; family = binomial: regresja logistyczna
+fit <- glm(y ~ ., data = data.frame(y = y, X), family = binomial)
+pred_t2d <- fit$fitted.values >= 0.5    # TRUE, gdy dopasowane prawdopodobieństwo T2D wynosi co najmniej 0,5
+mean(pred_t2d == (y == "T2D"))          # odsetek trafnych klasyfikacji na tych samych danych
+sum(is.na(coef(fit)))                   # liczba współczynników bez wartości (NA)
+length(coef(fit))                       # liczba wszystkich współczynników (650 cech + wyraz wolny)
+```
+
+**Rozwiązanie.** Model trafia w 100% próbek, ale to skutek `p > n`, a nie jakość modelu.
+W R 307 z 651 współczynników (650 cech + wyraz wolny) nie ma wartości (`NA`): przy 344 próbkach
+da się jednoznacznie wyznaczyć tylko 344 parametry. W Pythonie scikit-learn zwraca wszystkie
+współczynniki bez braków, ale rząd macierzy też wynosi 344, a bardzo duże współczynniki (rzędu
+kilkuset) są typowym objawem idealnego rozdzielenia klas. Dopasowanie do danych użytych do
+wyznaczenia modelu nic nie mówi o nowych próbkach; dlatego model ocenia się na danych, których
+nie widział.

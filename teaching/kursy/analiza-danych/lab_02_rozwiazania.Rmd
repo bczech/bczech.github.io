@@ -1,0 +1,420 @@
+---
+title: "Ćwiczenia 2 — Eksploracja danych przed modelowaniem (wersja R, z rozwiązaniami)"
+subtitle: "Dane demo: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Model uczy się wyłącznie z tego, co dostanie w danych. Jeśli dane zawierają błędy,
+przypadkowe zależności albo cechy, które mierzą coś innego niż badane zjawisko, model
+nauczy się także tego. Dlatego przed budową pierwszego modelu sprawdzamy: jakość danych,
+czy pojedyncze cechy w ogóle różnią klasy, czy różnic nie tłumaczy inna zmienna, które
+cechy powtarzają tę samą informację i jak skala cech wpływa na podobieństwo próbek.
+
+Na tym spotkaniu niczego nie usuwamy ani nie przekształcamy. Wyniki służą do zaplanowania
+decyzji, które podejmuje się dopiero po podziale danych na zbiór treningowy i testowy:
+decyzja podjęta na całym zbiorze korzystałaby z informacji o próbkach testowych.
+
+# Wczytanie danych
+
+Pliki CSV z katalogu `dane/` wyeksportowano na Ćwiczeniach 1. Są trzy, bo każdy
+przechowuje co innego: `X` to cechy (wiersze to próbki, kolumny to taksony, wartości to
+liczebności względne w procentach), `y` to klasa każdej próbki, a `meta` to metadane
+próbek (np. wiek). Arkusz najlepiej uruchamiać w nowej sesji R (w RStudio: *Session → Restart R*),
+blok po bloku od początku: obiekty pozostawione w pamięci przez wcześniejszy kod mogą mieć te
+same nazwy (np. `meta`) i inną zawartość.
+
+```{r dane}
+library(ggplot2)                        # pakiet do rysowania wykresów
+
+# row.names = 1: pierwsza kolumna pliku to nazwy próbek, a nie cecha
+# check.names = FALSE: nazwy taksonów zostają bez zmian (R nie zamienia spacji na kropki)
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+
+# $grupa: kolumna „grupa” z wczytanej tabeli
+# factor(): zmienna kategoryczna; levels ustala kolejność klas (najpierw control, potem T2D)
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+meta <- read.csv("dane/t2d_metadata.csv", row.names = 1)   # metadane; nazwy próbek jako nazwy wierszy
+
+dim(X)                                  # liczba wierszy (próbek) i kolumn (cech)
+table(y)                                # liczba próbek w każdej klasie
+names(meta)                             # nazwy kolumn metadanych
+```
+
+# 1. Jakość danych i nietypowe próbki
+
+Błędy w danych przechodzą do modelu. Brak danych zatrzymuje wiele funkcji albo jest
+pomijany bez ostrzeżenia. Powtórzona próbka może trafić jednocześnie do zbioru
+treningowego i testowego, a wtedy ocena modelu jest zawyżona. Etykieta przypisana do
+niewłaściwej próbki sprawia, że model uczy się szumu. Plik etykiet nie zawiera nazw
+próbek, więc `y` odpowiada wierszom `X` tylko według kolejności; porównanie z etykietą
+zapisaną w metadanych sprawdza, czy kolejność się zgadza.
+
+```{r jakosc}
+sum(is.na(X))                           # is.na() daje TRUE przy braku; sum() liczy wartości TRUE
+colSums(is.na(meta))                    # liczba braków osobno w każdej kolumnie metadanych
+sum(duplicated(X))                      # duplicated(): TRUE dla wiersza, który wystąpił już wcześniej
+all(meta$study_condition == y)          # all(): TRUE, gdy etykiety zgadzają się we wszystkich wierszach
+# sub(":.*", "", ...) usuwa z nazwy wszystko od dwukropka; zostaje poziom, np. "species"
+table(sub(":.*", "", colnames(X)))
+```
+
+**Na co patrzeć.** W danych demo nie ma braków ani duplikatów, a etykiety odpowiadają
+próbkom. Cechy nie są jednorodne: cztery opisują rodzaj (*genus*), a pozostałe gatunek.
+Cecha na poziomie rodzaju może częściowo obejmować te same organizmy co cechy gatunkowe.
+
+Próbka nietypowa może sama przesuwać średnie, odległości i wyniki modelu. Trzeba ją
+znaleźć i rozstrzygnąć, czy to błąd (wtedy się ją usuwa), czy rzadki, ale prawdziwy
+przypadek (wtedy zostaje, bo model ma działać także na takich próbkach). Dla każdej próbki
+liczymy dwa podsumowania profilu: liczbę cech o wartości niezerowej i udział największej
+cechy. Próbkę oznaczamy, gdy podsumowanie leży dalej niż 1,5 rozstępu międzykwartylowego
+(IQR) od pierwszego lub trzeciego kwartyla (reguła z wykładu 2).
+
+```{r nietypowe, fig.width=6, fig.height=4}
+n_nonzero <- rowSums(X > 0)             # X > 0 daje TRUE/FALSE; rowSums() liczy TRUE w każdym wierszu
+max_share <- apply(X, 1, max)           # apply(X, 1, max): największa wartość w każdym wierszu (próbce)
+
+# własna funkcja: dla wektora v zwraca TRUE przy wartościach odstających według reguły k × IQR
+iqr_outlier <- function(v, k = 1.5) {
+  q <- quantile(v, c(0.25, 0.75))       # pierwszy i trzeci kwartyl
+  v < q[1] - k * diff(q) | v > q[2] + k * diff(q)   # diff(q) to Q3 − Q1, czyli IQR; | oznacza „lub”
+}
+
+# tabela z dwiema kolumnami TRUE/FALSE, po jednym wierszu na próbkę
+flags <- data.frame(n_nonzero = iqr_outlier(n_nonzero),
+                    max_share = iqr_outlier(max_share))
+colSums(flags)                          # ile próbek oznacza każda reguła
+outlier <- rowSums(flags) > 0           # TRUE, gdy próbkę oznaczyła przynajmniej jedna reguła
+table(nietypowa = outlier, y)           # tabela krzyżowa: oznaczenie × klasa
+
+# wykres: jedna próbka = jeden punkt; kolor pokazuje, czy próbkę oznaczono
+samples <- data.frame(n_nonzero, max_share, outlier)
+ggplot(samples, aes(x = n_nonzero, y = max_share, colour = outlier)) +   # co na osiach, co kolorem
+  geom_point(shape = 1) +                                                 # punkty jako otwarte kółka
+  scale_colour_manual(values = c("grey60", "#B2182B"), labels = c("nie", "tak"),
+                      name = "nietypowa") +                               # kolory i opis legendy
+  labs(x = "Liczba cech niezerowych w próbce", y = "Udział największej cechy (%)") +   # podpisy osi
+  theme_bw()                                                              # jasne tło z siatką
+```
+
+Które cechy dominują w próbkach oznaczonych przez drugą regułę:
+
+```{r dominujace}
+dominant <- colnames(X)[apply(X, 1, which.max)]   # which.max(): numer kolumny z największą wartością
+flagged <- data.frame(max_share = round(max_share, 1),           # udział największej cechy
+                      dominant = sub("^species:", "", dominant), # jej nazwa bez przedrostka
+                      group = y)[flags$max_share, ]              # tylko wiersze oznaczone przez max_share
+flagged[order(-flagged$max_share), ]                             # order(-...): od największego udziału
+```
+
+🔧 **Do sprawdzenia.** Wywołać `iqr_outlier()` z `k = 3`. Ile próbek zostaje oznaczonych?
+
+> **✏️ Zadanie 1.** Na podstawie tabeli `flagged`: która cecha dominuje w oznaczonych
+> próbkach i w której klasie jest ich więcej? Czy próbki te wyglądają na błędy pomiaru, czy
+> na rzadszy, ale prawdziwy typ profilu? Czy należy je usunąć przed modelowaniem?
+> Odpowiedzieć w 2–3 zdaniach pod poleceniem.
+
+```{r zad-1}
+table(flagged$dominant, flagged$group)          # ile oznaczonych próbek: cecha dominująca × klasa
+range(flagged$max_share)                        # najmniejszy i największy udział wśród oznaczonych
+q <- quantile(max_share, c(0.25, 0.75))         # kwartyle udziału największej cechy
+q[2] + 1.5 * diff(q)                            # próg reguły 1,5 IQR (górna granica)
+sum(flags$n_nonzero & flags$max_share)          # ile próbek oznaczyły obie reguły naraz
+```
+
+**Rozwiązanie.** W 15 z 18 oznaczonych próbek dominuje *Prevotella copri*, która zajmuje
+w nich od 63% do 88% profilu (próg reguły wynosi 61,8%). Oznaczonych próbek jest więcej
+w grupie control (14) niż w T2D (4). Nie wyglądają na błędy pomiaru: ta sama cecha powtarza
+się w wielu próbkach, a żadnej z nich nie oznacza reguła dla liczby cech niezerowych. To
+rzadszy, ale prawdziwy typ profilu, więc próbek nie należy usuwać; model ma działać także na
+takich próbkach, a ich usunięcie zmieniłoby skład klas.
+
+# 2. Pojedyncze cechy a klasa
+
+Zanim zbudujemy model, sprawdzamy, czy klasy w ogóle różnią się cechami, którymi się różnią
+i w jaki sposób. Jeśli żadna cecha nie różni klas, trudno oczekiwać dobrego modelu; jeśli
+różni ich wiele, wiadomo, gdzie szukać wyjaśnienia jego przewidywań. To przegląd danych,
+a nie wybór cech do modelu: na tej podstawie niczego nie usuwamy. Wybór cech według etykiet
+wykonany na całym zbiorze korzysta z próbek testowych i zawyża ocenę modelu, dlatego wybór
+cech, jeśli jest potrzebny, wykonuje się później wyłącznie na zbiorze treningowym.
+
+W danych z wieloma zerami cecha może różnić klasy na dwa sposoby: tym, jak często występuje,
+albo tym, ile jej jest, gdy występuje. Dlatego dla każdej cechy liczymy dwa podsumowania
+w każdej klasie: częstość występowania (odsetek próbek, w których cecha jest większa od zera)
+i średnią. Różnicę średnich podajemy jako log2 ilorazu średnich (T2D / control): 1 oznacza
+średnią dwa razy większą w T2D, −1 dwa razy mniejszą, 0 brak różnicy. Bierzemy tylko cechy
+obecne w co najmniej 10% wszystkich próbek, bo dla cechy prawie zawsze równej zeru oba
+podsumowania opierają się na kilku próbkach.
+
+```{r cechy-klasy, fig.width=5, fig.height=5}
+prevalence <- colMeans(X > 0)           # częstość występowania w całym zbiorze
+Xf <- X[, prevalence >= 0.10]           # zostają kolumny (cechy) obecne w co najmniej 10% próbek
+ncol(Xf)                                # liczba zachowanych cech
+
+is_t2d <- y == "T2D"                    # TRUE dla próbek T2D, FALSE dla control
+prev_control <- colMeans(Xf[!is_t2d, ] > 0)   # częstość występowania w control (! oznacza „nie”)
+prev_t2d <- colMeans(Xf[is_t2d, ] > 0)        # częstość występowania w T2D
+diff_prev <- prev_t2d - prev_control          # dodatnia: cecha występuje częściej w T2D
+
+mean_control <- colMeans(Xf[!is_t2d, ])       # średnia cechy w control
+mean_t2d <- colMeans(Xf[is_t2d, ])            # średnia cechy w T2D
+# log2 ilorazu średnich; + 1e-4 (najmniejsza niezerowa wartość w danych) chroni przed dzieleniem przez 0
+log2_ratio <- log2((mean_t2d + 1e-4) / (mean_control + 1e-4))
+
+# 10 cech o największej różnicy częstości występowania (abs(): bez względu na kierunek)
+top <- names(sort(abs(diff_prev), decreasing = TRUE))[1:10]
+data.frame(prev_control = round(prev_control[top], 2),   # round(..., 2): dwa miejsca po przecinku
+           prev_t2d = round(prev_t2d[top], 2),               # częstość w T2D
+           diff_prev = round(diff_prev[top], 2),             # różnica częstości T2D − control
+           log2_ratio = round(log2_ratio[top], 2),           # log2 ilorazu średnich
+           row.names = sub("^species:", "", top))           # krótsze nazwy wierszy
+
+# wykres: jedna cecha = jeden punkt; częstość w control na osi X, w T2D na osi Y
+freq <- data.frame(prev_control, prev_t2d, in_top = names(prev_control) %in% top)   # %in%: czy cecha jest w top
+ggplot(freq, aes(x = prev_control, y = prev_t2d, colour = in_top)) +   # osie i kolor punktów
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +   # przekątna: ta sama częstość w obu klasach
+  geom_point(shape = 1) +                                        # punkty jako otwarte kółka
+  scale_colour_manual(values = c("grey60", "#B2182B"), labels = c("pozostałe", "10 z tabeli"), name = NULL) +   # kolory i opis legendy
+  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +                  # jednakowa skala obu osi
+  labs(x = "Częstość występowania w control", y = "Częstość występowania w T2D") +   # podpisy osi
+  theme_bw()                                                     # jasne tło z siatką
+```
+
+**Na co patrzeć.** Punkty na przekątnej to cechy występujące równie często w obu klasach.
+Punkty nad przekątną występują częściej w T2D, pod nią częściej w control. Większość cech
+leży blisko przekątnej, więc klasy różnią się tylko częścią cech i w niewielkim stopniu.
+
+Rozkład pięciu cech z początku tabeli w obu klasach. Używamy skali log10, bo wartości
+obejmują kilka rzędów wielkości; do zer dodajemy `1e-6`, bo logarytm z zera nie istnieje,
+więc zera leżą przy −6.
+
+```{r pudelkowe, fig.width=10, fig.height=3.5}
+show <- top[1:5]                                  # cechy do pokazania; można tu wpisać inne nazwy
+short <- sub("^species:", "", show)               # krótsze nazwy do podpisów
+# ggplot potrzebuje tabeli „długiej”: jeden wiersz = jedna próbka dla jednej cechy
+long <- data.frame(
+  feature = factor(rep(short, each = nrow(Xf)), levels = short),   # nazwa cechy powtórzona dla każdej próbki
+  group = rep(y, times = length(show)),                            # klasy powtórzone dla każdej cechy
+  value = log10(unlist(Xf[, show]) + 1e-6)                         # unlist(): kolumny jedna pod drugą
+)
+ggplot(long, aes(x = group, y = value)) +        # klasa na osi X, wartość na osi Y
+  geom_boxplot() +                                # wykres pudełkowy dla każdej klasy
+  facet_wrap(~ feature, nrow = 1) +               # osobny panel dla każdej cechy, w jednym rzędzie
+  labs(x = NULL, y = "log10(liczebność względna + 1e-6)") +   # podpis osi Y (oś X bez podpisu)
+  theme_bw(base_size = 9)                         # jasne tło, mniejsza czcionka
+```
+
+**Na co patrzeć.** Gdy cechy nie ma w większości próbek, mediana i dolny brzeg pudełka
+leżą przy −6. Różnica między klasami polega wtedy głównie na tym, jak często cecha
+występuje, a nie na jej typowej wartości.
+
+> **✏️ Zadanie 2.** W tabeli znaleźć cechę, dla której `diff_prev` i `log2_ratio` mają
+> przeciwne znaki. W pierwszym wierszu bloku z wykresami pudełkowymi wpisać jej nazwę
+> (`show <- "..."`) i narysować wykres. Wypisać jej pięć największych wartości w każdej
+> klasie (`sort(Xf[!is_t2d, "..."], decreasing = TRUE)[1:5]` i to samo dla T2D). Skąd bierze
+> się niezgodność obu podsumowań i któremu z nich bardziej ufać?
+
+```{r zad-2}
+# przeciwne znaki = iloczyn obu wartości jest ujemny
+f <- top[diff_prev[top] * log2_ratio[top] < 0]  # nazwa szukanej cechy
+f                                               # wypisanie nazwy
+
+# wykres pudełkowy tej cechy: kod z bloku `pudelkowe` z inną cechą w pierwszym wierszu
+show <- f                                       # w bloku `pudelkowe`: show <- "genus:Streptococcus"
+short <- sub("^species:", "", show)             # krótsza nazwa do podpisu
+long <- data.frame(                             # tabela „długa”: jeden wiersz = jedna próbka
+  feature = factor(rep(short, each = nrow(Xf)), levels = short),   # nazwa cechy przy każdej próbce
+  group = rep(y, times = length(show)),                            # klasa każdej próbki
+  value = log10(unlist(Xf[, show]) + 1e-6)                         # wartości cechy w skali log10
+)
+ggplot(long, aes(x = group, y = value)) +       # klasa na osi X, wartość na osi Y
+  geom_boxplot(outlier.shape = NA) +            # pudełko dla każdej klasy; bez osobnych punktów odstających
+  geom_jitter(width = 0.15, shape = 1, alpha = 0.5) +   # pojedyncze próbki jako kółka (rozsunięte w poziomie)
+  facet_wrap(~ feature, nrow = 1) +             # panel z nazwą cechy
+  labs(x = NULL, y = "log10(liczebność względna + 1e-6)") +   # podpis osi Y
+  theme_bw()                                    # jasne tło z siatką
+
+sort(Xf[!is_t2d, f], decreasing = TRUE)[1:5]    # pięć największych wartości w control
+sort(Xf[is_t2d, f], decreasing = TRUE)[1:5]     # pięć największych wartości w T2D
+
+v_control <- Xf[!is_t2d, f]                     # wartości cechy w control
+max(v_control) / sum(v_control)                 # jaką część sumy w control daje jedna próbka
+mean(v_control[-which.max(v_control)])          # średnia w control bez tej próbki
+```
+
+**Rozwiązanie.** Przeciwne znaki ma `genus:Streptococcus`: występuje częściej w T2D (26% próbek
+wobec 10%), a średnia jest niższa w T2D. Na wykresie w control prawie wszystkie próbki leżą
+przy −6 (cechy nie wykryto), a jedna wyraźnie odstaje u góry; w T2D niezerowych próbek jest
+więcej i zwykle mają wyższe wartości. Średnią w control podnosi ta jedna próbka (3,82%, prawie
+sto razy więcej niż kolejna), która daje 95% sumy cechy w tej grupie; bez niej średnia w control
+spada z 0,023% do 0,001%. Średnia jest wrażliwa na pojedyncze skrajne wartości, a częstość
+występowania nie, więc tu bardziej wiarygodna jest częstość występowania. Przed interpretacją
+podsumowania warto obejrzeć rozkład.
+
+# 3. Zmienna zakłócająca
+
+Na Ćwiczeniach 1 okazało się, że klasy różnią się wiekiem: grupa T2D jest starsza. Cecha
+może więc różnić klasy dlatego, że jest związana z wiekiem, a nie z chorobą. Model, który
+ją wykorzysta, rozpozna wtedy wiek, a nie T2D, i zawiedzie na danych, w których grupy mają
+podobny wiek. Taką zmienną nazywa się zakłócającą (ang. *confounder*). Sprawdzamy to po
+to, żeby wiedzieć, jak ostrożnie interpretować cechy, na których oprze się model. Blok
+pokazuje wiek w obu klasach i liczy korelację Spearmana (opartą na rangach, bo rozkłady cech
+są skośne) każdej z 10 cech z tabeli z wiekiem.
+
+```{r wiek, fig.width=4, fig.height=3.5}
+ggplot(data.frame(age = meta$age, group = y), aes(x = group, y = age)) +   # tabela: wiek i klasa każdej próbki
+  geom_boxplot() +                                # wiek w każdej klasie
+  labs(x = NULL, y = "Wiek (lata)") +            # podpis osi Y
+  theme_bw()                                      # jasne tło z siatką
+
+# sapply(top, ...) wykonuje funkcję dla każdej nazwy cechy z listy top i zbiera wyniki w wektor
+rho_age <- sapply(top, function(f) cor(Xf[, f], meta$age, method = "spearman"))
+data.frame(diff_prev = round(diff_prev[top], 2),  # kierunek różnicy między klasami (z sekcji 2)
+           rho_age = round(rho_age, 2),           # korelacja z wiekiem: od −1 do 1, 0 = brak związku
+           row.names = sub("^species:", "", top)) # krótsze nazwy wierszy
+```
+
+> **✏️ Zadanie 3.** Na podstawie tabeli: czy cechy częstsze w T2D (dodatni `diff_prev`)
+> rosną, czy maleją z wiekiem, a jak jest z cechami rzadszymi w T2D? Czy można twierdzić, że
+> cechy te różnią klasy z powodu choroby? Odpowiedzieć w 2–3 zdaniach.
+
+```{r zad-3}
+same_sign <- rho_age * diff_prev[top] > 0      # TRUE: korelacja z wiekiem ma ten sam znak co różnica klas
+all(same_sign)                                  # czy tak jest dla wszystkich 10 cech
+max(abs(rho_age))                               # najsilniejsza korelacja z wiekiem (co do wartości bezwzględnej)
+tapply(meta$age, y, median)                     # mediana wieku w każdej klasie
+```
+
+**Rozwiązanie.** We wszystkich 10 cechach znak korelacji z wiekiem jest taki sam jak kierunek
+różnicy między klasami: cechy częstsze w T2D rosną z wiekiem, a cechy rzadsze w T2D
+(*H. parainfluenzae*, *R. intestinalis*) maleją. Grupa T2D jest starsza (mediana wieku 54,5
+wobec 42 lat), więc każda z tych cech może różnić klasy częściowo dlatego, że wiąże się
+z wiekiem; nie można więc twierdzić, że różnice wynikają z choroby. Korelacje są słabe
+(najwyżej 0,21), więc wiek nie tłumaczy całej różnicy.
+
+# 4. Cechy powtarzające tę samą informację
+
+Dwie silnie skorelowane cechy niosą prawie tę samą informację. Model nie zyskuje na
+drugiej z nich, a niektóre modele nie potrafią rozdzielić wpływu między takie cechy, więc
+wynik zależy od przypadku, a wkładu każdej z cech nie da się ocenić osobno. Sprawdzamy, ile
+jest takich par, żeby później zdecydować: zostawić jedną cechę z pary, połączyć cechy albo
+użyć modelu, który radzi sobie z korelacją. Korelację liczymy metodą Spearmana (na rangach),
+bo rozkłady cech są skośne.
+
+```{r korelacje}
+r <- cor(Xf, method = "spearman")       # macierz korelacji: wiersz i kolumna dla każdej cechy
+r_pairs <- r[upper.tri(r)]              # górny trójkąt macierzy: każda para raz, bez przekątnej (r = 1)
+length(r_pairs)                         # liczba wszystkich par cech
+sum(abs(r_pairs) > 0.9)                 # pary bardzo silnie skorelowane; abs() uwzględnia korelacje ujemne
+sum(abs(r_pairs) > 0.7)                 # pary silnie skorelowane
+```
+
+Mapa korelacji dla 20 cech o największej średniej. Kolejność cech ustala grupowanie
+hierarchiczne, które ustawia podobne cechy obok siebie, dzięki czemu grupy skorelowanych
+cech widać jako bloki.
+
+```{r mapa-korelacji, fig.width=7, fig.height=6}
+top20 <- names(sort(colMeans(Xf), decreasing = TRUE))[1:20]   # 20 cech o największej średniej
+short20 <- sub("^species:", "", top20)                        # krótsze nazwy do podpisów
+r20 <- r[top20, top20]                                        # fragment macierzy korelacji dla tych cech
+ord <- hclust(as.dist(1 - r20))$order                         # odległość 1 − r; $order: kolejność cech
+# tabela „długa”: jeden wiersz = jedna komórka mapy (para cech i jej korelacja)
+heat <- data.frame(
+  f1 = factor(rep(short20, times = 20), levels = short20[ord]),
+  f2 = factor(rep(short20, each = 20), levels = short20[ord]),
+  r = as.vector(r20)                                          # macierz odczytana kolumna po kolumnie
+)
+ggplot(heat, aes(x = f1, y = f2, fill = r)) +              # cechy na osiach, korelacja jako kolor
+  geom_tile() +                                               # jedna komórka na parę cech
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B",
+                       limits = c(-1, 1), name = "korelacja\nSpearmana") +   # niebieski < 0 < czerwony
+  labs(x = NULL, y = NULL) +                                  # bez podpisów osi (nazwy cech wystarczą)
+  theme_minimal(base_size = 9) +                              # tło bez ramki, mniejsza czcionka
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))      # pionowe podpisy osi X
+```
+
+**Na co patrzeć.** Bloki czerwonych komórek to grupy cech, które rosną i maleją razem.
+W danych z dużą liczbą zer korelację podnoszą też wspólne zera: dwie cechy nieobecne
+w tych samych próbkach mają wysoką korelację rang.
+
+Para cech o największej korelacji i jej wykres rozrzutu:
+
+```{r para}
+r0 <- r                                               # kopia macierzy korelacji do zmiany
+diag(r0) <- 0                                         # pomijamy korelację cechy z samą sobą
+best <- which(abs(r0) == max(abs(r0)), arr.ind = TRUE)[1, ]   # wiersz i kolumna największej |r|
+a <- colnames(r0)[best[1]]                            # nazwa pierwszej cechy pary
+b <- colnames(r0)[best[2]]                            # nazwa drugiej cechy pary
+c(a, b)                                               # wypisanie obu nazw
+round(r0[a, b], 3)                                    # ich korelacja
+
+ggplot(data.frame(a = Xf[, a], b = Xf[, b]), aes(x = a, y = b)) +   # wartości obu cech w każdej próbce
+  geom_point(shape = 1) +                                            # jedna próbka = jedno kółko
+  labs(x = a, y = b) +                                               # nazwy cech jako podpisy osi
+  theme_bw()                                                         # jasne tło z siatką
+```
+
+**Na co patrzeć.** Obie cechy mają tę samą nazwę gatunku: w danych ten sam gatunek
+występuje dwa razy, raz z końcówką `_1` w nazwie, raz bez niej. Punkty leżą prawie na
+prostej, więc druga cecha nie wnosi nowej informacji. Taką parę należy wykryć przed
+modelowaniem i zostawić jedną z cech.
+
+🔧 **Do sprawdzenia.** Ile par ma |r| > 0,8? Zmienić próg w jednym z wierszy bloku
+`korelacje`.
+
+# 5. Skala cech i podobieństwo próbek
+
+Metody nienadzorowane (np. analiza głównych składowych i grupowanie, omawiane na
+następnych ćwiczeniach) oraz część modeli oceniają, które próbki są do siebie podobne,
+zwykle za pomocą odległości euklidesowej. Odległość sumuje różnice we wszystkich cechach,
+więc o wyniku decydują cechy o największym rozrzucie. Sprawdzamy, jak rozkłada się
+wariancja między cechami i jak bardzo odległości między próbkami zależą od jednej cechy,
+żeby wiedzieć, czy przed takimi metodami trzeba dane przekształcić.
+
+```{r skala, fig.width=6, fig.height=4}
+variances <- sort(apply(Xf, 2, var), decreasing = TRUE)   # wariancja każdej cechy, od największej
+round(head(variances / sum(variances), 5), 3)             # udział 5 pierwszych cech w całkowitej wariancji
+round(sum(variances[1:5]) / sum(variances), 3)            # łączny udział tych 5 cech
+
+# wykres: średnia i odchylenie standardowe każdej cechy
+ggplot(data.frame(mean = colMeans(Xf), sd = apply(Xf, 2, sd)), aes(x = mean, y = sd)) +
+  geom_point(shape = 1) +
+  scale_x_log10() + scale_y_log10() +                      # osie logarytmiczne: wartości z kilku rzędów wielkości
+  labs(x = "Średnia cechy (%)", y = "Odchylenie standardowe cechy") +   # podpisy osi
+  theme_bw()                                                # jasne tło z siatką
+
+d_top1 <- dist(Xf[, names(variances)[1]])                  # odległości między próbkami liczone tylko na jednej cesze
+d_raw <- dist(Xf)                                          # odległości euklidesowe liczone na wszystkich cechach
+cor(d_raw, d_top1)                                         # na ile ta jedna cecha wyznacza odległości
+```
+
+**Na co patrzeć.** Cechy o większej średniej mają większy rozrzut, więc kilka
+najliczniejszych cech skupia większość całkowitej wariancji. Im bliżej 1 jest ostatnia
+liczba, tym bardziej odległości między próbkami wyznacza jedna cecha; przy 190 cechach
+już korelacja rzędu 0,5 oznacza, że jedna cecha przeważa nad wszystkimi pozostałymi.
+
+> **✏️ Zadanie 4.** W wierszu `d_raw <- dist(Xf)` zamienić `Xf` najpierw na `scale(Xf)`
+> (standaryzacja: każda cecha ma średnią 0 i odchylenie 1), a potem na `log10(Xf + 1e-6)`,
+> i za każdym razem uruchomić dwa ostatnie wiersze bloku. Jak zmienia się korelacja?
+> Co z tego wynika dla metod, które oceniają podobieństwo próbek na podstawie odległości?
+
+```{r zad-4}
+cor(dist(Xf), d_top1)                           # dane surowe
+cor(dist(scale(Xf)), d_top1)                    # po standaryzacji
+cor(dist(log10(Xf + 1e-6)), d_top1)             # w skali log10
+```
+
+**Rozwiązanie.** Korelacja z odległością liczoną na samej *P. copri* wynosi 0,70 dla danych
+surowych, −0,23 po standaryzacji i −0,11 w skali log10. Na danych surowych odległości wyznacza
+głównie jedna cecha o największym rozrzucie; po standaryzacji każda cecha ma ten sam rozrzut,
+a w skali log liczą się różnice względne, więc wpływ jednej cechy znika. To, które próbki uznamy
+za podobne, zależy od skali cech, więc metody oparte na odległościach (analiza głównych
+składowych, grupowanie, k najbliższych sąsiadów) dadzą różne wyniki zależnie od przekształcenia.
