@@ -328,6 +328,21 @@ main h3 { color: #2c3e50; font-weight: 700; }
 .mat-item .mat-tt { font-weight: 700; line-height: 1.2; }
 .mat-item .mat-meta { display: block; font-size: 0.8rem; font-weight: 500; color: #94a3b8; margin-top: 2px; }
 .mat-item .mat-dl { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: #3498db; white-space: nowrap; }
+// ——— Materiały: podsekcje (Wykłady / Ćwiczenia) i karty ćwiczeń ———
+.mat-sub { font-size: 1.05rem; font-weight: 700; color: #475569; margin: 26px 0 4px; text-transform: none; }
+.lab-list { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 10px; }
+.lab-card { border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; padding: 14px 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.lab-card .lab-tt { display: flex; align-items: center; gap: 12px; font-weight: 700; line-height: 1.25; }
+.lab-card .lab-tt .bi { font-size: 1.4rem; color: #B5342E; }
+.lab-card .lab-tt .lab-meta { display: block; font-size: 0.8rem; font-weight: 500; color: #94a3b8; }
+.lab-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0 0 38px; }
+.lab-row .lab-lbl { width: 150px; font-size: 0.82rem; font-weight: 600; color: #64748b; }
+.lab-btn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border: 1px solid #e2e8f0; border-radius: 999px;
+  font-size: 0.82rem; font-weight: 600; color: #2c3e50 !important; text-decoration: none !important; background: #f8fafc; transition: border-color .15s, background .15s; }
+.lab-btn:hover { border-color: #3498db; background: #eef6fc; }
+.lab-btn .bi { color: #3498db; }
+.lab-row.sol .lab-btn .bi { color: #2e8b57; }
+@media (max-width: 600px) { .lab-row { margin-left: 0; } .lab-row .lab-lbl { width: 100%; } }
 @media (max-width: 600px) {
   .info-card dl { grid-template-columns: 1fr; gap: 2px 0; }
   .info-card dt { margin-top: 10px; }
