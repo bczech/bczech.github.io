@@ -18,7 +18,7 @@
     "href": "kursy/pracownia-informatyczna.html#materiały",
     "title": "Pracownia Informatyczna",
     "section": "Materiały",
-    "text": "Materiały\n\nWykład 1: Wiersz poleceń i filozofia Uniksa97 slajdów · PDFPobierz Wykład 2: Reprodukowalność analizy i narzędzia pracy96 slajdów · PDFPobierz"
+    "text": "Materiały\n\nWykłady\n\nWykład 1: Wiersz poleceń i filozofia Uniksa97 slajdów · PDFPobierz Wykład 2: Reprodukowalność analizy i narzędzia pracy96 slajdów · PDFPobierz"
   },
   {
     "objectID": "kursy/biostatystyka.html",
@@ -39,7 +39,7 @@
     "href": "kursy/biostatystyka.html#materiały",
     "title": "Biostatystyka",
     "section": "Materiały",
-    "text": "Materiały\n\nWykład 1: Wprowadzenie49 slajdów · PDFPobierz Wykład 2: Populacje i próby danych48 slajdów · PDFPobierz Wykład 3: Testowanie hipotez i estymacja49 slajdów · PDFPobierz Wykład 4: Testy statystyczne I (testy t)39 slajdów · PDFPobierz\n\nKolejne wykłady pojawią się wkrótce."
+    "text": "Materiały\n\nWykłady\n\nWykład 1: Wprowadzenie49 slajdów · PDFPobierz Wykład 2: Populacje i próby danych48 slajdów · PDFPobierz Wykład 3: Testowanie hipotez i estymacja49 slajdów · PDFPobierz Wykład 4: Testy statystyczne I (testy t)39 slajdów · PDFPobierz\n\nKolejne wykłady pojawią się wkrótce."
   },
   {
     "objectID": "index.html",
@@ -81,7 +81,7 @@
     "href": "kursy/analiza-danych.html#materiały",
     "title": "Analiza danych",
     "section": "Materiały",
-    "text": "Materiały\n\nWykład 1: Wprowadzenie do uczenia maszynowego68 slajdów · PDFPobierz Wykład 2: Przygotowanie danych68 slajdów · PDFPobierz Wykład 3: Uczenie nienadzorowane85 slajdów · PDFPobierz Wykład 4: Uczenie nadzorowane90 slajdów · PDFPobierz Ćwiczenia 1 — arkusz R: środowisko, dane i kształt p ≫ nR Markdown · .RmdPobierz Ćwiczenia 1 — arkusz Python: środowisko, dane i kształt p ≫ nJupyter · .ipynbPobierz Ćwiczenia 1 — arkusz R z rozwiązaniamiR Markdown · .RmdPobierz Ćwiczenia 1 — arkusz Python z rozwiązaniamiJupyter · .ipynbPobierz Ćwiczenia 2 — arkusz R: eksploracja danych przed modelowaniemR Markdown · .RmdPobierz Ćwiczenia 2 — arkusz Python: eksploracja danych przed modelowaniemJupyter · .ipynbPobierz Ćwiczenia 2 — arkusz R z rozwiązaniamiR Markdown · .RmdPobierz Ćwiczenia 2 — arkusz Python z rozwiązaniamiJupyter · .ipynbPobierz\n\nKolejne materiały pojawią się wkrótce."
+    "text": "Materiały\n\nWykłady\n\nWykład 1: Wprowadzenie do uczenia maszynowego68 slajdów · PDFPobierz Wykład 2: Przygotowanie danych68 slajdów · PDFPobierz Wykład 3: Uczenie nienadzorowane85 slajdów · PDFPobierz Wykład 4: Uczenie nadzorowane90 slajdów · PDFPobierz\n\n\n\nĆwiczenia\n\n\nĆwiczenia 1: środowisko, dane i kształt p ≫ narkusz w R lub w Pythonie — do wyboru\nArkusz do pracy  R · .Rmd  Python · .ipynb\nZ rozwiązaniami  R · .Rmd  Python · .ipynb\n\n\nĆwiczenia 2: eksploracja danych przed modelowaniemarkusz w R lub w Pythonie — do wyboru\nArkusz do pracy  R · .Rmd  Python · .ipynb\nZ rozwiązaniami  R · .Rmd  Python · .ipynb\n\n\nKolejne materiały pojawią się wkrótce."
   },
   {
     "objectID": "kursy/coding-lab.html",
