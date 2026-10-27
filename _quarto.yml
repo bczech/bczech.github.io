@@ -41,6 +41,7 @@ format:
     anchor-sections: true
     smooth-scroll: true
     link-external-newwindow: true
+    include-after-body: goatcounter.html
     grid:
       sidebar-width: 250px
       body-width: 860px
