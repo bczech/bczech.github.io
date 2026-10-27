@@ -216,6 +216,28 @@ ul.task-list li input[type="checkbox"] {
 </section>
 
 </main> <!-- /main -->
+<!-- GoatCounter: statystyki odwiedzin bez ciasteczek (panel: https://bczech-teaching.goatcounter.com) -->
+<script data-goatcounter="https://bczech-teaching.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+<script>
+  // Pobrania materiałów (PDF, .Rmd, .ipynb, .zip) liczone jako zdarzenia „pobranie/<kurs>/<plik>”;
+  // dotyczy też plików dodanych później, bez oznaczania każdego linku.
+  (function () {
+    function licz(e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || !/\.(pdf|rmd|ipynb|zip)$/i.test(a.getAttribute('href'))) return;
+      if (!window.goatcounter || !window.goatcounter.count) return;
+      var plik = a.getAttribute('href').split('/').pop();
+      var kurs = location.pathname.split('/').pop().replace(/\.html$/, '') || 'start';
+      window.goatcounter.count({
+        path: 'pobranie/' + kurs + '/' + plik,
+        title: a.textContent.replace(/\s+/g, ' ').trim(),
+        event: true
+      });
+    }
+    document.addEventListener('click', licz);
+    document.addEventListener('auxclick', licz);  // środkowy przycisk: otwarcie w nowej karcie
+  })();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
