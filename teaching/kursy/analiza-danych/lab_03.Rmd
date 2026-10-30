@@ -1,0 +1,325 @@
+---
+title: "Ćwiczenia 3 — Uczenie nienadzorowane: PCA, mapy próbek, skupienia (wersja R)"
+subtitle: "Dane demo: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Na Ćwiczeniach 2 oglądaliśmy cechy pojedynczo. Teraz patrzymy na wszystkie cechy
+jednocześnie i pytamy, czy próbki układają się w jakąś strukturę: czy tworzą grupy, jakie
+kierunki zmienności dominują w danych i czy ta struktura ma związek z klasą. Metody
+nienadzorowane (ang. *unsupervised learning*) nie korzystają z etykiet: klasę nanosimy na
+wyniki dopiero na końcu, żeby sprawdzić, czy największa zmienność w danych wiąże się
+z chorobą. Jeśli tak, model nadzorowany ma łatwe zadanie; jeśli nie, różnice między klasami
+są subtelne i model musi ich szukać wśród wielu innych źródeł zmienności.
+
+Pracujemy na całym zbiorze, bez podziału na trening i test. Przy oglądaniu danych bez
+etykiet wolno tak robić, bo niczego nie dopasowujemy do klasy i niczego nie oceniamy.
+Decyzje dotyczące modelu (np. wybór przekształcenia albo liczby składowych jako cech)
+podejmuje się później, wyłącznie na zbiorze treningowym.
+
+# Wczytanie danych
+
+Wczytujemy te same pliki co na Ćwiczeniach 2 i zostawiamy cechy obecne w co najmniej 10%
+próbek. Arkusz trzeba zapisać w tym samym katalogu co arkusze z Ćwiczeń 1 i 2, czyli obok
+katalogu `dane/`. Arkusz najlepiej uruchamiać w nowej sesji R (w RStudio: *Session → Restart R*),
+blok po bloku od początku.
+
+Pakiety metod nienadzorowanych instaluje się jednorazowo (jeśli `library()` zgłasza błąd
+`there is no package called ...`):
+
+```{r instalacja, eval=FALSE}
+install.packages(c("vegan", "Rtsne", "uwot", "cluster", "mclust"))   # jednorazowo, potem tylko library()
+```
+
+```{r dane}
+library(ggplot2)                        # wykresy
+library(vegan)                          # vegdist(): odległość Braya–Curtisa
+library(Rtsne)                          # t-SNE
+library(uwot)                           # UMAP
+library(cluster)                        # silhouette(): szerokość sylwetki
+library(mclust)                         # adjustedRandIndex(): zgodność dwóch podziałów
+
+# row.names = 1: pierwsza kolumna to nazwy próbek; check.names = FALSE: nazwy taksonów bez zmian
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+# factor() z levels: klasa jako zmienna kategoryczna, najpierw control, potem T2D
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+Xf <- X[, colMeans(X > 0) >= 0.10]      # cechy obecne w co najmniej 10% próbek
+dim(Xf)                                 # liczba próbek i cech
+table(y)                                # liczba próbek w każdej klasie
+
+cols <- c(control = "#2C5F7C", T2D = "#D55E00")  # kolory klas na wszystkich rycinach (granatowy, pomarańczowy)
+```
+
+# 1. Przekształcenie CLR
+
+Na Ćwiczeniach 2 okazało się, że na surowych danych odległości między próbkami wyznacza
+w dużej mierze jedna cecha (*Prevotella copri*), bo ma największy rozrzut. Metody z tego
+arkusza opierają się na odległościach i wariancji, więc bez przekształcenia pokazywałyby
+głównie tę jedną cechę. Do tego dane są kompozycyjne (ang. *compositional data*): wartości
+w każdej próbce sumują się do 100%, więc wzrost jednej cechy oznacza spadek pozostałych.
+Przekształcenie CLR (ang. *centered log-ratio*) rozwiązuje oba problemy: każdą wartość
+logarytmuje się i odejmuje od niej średnią logarytmów w tej samej próbce. Wynik mówi, ile
+razy cecha jest liczniejsza od „typowej” cechy w danej próbce, więc liczą się proporcje,
+a nie wartości bezwzględne. Logarytm z zera nie istnieje, dlatego przed logarytmowaniem
+dodajemy małą stałą `1e-6`, czyli pseudoliczność (ang. *pseudocount*), tę samą co
+w całym kursie.
+
+```{r clr}
+# własna funkcja: CLR dla każdego wiersza (próbki) macierzy M
+clr <- function(M) {
+  L <- log(as.matrix(M) + 1e-6)         # logarytm naturalny po dodaniu pseudoliczności
+  L - rowMeans(L)                       # od każdej wartości odejmujemy średnią logarytmów jej wiersza
+}
+Z <- clr(Xf)                            # dane po przekształceniu CLR: te same próbki i cechy
+dim(Z)                                  # wymiary się nie zmieniają
+
+variances <- sort(apply(Z, 2, var), decreasing = TRUE)   # wariancja każdej cechy po CLR
+round(sum(variances[1:5]) / sum(variances), 3)           # udział 5 cech o największej wariancji
+d_top1 <- dist(Xf[, "species:Prevotella copri"])         # odległości liczone tylko na P. copri
+cor(dist(Z), d_top1)                                     # na ile ta cecha wyznacza odległości po CLR
+```
+
+**Na co patrzeć.** Na surowych danych pięć cech skupiało około 60% całkowitej wariancji,
+a po CLR skupia tylko kilka procent. Korelacja odległości z odległością liczoną na samej
+*P. copri* spadła z około 0,70 (Ćwiczenia 2) do wartości bliskiej zeru: żadna pojedyncza
+cecha nie wyznacza już podobieństwa próbek.
+
+# 2. Analiza głównych składowych
+
+Analiza głównych składowych (ang. *principal component analysis*, PCA) szuka kierunków,
+wzdłuż których próbki różnią się najbardziej. Pierwsza składowa główna (PC1) to kierunek
+największej zmienności, druga (PC2) kolejny, prostopadły do pierwszego, i tak dalej. Po co:
+dwie pierwsze składowe pozwalają pokazać próbki opisane 190 cechami na jednej płaskiej rycinie,
+a odsetek wariancji mówi, jaką część informacji ta rycina zachowuje. PCA liczymy na danych
+CLR po wycentrowaniu, bez standaryzacji, jak na wykładzie 3: po CLR wszystkie cechy mają
+wspólną jednostkę (logarytm ilorazu).
+
+```{r pca}
+pca <- prcomp(Z, center = TRUE, scale. = FALSE)   # center: odjęcie średniej każdej cechy; bez standaryzacji
+var_prop <- pca$sdev^2 / sum(pca$sdev^2)          # sdev^2: wariancja każdej składowej; dzielimy przez sumę
+round(var_prop[1:5], 3)                           # odsetek wariancji pięciu pierwszych składowych
+round(cumsum(var_prop)[c(2, 10)], 3)              # cumsum(): odsetek skumulowany dla 2 i 10 składowych
+```
+
+Wykres osypiska (ang. *scree plot*) pokazuje odsetek wariancji kolejnych składowych:
+
+```{r osypisko, fig.width=6, fig.height=3.5}
+scree <- data.frame(pc = 1:20, value = 100 * var_prop[1:20])   # 20 pierwszych składowych, w procentach
+ggplot(scree, aes(x = pc, y = value)) +   # wykres: składowa na osi X, odsetek wariancji na osi Y
+  geom_col(fill = "grey60") +                     # słupek dla każdej składowej
+  labs(x = "Składowa główna", y = "Wariancja wyjaśniona (%)") +   # podpisy osi
+  theme_bw()   # jasne tło z siatką
+```
+
+**Na co patrzeć.** PC1 i PC2 wyraźnie odstają od pozostałych, a dalej słupki maleją powoli.
+Wariancja rozkłada się na wiele kierunków, więc rycina z dwiema osiami pokazuje tylko
+niewielką część informacji zawartej w danych.
+
+Wykres próbek na dwóch pierwszych składowych. PCA nie zna etykiet; kolor klasy nanosimy
+po obliczeniach:
+
+```{r pca-rozrzut, fig.width=6, fig.height=4.5}
+pc_df <- data.frame(PC1 = pca$x[, 1], PC2 = pca$x[, 2], group = y)   # pca$x: położenie próbek na składowych
+ggplot(pc_df, aes(x = PC1, y = PC2, colour = group)) +   # osie: PC1 i PC2; kolor: klasa
+  geom_point(shape = 1, stroke = 0.8) +           # jedna próbka = jedno kółko
+  scale_colour_manual(values = cols, name = NULL) +   # kolory klas z wektora cols, legenda bez tytułu
+  labs(x = paste0("PC1 (", round(100 * var_prop[1], 1), "%)"),     # odsetek wariancji w podpisie osi
+       y = paste0("PC2 (", round(100 * var_prop[2], 1), "%)")) +   # paste0() skleja napis bez spacji
+  theme_bw()   # jasne tło z siatką
+```
+
+Ładunki (ang. *loadings*) mówią, z jaką wagą każda cecha wchodzi do składowej. Pięć cech
+o największym ładunku PC1 (bez względu na znak, bo znak składowej jest umowny i może się
+różnić między programami):
+
+```{r ladunki}
+load_pc1 <- pca$rotation[, 1]                                # ładunki PC1: jedna liczba na cechę
+top5 <- names(sort(abs(load_pc1), decreasing = TRUE))[1:5]   # pięć największych wartości bezwzględnych
+data.frame(loading = round(load_pc1[top5], 3), row.names = sub("^species:", "", top5))   # tabela ładunków z krótkimi nazwami cech
+```
+
+**Na co patrzeć.** Cechy o przeciwnych znakach działają w przeciwnych kierunkach: próbki
+z jednego końca PC1 mają względnie więcej cech o ładunku dodatnim, a z drugiego końca więcej
+cech o ładunku ujemnym. Ładunek opisuje udział cechy w zmienności danych, a nie jej związek
+z chorobą.
+
+🔧 **Do sprawdzenia.** W bloku `pca` zmienić `scale. = FALSE` na `scale. = TRUE`
+(standaryzacja: każda cecha z tą samą wagą) i uruchomić sekcję ponownie. Jak zmienia się
+odsetek wariancji PC1 i wygląd wykresu próbek?
+
+> **✏️ Zadanie 1.** Odczytać, jaki odsetek wariancji wyjaśniają razem PC1 i PC2 i ile
+> wyjaśnia 10 pierwszych składowych. Czy na wykresie PC1–PC2 klasy tworzą oddzielne chmury,
+> czy się nakładają? Wzdłuż której osi różnią się bardziej? Odpowiedzieć w 2–3 zdaniach.
+
+> **✏️ Zadanie 2.** Sprawdzić, co opisuje PC1: policzyć korelację położenia próbek na PC1
+> z liczbą cech niezerowych w próbce, `cor(pca$x[, 1], rowSums(Xf > 0))`. Co oznacza ta
+> wartość? Wskazówka do interpretacji: po CLR z pseudolicznością 1e-6 każde zero staje się
+> bardzo małą liczbą (logarytm z 1e-6 to około −14).
+
+```{r zad-2}
+# miejsce na obliczenie z Zadania 2
+```
+
+# 3. Analiza współrzędnych głównych na odległości Braya–Curtisa
+
+PCA opiera się na odległości euklidesowej między próbkami. W danych o składzie próbek często
+stosuje się inną miarę: odległość Braya–Curtisa (ang. *Bray–Curtis dissimilarity*), liczoną
+na udziałach procentowych; 0 oznacza identyczny skład, 1 brak wspólnych cech. Analiza
+współrzędnych głównych (ang. *principal coordinates analysis*, PCoA) rysuje próbki tak, by
+odległości na rycinie jak najlepiej odtwarzały wybraną miarę. Po co: inna miara odległości
+może pokazać inną strukturę danych, więc warto sprawdzić, czy wnioski z PCA się powtarzają.
+
+```{r pcoa, fig.width=6, fig.height=4.5}
+d_bc <- vegdist(Xf, method = "bray")              # odległość Braya–Curtisa dla każdej pary próbek (na udziałach)
+pcoa <- cmdscale(d_bc, k = 2, eig = TRUE)         # k = 2: dwie osie do ryciny; eig = TRUE: zwraca wartości własne
+axis_prop <- pcoa$eig / sum(pcoa$eig[pcoa$eig > 0])   # odsetek osi (względem sumy dodatnich wartości własnych)
+round(axis_prop[1:2], 3)                          # odsetek dwóch pierwszych osi
+
+pcoa_df <- data.frame(axis1 = pcoa$points[, 1], axis2 = pcoa$points[, 2], group = y)   # położenie próbek
+ggplot(pcoa_df, aes(x = axis1, y = axis2, colour = group)) +   # osie: dwie pierwsze osie PCoA; kolor: klasa
+  geom_point(shape = 1, stroke = 0.8) +   # punkty jako puste kółka; stroke: grubość obwódki
+  scale_colour_manual(values = cols, name = NULL) +   # kolory klas z wektora cols, legenda bez tytułu
+  labs(x = paste0("Oś 1 (", round(100 * axis_prop[1], 1), "%)"),   # podpis osi z odsetkiem osi
+       y = paste0("Oś 2 (", round(100 * axis_prop[2], 1), "%)")) +   # to samo dla osi 2
+  theme_bw()   # jasne tło z siatką
+
+# czy pierwsza oś PCoA wiąże się z udziałem najliczniejszej cechy (korelacja rang)
+cor(pcoa$points[, 1], Xf[, "species:Prevotella copri"], method = "spearman")
+```
+
+**Na co patrzeć.** Odległość Braya–Curtisa liczona na udziałach procentowych zależy przede
+wszystkim od cech liczebnych, dlatego pierwsza oś PCoA wyraźnie wiąże się z udziałem
+*P. copri*. To inny obraz niż w PCA na danych CLR: wybór miary odległości zmienia to, co
+widać na mapie próbek.
+
+# 4. Mapy t-SNE i UMAP
+
+t-SNE (ang. *t-distributed stochastic neighbor embedding*) i UMAP (ang. *uniform manifold
+approximation and projection*) układają próbki na płaszczyźnie tak, żeby próbki bliskie
+w danych leżały blisko na mapie. Po co: lepiej niż PCA pokazują lokalne grupy podobnych
+próbek. Interpretuje się tylko sąsiedztwo; odległości między odległymi grupami i wielkości
+grup na mapie nie odpowiadają danym. Obie metody są losowe, więc ustalamy ziarno. Wejściem
+jest 10 pierwszych składowych PCA, co pomija składowe o małej wariancji i skraca obliczenia.
+Parametr `perplexity` w t-SNE to w przybliżeniu liczba sąsiadów, których bierze pod uwagę
+każda próbka; `n_neighbors` w UMAP pełni podobną rolę.
+
+```{r mapy, fig.width=10, fig.height=4.5}
+scores10 <- pca$x[, 1:10]                         # 10 pierwszych składowych głównych
+set.seed(42)                                      # ziarno: ta sama mapa przy każdym uruchomieniu
+tsne <- Rtsne(scores10, dims = 2, perplexity = 30, pca = FALSE)   # pca = FALSE: wejście to już składowe PCA
+set.seed(42)   # ziarno: ten sam wynik przy każdym uruchomieniu
+umap_xy <- umap(scores10, n_neighbors = 15, min_dist = 0.1, n_threads = 1)   # min_dist jak w wersji Python
+
+# tabela „długa”: obie mapy jedna pod drugą, z nazwą metody w osobnej kolumnie
+maps <- rbind(
+  data.frame(d1 = tsne$Y[, 1], d2 = tsne$Y[, 2], group = y, method = "t-SNE (perplexity = 30)"),
+  data.frame(d1 = umap_xy[, 1], d2 = umap_xy[, 2], group = y, method = "UMAP (n_neighbors = 15)")
+)
+ggplot(maps, aes(x = d1, y = d2, colour = group)) +   # osie: dwa wymiary mapy; kolor: klasa
+  geom_point(shape = 1, stroke = 0.8) +   # punkty jako puste kółka; stroke: grubość obwódki
+  scale_colour_manual(values = cols, name = NULL) +   # kolory klas z wektora cols, legenda bez tytułu
+  facet_wrap(~ method, scales = "free") +         # osobny panel dla każdej metody
+  labs(x = "Wymiar 1", y = "Wymiar 2") +   # podpisy osi (bez jednostek)
+  theme_bw()   # jasne tło z siatką
+```
+
+**Na co patrzeć.** Kolory pokazują, czy najbliżsi sąsiedzi próbki należą zwykle do tej
+samej klasy. Jeśli w małych fragmentach mapy kolory są wymieszane, sąsiedztwo w danych słabo
+wiąże się z chorobą. Skupiska widoczne na mapie należy traktować jako hipotezę do
+sprawdzenia, bo t-SNE i UMAP tworzą wyraźne skupiska także w danych bez wyraźnej struktury.
+
+🔧 **Do sprawdzenia.** W wywołaniu `umap()` zmienić `n_neighbors` na 5, a potem na 50.
+
+> **✏️ Zadanie 3.** W wywołaniu `Rtsne()` zmienić `perplexity` na 5, a potem na 50
+> (ziarno bez zmian) i za każdym razem narysować mapę ponownie. Jak zmienia się liczba
+> i rozstaw skupisk? Czy przy którejś wartości klasy rozdzielają się wyraźniej? Co z tego
+> wynika dla interpretacji jednej mapy t-SNE?
+
+# 5. Analiza skupień
+
+Analiza skupień (ang. *clustering*) dzieli próbki na grupy podobnych próbek. Po co:
+sprawdzamy, czy dane same dzielą się na grupy i czy te grupy odpowiadają klasom. Metoda
+k-średnich (ang. *k-means*) dzieli próbki na k skupień tak, by próbki leżały jak najbliżej
+środka swojego skupienia. Liczbę skupień wybieramy dwiema miarami: metodą łokcia (ang.
+*elbow method*; suma kwadratów odległości od środków skupień, WSS, maleje z każdym k i szuka
+się miejsca, po którym spada już wolno) i średnią szerokością sylwetki (ang. *silhouette
+width*; od −1 do 1, im wyżej, tym lepiej oddzielone skupienia). Skupienia wyznaczamy na tych
+samych 10 składowych PCA.
+
+```{r kmeans, fig.width=9, fig.height=3.5}
+ks <- 2:6                                         # sprawdzane liczby skupień
+d_scores <- dist(scores10)                        # odległości między próbkami, potrzebne do sylwetki
+wss <- numeric(length(ks))                        # puste wektory na wyniki
+sil <- numeric(length(ks))   # pusty wektor na średnie sylwetki
+for (i in seq_along(ks)) {                        # pętla po kolejnych wartościach k
+  set.seed(42)                                    # k-średnich startuje z losowych środków
+  km_k <- kmeans(scores10, centers = ks[i], nstart = 25)   # nstart = 25: 25 startów, zostaje najlepszy podział
+  wss[i] <- km_k$tot.withinss                     # WSS dla tego k
+  sil[i] <- mean(silhouette(km_k$cluster, d_scores)[, "sil_width"])   # średnia sylwetka wszystkich próbek
+}
+data.frame(k = ks, WSS = round(wss), silhouette = round(sil, 3))   # tabela wyników dla każdego k
+
+# tabela „długa”: obie miary jedna pod drugą
+k_df <- rbind(data.frame(k = ks, value = wss, measure = "WSS (metoda łokcia)"),
+              data.frame(k = ks, value = sil, measure = "Średnia sylwetka"))
+k_df$measure <- factor(k_df$measure, levels = c("WSS (metoda łokcia)", "Średnia sylwetka"))   # kolejność paneli
+ggplot(k_df, aes(x = k, y = value)) +   # wykres: k na osi X, wartość miary na osi Y
+  geom_line() + geom_point() +   # linia łącząca punkty i same punkty
+  facet_wrap(~ measure, scales = "free_y") +      # osobna skala osi Y dla każdej miary
+  labs(x = "Liczba skupień k", y = NULL) +   # podpis osi X, bez podpisu osi Y
+  theme_bw()   # jasne tło z siatką
+```
+
+**Na co patrzeć.** Krzywa WSS opada bez wyraźnego załamania, a średnia sylwetka jest
+największa dla k = 2, ale niska. Próbki nie tworzą wyraźnie oddzielonych grup; dalej
+porównujemy podział na dwa skupienia z dwiema klasami.
+
+Grupowanie hierarchiczne (ang. *hierarchical clustering*) łączy kolejno najbliższe próbki
+i skupienia w drzewo, czyli dendrogram. Metoda Warda (`ward.D2`) przy każdym łączeniu wybiera
+parę skupień, której połączenie najmniej zwiększa WSS. Przecięcie drzewa daje podział na
+skupienia. Dendrogram rysujemy grafiką podstawową R, bo ggplot2 nie ma gotowej funkcji do
+rysowania drzew.
+
+```{r hclust, fig.width=9, fig.height=4}
+hc <- hclust(d_scores, method = "ward.D2")        # drzewo na tych samych odległościach co sylwetka
+plot(hc, labels = FALSE, hang = -1, xlab = "", sub = "", ylab = "Wysokość",   # labels = FALSE: bez nazw próbek
+     main = "Dendrogram (metoda Warda)")   # tytuł ryciny
+rect.hclust(hc, k = 2, border = "#B2182B")        # ramki wokół dwóch skupień
+```
+
+Porównanie skupień z klasami. Skorygowany indeks Randa (ang. *adjusted Rand index*, ARI)
+mierzy zgodność dwóch podziałów tych samych próbek: 1 oznacza pełną zgodność, 0 zgodność
+taką jak przy podziale losowym.
+
+```{r skupienia-klasy}
+set.seed(42)   # ziarno: ten sam wynik przy każdym uruchomieniu
+km <- kmeans(scores10, centers = 2, nstart = 25)  # k-średnich dla k = 2
+hc_cl <- cutree(hc, k = 2)                        # cutree(): przecięcie drzewa na 2 skupienia
+table(cluster = km$cluster, class = y)            # tabela krzyżowa: skupienie k-średnich × klasa
+table(cluster = hc_cl, class = y)                 # skupienie metody Warda × klasa
+round(adjustedRandIndex(km$cluster, y), 3)        # ARI: k-średnich a klasa
+round(adjustedRandIndex(hc_cl, y), 3)             # ARI: metoda Warda a klasa
+round(adjustedRandIndex(km$cluster, hc_cl), 3)    # ARI: obie metody skupień między sobą
+```
+
+**Na co patrzeć.** Numery skupień są umowne i mogą się zamienić po zmianie ziarna albo
+między programami; ARI od numeracji nie zależy. Gdyby skupienia odpowiadały klasom, w każdym
+wierszu tabeli przeważałaby wyraźnie jedna klasa.
+
+> **✏️ Zadanie 4.** Na podstawie tabel i wartości ARI: czy skupienia odpowiadają klasom?
+> Czy obie metody skupień znajdują podobny podział? Policzyć medianę liczby cech niezerowych
+> w każdym skupieniu k-średnich, `tapply(rowSums(Xf > 0), km$cluster, median)`, i ocenić,
+> czym różnią się skupienia. Odpowiedzieć w 2–3 zdaniach.
+
+```{r zad-4}
+# miejsce na obliczenie z Zadania 4
+```
