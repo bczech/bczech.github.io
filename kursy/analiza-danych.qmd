@@ -40,6 +40,12 @@ budowa modelu i jego ocena.
 [[Z rozwiązaniami]{.lab-lbl} [[]{.bi .bi-file-earmark-check} R · .Rmd](analiza-danych/lab_02_rozwiazania.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-check} Python · .ipynb](analiza-danych/lab_02_rozwiazania.ipynb){.lab-btn}]{.lab-row .sol}
 :::
 
+::: {.lab-card}
+[[]{.bi .bi-journal-code}[Ćwiczenia 3: uczenie nienadzorowane — PCA, mapy próbek, skupienia[arkusz w R lub w Pythonie — do wyboru]{.lab-meta}]{}]{.lab-tt}
+
+[[Arkusz do pracy]{.lab-lbl} [[]{.bi .bi-file-earmark-code} R · .Rmd](analiza-danych/lab_03.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-code} Python · .ipynb](analiza-danych/lab_03.ipynb){.lab-btn}]{.lab-row}
+:::
+
 :::
 
 Kolejne materiały pojawią się wkrótce.
