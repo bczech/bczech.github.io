@@ -1,0 +1,205 @@
+[
+  {
+    "objectID": "software.html",
+    "href": "software.html",
+    "title": "Software",
+    "section": "",
+    "text": "I write R packages for analyses that I run often, so that other people can repeat them. All of them are open source."
+  },
+  {
+    "objectID": "software.html#ggwas",
+    "href": "software.html#ggwas",
+    "title": "Software",
+    "section": "ggwas",
+    "text": "ggwas\n\n\n\nggwas draws plots for genome-wide association studies with ggplot2. It covers the usual steps from quality control to figures for a paper: Manhattan, QQ, Miami and locus zoom plots, PheWAS, fine-mapping, colocalization and genetic correlations. It includes journal themes and colour-blind-safe palettes, and it downsamples points so that biobank-sized files still plot quickly. The package is under review at Bioconductor.\n\n Code  Documentation  Zenodo DOI\n\n\n\n\nggwas in a few lines\n\n\npak::pak(\"bczech/ggwas\")\n\nlibrary(ggwas)\ndata(example_gwas)  # columns CHR, BP, SNP, P\n\nmanhattan_plot(example_gwas)\nqq_plot(example_gwas, show_lambda = TRUE)\n\n\n\n\n\nManhattan plot of the bundled example data, from the ggwas documentation.\n\n\n\n\n\n\nGallery\n\n  Manhattan plot\n  Miami plot: two traits\n  QQ plot\n  PheWAS\n  Genetic correlations\n  Circular Manhattan plot"
+  },
+  {
+    "objectID": "software.html#brassvis",
+    "href": "software.html#brassvis",
+    "title": "Software",
+    "section": "BRASSVis",
+    "text": "BRASSVis\nBRASSVis plots gene fusions and structural variants found by BRASS in whole-genome sequencing data. Each fusion gets one page with chromosome ideograms, exon structure, a circos plot, retained protein domains and read support. The layout follows the Arriba fusion plots, adapted to BRASS output.\n\n Code"
+  },
+  {
+    "objectID": "software.html#gdr",
+    "href": "software.html#gdr",
+    "title": "Software",
+    "section": "gDR",
+    "text": "gDR\nI contribute to gDR, an open-source R suite for processing and analysing drug response screens, available on Bioconductor. It processed the screens behind the papers in Cancers (2024) and Nature Communications (2025).\n\n gdrplatform on GitHub"
+  },
+  {
+    "objectID": "software.html#internal-tools",
+    "href": "software.html#internal-tools",
+    "title": "Software",
+    "section": "Internal tools",
+    "text": "Internal tools\nIn pharmaceutical R&D I build R/Shiny applications for scientists and maintain production WDL pipelines for NGS data."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "",
+    "text": "Bioinformatics · Computational biology · Biostatistics\n      \n      Bioinformatician and computational biologist\n      Assistant Professor at Wrocław University of Environmental and Life Sciences · Senior Bioinformatician in pharmaceutical R&D · Founder of GeneStat\n       Wrocław, Poland\n      \n         CV\n         Email\n         GitHub\n         Google Scholar\n         ORCID\n         LinkedIn\nCitation counts from OpenAlex, updated 2026-11-06. Google Scholar counts are usually higher."
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "About",
+    "text": "About\nI am a bioinformatician and computational biologist. I analyse sequencing, mass spectrometry and drug screening data, build statistical models that answer biological questions, and write R packages and pipelines that make these analyses repeatable. My methods do not depend on the organism: I have worked with data from human cancer cell lines, cattle, chickens, cats, dog cells infected with influenza virus, and gut bacteria."
+  },
+  {
+    "objectID": "index.html#current-roles",
+    "href": "index.html#current-roles",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Current roles",
+    "text": "Current roles\n\n\n Since May 2026\n\nAssistant Professor\nDepartment of Genetics, Wrocław University of Environmental and Life Sciences. Research in bioinformatics and computational biology; teaching bioinformatics and biostatistics.\n\n\n\n Since July 2019\n\nSenior Bioinformatician\nPharmaceutical R&D, contracted through 7N. Drug response screens, NGS and phosphoproteomics data, R/Shiny applications and WDL pipelines.\n\n\n\n Since 2019 · own company\n\nFounder, GeneStat\nBioinformatics and statistics services for research groups and companies: sequencing and spatial transcriptomics data, statistical analysis of experiments, written reports."
+  },
+  {
+    "objectID": "index.html#research",
+    "href": "index.html#research",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Research",
+    "text": "Research\n\n\n\n\nSequencing data analysis\nWhole-genome and targeted sequencing, variant calling, bulk and single-cell RNA-seq, small RNA-seq and 16S rRNA. I take the data from raw reads through quality control and alignment to statistical tests.\n\n\n\n\n\nMulti-omics integration\nCombining data types to explain one biological process, for example host gene expression with gut microbiome profiles. I also analyse mass spectrometry phosphoproteomics.\n\n\n\n\n\nStatistical modelling and machine learning\nDose-response models for drug screens and drug combinations, mixed models and association studies, and supervised and unsupervised learning.\n\n\n\nAll publications →"
+  },
+  {
+    "objectID": "index.html#selected-work",
+    "href": "index.html#selected-work",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Selected work",
+    "text": "Selected work\n\n  \n    \n    R package\n    ggwas\n    ggplot2 plots for GWAS summary statistics: Manhattan, QQ, Miami, locus zoom, PheWAS and more. Submitted to Bioconductor.\n  \n  \n    \n    Nature Communications · 2025\n    Resistance to TEAD inhibitors\n    Joint activation of the Hippo and MAPK pathways makes cancer cells resistant to TEAD inhibition. I processed the drug screen data with the gDR package.\n  \n  \n    \n    Frontiers in Microbiology · 2022 · first author\n    Host transcriptome and microbiome integration\n    Co-expression networks connect host RNA-seq with 16S rRNA profiles of gut bacteria to describe the response to heat stress."
+  },
+  {
+    "objectID": "index.html#skills",
+    "href": "index.html#skills",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Skills",
+    "text": "Skills\n\nSequencing and omics dataWGS and WESVariant callingStructural variants and gene fusionsBulk RNA-seqSingle-cell RNA-seqSpatial transcriptomics (Visium HD)Small RNA-seqChIP-seqATAC-seq and scATAC-seqEpigenomics16S rRNA and metagenomicsGenome annotationComparative and population genomics\nDrug discovery and proteomicsDose-response modellingDrug combinations and synergyHigh-throughput screensCRISPR screensMS phosphoproteomicsKinase activity (KSEA)Pathway and enrichment analysisNetwork biologyStructural biology\nStatistics and machine learningLinear and mixed modelsGWAS and statistical geneticsStudy design and power analysisMulti-omics integrationExploratory data analysisSupervised and unsupervised learningDeep learningFeature engineeringscikit-learncaretTensorFlow and KerasPyTorch\nProgramming and visualisationRR packages (Bioconductor)ShinyPythonBash, sed, AWKSQLGit, GitHub, GitLabggplot2PlotlySeabornDashR Markdown and QuartoJupyterLaTeXREST APIs\nPipelines, infrastructure and dataWDL pipelinesHPC and SlurmLinuxAWSDockerKubernetesCondaSnowflakeMySQL and SQLiteDatabase designFAIR dataMetadata management\nCollaboration and deliveryScrumProduct ownershipJiraTrelloReports for non-specialistsScientific writingTechnical documentationTeaching and training"
+  },
+  {
+    "objectID": "index.html#path",
+    "href": "index.html#path",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Path",
+    "text": "Path\n\n  2014BSc in BioinformaticsWrocław University of Environmental and Life Sciences\n  2017MSc in BioinformaticsBiostatistics and bioinformatics programming\n  2018NGS internshipAarhus University, Denmark\n  2019Pharma R&D, GeneStat, PhDSenior bioinformatician via 7N; own company; doctoral studies\n  2024PhD in Biological SciencesWrocław University of Environmental and Life Sciences\n  2025MBA in Healthcare ManagementPoznan University of Medical Sciences, in progress\n  2026Assistant ProfessorDepartment of Genetics, Wrocław University of Environmental and Life Sciences"
+  },
+  {
+    "objectID": "index.html#teaching",
+    "href": "index.html#teaching",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Teaching",
+    "text": "Teaching\nI teach bioinformatics and biostatistics to bioinformatics and biology students at Wrocław University of Environmental and Life Sciences. Slides, worksheets and datasets are public (course pages in Polish; Coding Lab in English).\n\n  \n    \n    BiostatisticsStatistical thinking and tests for biologists, with R.\n  \n  \n    \n    Data AnalysisMachine learning in R and Python for bioinformatics students.\n  \n  \n    \n    Computer LabThe Unix command line and shell tools for biological data.\n  \n  \n    \n    Coding LabErasmus+ course in English: Linux, Bash, AWK, Conda and Docker."
+  },
+  {
+    "objectID": "index.html#contact-and-collaboration",
+    "href": "index.html#contact-and-collaboration",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Contact and collaboration",
+    "text": "Contact and collaboration\nI am open to collaboration on sequencing and multi-omics projects. Academic projects run through the university, commercial analyses through GeneStat. Write to me with a short description of your data and the question you want to answer.\n\n bartosz.w.czech@gmail.com  bartosz.czech@upwr.edu.pl\n\nDepartment of Genetics, Wrocław University of Environmental and Life Sciences, Kożuchowska 7, 51-631 Wrocław, Poland"
+  },
+  {
+    "objectID": "research.html",
+    "href": "research.html",
+    "title": "Research",
+    "section": "",
+    "text": "I work with genomic data and statistics. Most of my projects start with sequencing data (DNA, RNA, small RNA or 16S rRNA) and end with a statistical model that answers a biological question. I have published 14 peer-reviewed articles, 4 of them as first author."
+  },
+  {
+    "objectID": "research.html#publications-and-citations",
+    "href": "research.html#publications-and-citations",
+    "title": "Research",
+    "section": "Publications and citations",
+    "text": "Publications and citations\n\nPeer-reviewed articles per year012320181 article in 201820190 articles in 2019320203 articles in 202020211 article in 202120222 articles in 202220232 articles in 202320242 articles in 202420251 article in 2025220262 articles in 2026\nCitations per year020406020180 citations in 201820190 citations in 2019202010 citations in 202020214 citations in 202120229 citations in 2022202315 citations in 2023202419 citations in 2024202527 citations in 202550202650 citations in 2026\n\nArticles from the list below; citations from OpenAlex, updated 2026-11-06. The current year is not complete.\nShow the numbers as a table\n\n\n\nYear\nArticles\nCitations\n\n\n\n\n2018\n1\n0\n\n\n2019\n0\n0\n\n\n2020\n3\n10\n\n\n2021\n1\n4\n\n\n2022\n2\n9\n\n\n2023\n2\n15\n\n\n2024\n2\n19\n\n\n2025\n1\n27\n\n\n2026\n2\n50"
+  },
+  {
+    "objectID": "research.html#what-i-do",
+    "href": "research.html#what-i-do",
+    "title": "Research",
+    "section": "What I do",
+    "text": "What I do\nSequencing data analysis. I analyse whole-genome, targeted and RNA sequencing data, including single-cell RNA-seq, small RNA-seq and 16S rRNA amplicons. I have built and run pipelines for variant calling, differential expression and small RNA annotation in many species: human cancer cells, cattle, chickens, cats, and dog cells infected with influenza A virus.\nMulti-omics and microbiome data. I combine data types when one of them cannot explain a process alone, for example host RNA-seq with the gut microbiome. I also analyse mass spectrometry phosphoproteomics.\nStatistical modelling and machine learning. I fit dose-response models to high-throughput drug screens, including drug combinations, run association studies with mixed models, and use machine learning for classification, such as separating true from false SNP calls or predicting semen quality after freezing.\nAnalysis choices and reproducibility. Reference genomes, pipelines and parameters can change the results of an analysis. I test how much they do, for example the effect of the reference transcriptome on cancer RNA-seq, and I package repeated analyses as R libraries and workflows."
+  },
+  {
+    "objectID": "research.html#articles",
+    "href": "research.html#articles",
+    "title": "Research",
+    "section": "Peer-reviewed articles",
+    "text": "Peer-reviewed articles\nClick a paper to see the question, the methods and a figure.\n\n2026A proof-of-concept study: reference transcriptome choice as a hidden analytical variable in breast cancer RNA-seq analysisZieliński P, Frąszczak M, Czech B, Dobosz P, Adamiak K, Mierzejewski P, Stępień R, Mielczarek MInternational Journal of Molecular Sciences 27(21):9398Tests whether the choice between the GRCh37 and GRCh38 reference transcriptomes changes the list of differentially expressed genes in breast cancer RNA-seq data.MethodsQuantification with kallisto against GRCh37 and GRCh38Differential expression with DESeq2 under four analysis approachesRNA-seqReference genomekallistoDESeq2Breast cancer Read the paper\n2026Motile sperm head morphometry in relation to sperm kinematics and freezability in catsProchowska S, Czech B, Eberhardt M, Niżański WTheriogenology 255:117839Asks whether the head shape of motile sperm cells relates to their movement and to how well semen survives freezing in domestic cats.MethodsProcessing of single-cell kinematics and morphometry from a CASA systemPCA and clustering of morpho-kinetic subpopulationsClassification trees predicting post-thaw semen qualityPCAClusteringClassification treesCASA Read the paper\n2025Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibitionPaul S, Hagenbeek TJ, Tremblay J, Kameswaran V, Ong C, Liu C, Guarnaccia AD, Mondo JA, Hsu PL, Kljavin NM, Czech B, Smola J, Nguyen DAH, Lacap JA, Pham TH, Liang Y, Blake RA, Gerosa L, Grimmer M, Xie S, Daniel B, Yao X, Dey ANature Communications 16:1743Describes how cancer cells become resistant to TEAD inhibitors through joint activation of the Hippo and MAPK pathways.MethodsProcessing of high-throughput drug screens with the gDR R packageDose-response fitting with four-parameter logistic modelsDrug responseDose-response modellingRgDR Read the paper\n2024Profiling of snoRNAs in exosomes secreted from cells infected with influenza A virusRozek W, Kwasnik M, Socha W, Czech B, Rola JInternational Journal of Molecular Sciences 26(1):12Characterises small nucleolar RNAs carried in exosomes released by cells infected with influenza A virus.MethodsSmall RNA-seq trimming (Trimmomatic) and alignment (BWA-MEM)snoRNA annotation with Ensembl and RfamDifferential expression with DESeq2Interaction networks from RNAInterSmall RNA-seqsnoRNAExosomesDESeq2 Read the paper\n2024Computational modeling of drug response identifies mutant-specific constraints for dosing panRAF and MEK inhibitors in melanomaGoetz A, Shanahan F, Brooks L, Lin E, Mroue R, Dela Cruz D, Hunsaker T, Czech B, Dixit P, Segal U, Martin S, Foster SA, Gerosa LCancers 16(16):2914Uses drug response modelling to find dose ranges of panRAF and MEK inhibitor combinations that work for specific melanoma mutations.MethodsProcessing of high-throughput combination screens with the gDR R packageDose-response fitting and Bliss synergy scoresDrug combinationsSynergyRgDR Read the paper\n2023Feline sperm head morphometry in relation to male pedigree and fertilityProchowska S, Napierkowska S, Czech B, Niżański WTheriogenology 208:119–125Compares sperm head shape between pedigree and non-pedigree cats and relates it to fertility.MethodsPCA and k-means clustering of sperm subpopulationsGroup comparisons with ANOVA or Kruskal–Wallis testsPCAClusteringANOVAR Read the paper\n2023Protein-coding region derived small RNA in exosomes from influenza A virus–infected cellsKwasnik M, Socha W, Czech B, Wasiak M, Rola J, Rozek WInternational Journal of Molecular Sciences 24(1):867Looks at small RNA fragments that come from protein-coding genes and are packed into exosomes during influenza A infection.MethodsAlignment to the dog and influenza genomes with BWA-MEMDifferential expression with DESeq2Functional annotation with PANTHER and STRINGSmall RNA-seqExosomesDESeq2STRING Read the paper\n2022Host transcriptome and microbiome interactions in Holstein cattle under heat stress conditionCzech B, Wang Y, Wang K, Luo H, Hu L, Szyda JFrontiers in Microbiology 13:998093First authorLinks gene expression in the host to gut microbiota composition in dairy cows under heat stress.MethodsHost RNA-seq alignment with STAR16S rRNA processing with QIIME2 and DADA2Co-expression modules (WGCNA) linked to bacterial taxaRNA-seq16S rRNAWGCNAMulti-omics Read the paper\n2022Fecal microbiota and their association with heat stress in Bos taurusCzech B, Szyda J, Wang K, Luo H, Wang YBMC Microbiology 22:171First authorIdentifies gut bacteria whose abundance is associated with heat stress indicators in dairy cattle.Methods16S rRNA quality control and denoising (DADA2, QIIME2)Alpha and beta diversity, PERMANOVADifferential abundance with edgeR16S rRNAMicrobiomePERMANOVAedgeR Read the paper\n2021SNP prioritization in targeted sequencing data associated with humoral immune responses in chickenSuchocki T, Czech B, Dunislawska A, Slawinska A, Derebecka N, Wesoly J, Siwek M, Szyda JPoultry Science 100(11):101433Ranks variants from targeted sequencing by their likely link to antibody response in chickens.MethodsAlignment with BWA-MEM and variant calling with GATKVariant annotation with Ensembl VEPAssociation tests and linkage disequilibriumVariant callingGATKEnsembl VEPAssociation tests Read the paper\n2020Extraordinary command line: basic data editing tools for biologists dealing with sequence dataMielczarek M, Czech B, Stańczyk J, Szyda J, Guldbrandtsen BThe Open Bioinformatics Journal 13(1):137–145A tutorial on Unix command-line tools for editing FASTA, FASTQ and GFF files.Methodssed, awk, grep and Bash scriptingUnixBashTutorial Read the paper\n2020The application of deep learning for the classification of correct and incorrect SNP genotypes from whole-genome DNA sequencing pipelinesKotlarz K, Mielczarek M, Suchocki T, Czech B, Guldbrandtsen B, Szyda JJournal of Applied Genetics 61(4):607–616Trains neural networks to separate true from false SNP calls in whole-genome sequencing data.MethodsQuality features extracted from alignmentsDeep learning in Keras and TensorFlowROC curves and cross-validationDeep learningVariant callingPython Read the paper\n2020Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome in Bos taurus genomeCzech B, Guldbrandtsen B, Szyda JScientific Reports 10:13641First authorCompares the amount and type of DNA variation on autosomes and sex chromosomes in cattle whole-genome data.MethodsAlignment with BWA-MEM, variant calling with GATK and SAMtoolsAnnotation with snpEff and SIFT4GDiversity statistics with VCFtoolsWhole-genome sequencingSex chromosomesPopulation genetics Read the paper\n2018Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomesCzech B, Frąszczak M, Mielczarek M, Szyda JPLOS ONE 13(6):e0198419First authorFinds SNPs specific to individual cattle breeds and describes the genes and traits they affect.MethodsAlignment with BWA-MEM, filtering with VCFtoolsFunctional analysis with KOBAS, OMIA and Cattle QTLdbWhole-genome sequencingSNPCattle breeds Read the paper"
+  },
+  {
+    "objectID": "research.html#preprints",
+    "href": "research.html#preprints",
+    "title": "Research",
+    "section": "Preprints",
+    "text": "Preprints\n\n2023Genome-wide association study of heat stress response in Bos taurusCzech B, Wang YbioRxivFirst author\n\nConference talks and posters are listed in the CV."
+  },
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "",
+    "text": "Download as PDF\nWrocław, Poland · bartosz.w.czech@gmail.com · bczech.github.io\nORCID 0000-0002-9908-3007 · github.com/bczech"
+  },
+  {
+    "objectID": "cv.html#experience",
+    "href": "cv.html#experience",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Experience",
+    "text": "Experience\nAssistant Professor, Department of Genetics, Wrocław University of Environmental and Life Sciences\nMay 2026 – present · Wrocław, Poland\n\nResearch in bioinformatics and computational biology; teaching bioinformatics and biostatistics.\n\nSenior Bioinformatician, 7N, contracted to a global pharmaceutical company\nJuly 2019 – present · Warsaw, Poland\n\nProcessing and modelling of high-throughput drug response screens; co-author of the open-source gDR suite (Bioconductor).\nNGS data analysis: bulk and single-cell RNA-seq, whole-genome sequencing, 16S rRNA.\nMass spectrometry phosphoproteomics.\nR/Shiny applications and production WDL pipelines; product owner role in an agile team.\n\nFounder and owner, GeneStat\n2019 – present · Wrocław, Poland\n\nBioinformatics and statistics services for research groups and companies: sequencing and spatial transcriptomics data analysis, statistical analysis of experiments, written reports.\n\nNGS data analysis internship, Center for Quantitative Genetics and Genomics, Aarhus University\nJuly – August 2018 · Foulum, Denmark\nStatistical analysis internship, Biostat sp. z o.o.\nJuly – August 2016 · Rybnik, Poland"
+  },
+  {
+    "objectID": "cv.html#education",
+    "href": "cv.html#education",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Education",
+    "text": "Education\nMBA in Healthcare Management with elements of clinical research, Poznan University of Medical Sciences\n2025 – present\nPhD in Biological Sciences, Wrocław University of Environmental and Life Sciences\n2019 – 2024\nMSc in Bioinformatics (biostatistics and bioinformatics programming), Wrocław University of Environmental and Life Sciences\n2017 – 2019\nBSc in Bioinformatics, Wrocław University of Environmental and Life Sciences\n2014 – 2017"
+  },
+  {
+    "objectID": "cv.html#publications",
+    "href": "cv.html#publications",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Publications",
+    "text": "Publications\n\nPeer-reviewed articles\n\nZieliński P, Frąszczak M, Czech B, Dobosz P, Adamiak K, Mierzejewski P, Stępień R, Mielczarek M (2026). A proof-of-concept study: reference transcriptome choice as a hidden analytical variable in breast cancer RNA-seq analysis. International Journal of Molecular Sciences, 27(21):9398. doi:10.3390/ijms27219398\nProchowska S, Czech B, Eberhardt M, Niżański W (2026). Motile sperm head morphometry in relation to sperm kinematics and freezability in cats. Theriogenology, 255:117839. doi:10.1016/j.theriogenology.2026.117839\nPaul S, Hagenbeek TJ, Tremblay J, Kameswaran V, Ong C, Liu C, Guarnaccia AD, Mondo JA, Hsu PL, Kljavin NM, Czech B, Smola J, Nguyen DAH, Lacap JA, Pham TH, Liang Y, Blake RA, Gerosa L, Grimmer M, Xie S, Daniel B, Yao X, Dey A (2025). Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibition. Nature Communications, 16:1743. doi:10.1038/s41467-025-56634-y\nRozek W, Kwasnik M, Socha W, Czech B, Rola J (2024). Profiling of snoRNAs in exosomes secreted from cells infected with influenza A virus. International Journal of Molecular Sciences, 26(1):12. doi:10.3390/ijms26010012\nGoetz A, Shanahan F, Brooks L, Lin E, Mroue R, Dela Cruz D, Hunsaker T, Czech B, Dixit P, Segal U, Martin S, Foster SA, Gerosa L (2024). Computational modeling of drug response identifies mutant-specific constraints for dosing panRAF and MEK inhibitors in melanoma. Cancers, 16(16):2914. doi:10.3390/cancers16162914\nProchowska S, Napierkowska S, Czech B, Niżański W (2023). Feline sperm head morphometry in relation to male pedigree and fertility. Theriogenology, 208:119–125. doi:10.1016/j.theriogenology.2023.06.006\nKwasnik M, Socha W, Czech B, Wasiak M, Rola J, Rozek W (2023). Protein-coding region derived small RNA in exosomes from influenza A virus–infected cells. International Journal of Molecular Sciences, 24(1):867. doi:10.3390/ijms24010867\nCzech B, Wang Y, Wang K, Luo H, Hu L, Szyda J (2022). Host transcriptome and microbiome interactions in Holstein cattle under heat stress condition. Frontiers in Microbiology, 13:998093. doi:10.3389/fmicb.2022.998093\nCzech B, Szyda J, Wang K, Luo H, Wang Y (2022). Fecal microbiota and their association with heat stress in Bos taurus. BMC Microbiology, 22:171. doi:10.1186/s12866-022-02576-0\nSuchocki T, Czech B, Dunislawska A, Slawinska A, Derebecka N, Wesoly J, Siwek M, Szyda J (2021). SNP prioritization in targeted sequencing data associated with humoral immune responses in chicken. Poultry Science, 100(11):101433. doi:10.1016/j.psj.2021.101433\nMielczarek M, Czech B, Stańczyk J, Szyda J, Guldbrandtsen B (2020). Extraordinary command line: basic data editing tools for biologists dealing with sequence data. The Open Bioinformatics Journal, 13(1):137–145. doi:10.2174/1875036202013010137\nKotlarz K, Mielczarek M, Suchocki T, Czech B, Guldbrandtsen B, Szyda J (2020). The application of deep learning for the classification of correct and incorrect SNP genotypes from whole-genome DNA sequencing pipelines. Journal of Applied Genetics, 61(4):607–616. doi:10.1007/s13353-020-00586-0\nCzech B, Guldbrandtsen B, Szyda J (2020). Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome in Bos taurus genome. Scientific Reports, 10:13641. doi:10.1038/s41598-020-70380-9\nCzech B, Frąszczak M, Mielczarek M, Szyda J (2018). Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomes. PLOS ONE, 13(6):e0198419. doi:10.1371/journal.pone.0198419\n\n\n\nPreprints\n\nCzech B, Wang Y (2023). Genome-wide association study of heat stress response in Bos taurus. bioRxiv. doi:10.1101/2023.06.05.543663"
+  },
+  {
+    "objectID": "cv.html#software",
+    "href": "cv.html#software",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Software",
+    "text": "Software\n\nggwas: ggplot2 plots for GWAS summary statistics (R; under review at Bioconductor). github.com/bczech/ggwas\nBRASSVis: plots of gene fusions and structural variants from BRASS (R). github.com/bczech/BRASSVis\ngDR: co-author of the R suite for drug response screens (Bioconductor). github.com/gdrplatform"
+  },
+  {
+    "objectID": "cv.html#teaching",
+    "href": "cv.html#teaching",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Teaching",
+    "text": "Teaching\nI teach bioinformatics and biostatistics at Wrocław University of Environmental and Life Sciences. Courses in 2026/27: Biostatistics; Data Analysis (machine learning in R and Python); Computer Lab (Unix command line for bioinformatics); Coding Lab for Erasmus+ students (in English). Materials: bczech.github.io/teaching."
+  },
+  {
+    "objectID": "cv.html#conference-presentations",
+    "href": "cv.html#conference-presentations",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Conference presentations",
+    "text": "Conference presentations\n\nTalks\n\nCzech B, Szyda J (2024). Gut microbiota composition and gene expression in Holstein cattle under heat stress. Invited talk (in Polish), XXIX Winter School of Cattle Breeders, Zakopane, Poland.\nJaśkowski B, Czech B, Niżański W (2023). Evaluation of the size of the recipient’s corpus luteum after synchronization as an additional criterion for increasing the pregnancy rate after an embryo transfer in cattle. Japan–Poland Joint Seminar, Morioka, Japan.\nCzech B, Szyda J, Wang Y (2022). Host transcriptome and microbiome data integration in Chinese Holstein cattle under heat stress. 73rd Annual Meeting of the European Federation of Animal Science (EAAP), Porto, Portugal.\nCzech B, Wang K, Chen S, Wang Y, Szyda J (2021). Faecal microbiota and their association with heat stress in Bos taurus. 72nd EAAP Annual Meeting, Davos, Switzerland.\nCzech B, Suchocki T, Szyda J (2019). SNP prioritisation in GWAS with dense marker sets. 70th EAAP Annual Meeting, Ghent, Belgium.\nSuchocki T, Czech B, Siwek M, Szyda J (2019). Breed specific reference genomes in cattle. 70th EAAP Annual Meeting, Ghent, Belgium.\nCzech B, Zając M, Wasyl D, Mielczarek M, Sztromwasser P (2019). Optimization of de novo genome assembly based on second and third generation sequencing data. XXIV International Conference of Student Scientific Circles, Wrocław, Poland.\nCzech B, Mielczarek M, Frąszczak M, Szyda J (2018). Breed specific reference genomes in cattle. 69th EAAP Annual Meeting, Dubrovnik, Croatia.\nCzech B (2018). Construction of Bos taurus breed specific reference genomes. XXIII International Conference of Student Scientific Circles, Wrocław, Poland.\nCzech B, Dobkowski E, Mielczarek M, Frąszczak M, Szyda J (2017). Construction of Bos taurus breed specific reference genomes for Fleckvieh, Simmental, Guernsey and Brown Swiss. Vortragstagung der DGfZ und GfT, University of Hohenheim, Stuttgart, Germany.\nCzech B, Dobkowski E, Barski P, Odziemczyk M (2017). Creating the Brown Swiss breed specific reference genome. XXII International Conference of Student Scientific Circles, Wrocław, Poland.\n\n\n\nPosters\n\nJaśkowski B, Czech B, Jaśkowski J (2024). Corpus luteum in embryo recipient heifers: practical aspects. 32nd World Buiatrics Congress.\nMielczarek M, Czech B, Stępień R, et al. (2024). The effect of transcriptomic annotations in breast cancer DGE study. European Human Genetics Conference (ESHG). European Journal of Human Genetics 32(Suppl 2):915.\nStępień R, Szyda J, Czech B, Mielczarek M (2023). The effect of transcriptomic annotations in breast cancer differential gene expression study. 17th International Symposium on Integrative Bioinformatics, Wrocław, Poland.\nCzech B, Szyda J, Wang Y (2022). Host transcriptome and microbiome data integration in Chinese Holstein cattle under heat stress. 73rd EAAP Annual Meeting, Porto, Portugal.\nCzech B, Wang K, Chen S, Wang Y, Szyda J (2021). Challenges of 16S rRNA gene analysis in Chinese Holstein cows under heat stress condition. 72nd EAAP Annual Meeting, Davos, Switzerland.\nCzech B, Szyda J, Wang K, Chen S, Wang Y (2020). The effect of pipelines and databases on the analysis of the fecal microbiota of dairy cattle. 71st EAAP Annual Meeting (online).\nSzyda J, Czech B, Wang K, Chen S, Wang Y (2020). The application of mixed linear models for the analysis of microbiome influence on heat stress in Chinese Holstein cows. 71st EAAP Annual Meeting (online).\nKotlarz K, Mielczarek M, Suchocki T, Czech B, Guldbrandtsen B, Szyda J (2020). Don’t play too much! Deep learning to classify true and false positive SNPs in whole genome sequence. 71st EAAP Annual Meeting (online).\nCzech B, Guldbrandtsen B, Szyda J (2020). Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome in Bos taurus genome. Autumn Workshop of the Polish Bioinformatics Society (PTBI).\nKotlarz K, Mielczarek M, Suchocki T, Czech B, Guldbrandtsen B, Szyda J (2020). Dig (deep)er: deep learning algorithms for the imbalanced classification of correct and incorrect SNP genotypes from WGS pipelines. Autumn Workshop of the Polish Bioinformatics Society (PTBI).\nCzech B, Guldbrandtsen B, Szyda J (2019). Pattern of genetic variation between autosomes and sex chromosomes in Bos taurus genome. 70th EAAP Annual Meeting, Ghent, Belgium."
+  },
+  {
+    "objectID": "cv.html#skills",
+    "href": "cv.html#skills",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Skills",
+    "text": "Skills\n\nSequencing and omics data: WGS and WES, Variant calling, Structural variants and gene fusions, Bulk RNA-seq, Single-cell RNA-seq, Spatial transcriptomics (Visium HD), Small RNA-seq, ChIP-seq, ATAC-seq and scATAC-seq, Epigenomics, 16S rRNA and metagenomics, Genome annotation, Comparative and population genomics.\nDrug discovery and proteomics: Dose-response modelling, Drug combinations and synergy, High-throughput screens, CRISPR screens, MS phosphoproteomics, Kinase activity (KSEA), Pathway and enrichment analysis, Network biology, Structural biology.\nStatistics and machine learning: Linear and mixed models, GWAS and statistical genetics, Study design and power analysis, Multi-omics integration, Exploratory data analysis, Supervised and unsupervised learning, Deep learning, Feature engineering, scikit-learn, caret, TensorFlow and Keras, PyTorch.\nProgramming and visualisation: R, R packages (Bioconductor), Shiny, Python, Bash, sed, AWK, SQL, Git, GitHub, GitLab, ggplot2, Plotly, Seaborn, Dash, R Markdown and Quarto, Jupyter, LaTeX, REST APIs.\nPipelines, infrastructure and data: WDL pipelines, HPC and Slurm, Linux, AWS, Docker, Kubernetes, Conda, Snowflake, MySQL and SQLite, Database design, FAIR data, Metadata management.\nCollaboration and delivery: Scrum, Product ownership, Jira, Trello, Reports for non-specialists, Scientific writing, Technical documentation, Teaching and training."
+  },
+  {
+    "objectID": "cv.html#memberships",
+    "href": "cv.html#memberships",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Memberships",
+    "text": "Memberships\nEuropean Federation of Animal Science (since 2018) · Polish Bioinformatics Society (since 2018)"
+  },
+  {
+    "objectID": "cv.html#languages",
+    "href": "cv.html#languages",
+    "title": "Bartosz Czech, PhD, Eng.",
+    "section": "Languages",
+    "text": "Languages\nPolish (native) · English (upper-intermediate) · Spanish (basic)"
+  }
+]
