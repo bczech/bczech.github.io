@@ -1,0 +1,205 @@
+# Publications shown on research.qmd and cv.qmd.
+# scripts/gen_pubs.py reads this file before each render (pre-render hook).
+#
+# To add a paper: copy one [[pub]] block, put it in date order (newest first)
+# and fill in the fields. Only title, authors, journal, year and doi are required.
+#
+#   type      "article" (peer-reviewed) or "preprint"
+#   first     true if I am the first author (adds a marker on the page)
+#   cite      volume, issue and pages as they should appear in the reference
+#   img       figure from the paper, path relative to portfolio/
+#   summary   one or two sentences: the question the paper answers
+#   methods   short list of the main methods
+#   tags      keywords shown as small chips
+
+[[pub]]
+type = "article"
+year = 2026
+title = "A proof-of-concept study: reference transcriptome choice as a hidden analytical variable in breast cancer RNA-seq analysis"
+authors = "Zieliński P, Frąszczak M, Czech B, Dobosz P, Adamiak K, Mierzejewski P, Stępień R, Mielczarek M"
+journal = "International Journal of Molecular Sciences"
+cite = "27(21):9398"
+doi = "10.3390/ijms27219398"
+summary = "Tests whether the choice between the GRCh37 and GRCh38 reference transcriptomes changes the list of differentially expressed genes in breast cancer RNA-seq data."
+methods = ["Quantification with kallisto against GRCh37 and GRCh38", "Differential expression with DESeq2 under four analysis approaches"]
+tags = ["RNA-seq", "Reference genome", "kallisto", "DESeq2", "Breast cancer"]
+
+[[pub]]
+type = "article"
+year = 2026
+title = "Motile sperm head morphometry in relation to sperm kinematics and freezability in cats"
+authors = "Prochowska S, Czech B, Eberhardt M, Niżański W"
+journal = "Theriogenology"
+cite = "255:117839"
+doi = "10.1016/j.theriogenology.2026.117839"
+summary = "Asks whether the head shape of motile sperm cells relates to their movement and to how well semen survives freezing in domestic cats."
+methods = ["Processing of single-cell kinematics and morphometry from a CASA system", "PCA and clustering of morpho-kinetic subpopulations", "Classification trees predicting post-thaw semen quality"]
+tags = ["PCA", "Clustering", "Classification trees", "CASA"]
+
+[[pub]]
+type = "article"
+year = 2025
+title = "Cooperation between the Hippo and MAPK pathway activation drives acquired resistance to TEAD inhibition"
+authors = "Paul S, Hagenbeek TJ, Tremblay J, Kameswaran V, Ong C, Liu C, Guarnaccia AD, Mondo JA, Hsu PL, Kljavin NM, Czech B, Smola J, Nguyen DAH, Lacap JA, Pham TH, Liang Y, Blake RA, Gerosa L, Grimmer M, Xie S, Daniel B, Yao X, Dey A"
+journal = "Nature Communications"
+cite = "16:1743"
+doi = "10.1038/s41467-025-56634-y"
+img = "img/pubs/img1.png"
+summary = "Describes how cancer cells become resistant to TEAD inhibitors through joint activation of the Hippo and MAPK pathways."
+methods = ["Processing of high-throughput drug screens with the gDR R package", "Dose-response fitting with four-parameter logistic models"]
+tags = ["Drug response", "Dose-response modelling", "R", "gDR"]
+
+[[pub]]
+type = "article"
+year = 2024
+title = "Profiling of snoRNAs in exosomes secreted from cells infected with influenza A virus"
+authors = "Rozek W, Kwasnik M, Socha W, Czech B, Rola J"
+journal = "International Journal of Molecular Sciences"
+cite = "26(1):12"
+doi = "10.3390/ijms26010012"
+img = "img/pubs/img2.png"
+summary = "Characterises small nucleolar RNAs carried in exosomes released by cells infected with influenza A virus."
+methods = ["Small RNA-seq trimming (Trimmomatic) and alignment (BWA-MEM)", "snoRNA annotation with Ensembl and Rfam", "Differential expression with DESeq2", "Interaction networks from RNAInter"]
+tags = ["Small RNA-seq", "snoRNA", "Exosomes", "DESeq2"]
+
+[[pub]]
+type = "article"
+year = 2024
+title = "Computational modeling of drug response identifies mutant-specific constraints for dosing panRAF and MEK inhibitors in melanoma"
+authors = "Goetz A, Shanahan F, Brooks L, Lin E, Mroue R, Dela Cruz D, Hunsaker T, Czech B, Dixit P, Segal U, Martin S, Foster SA, Gerosa L"
+journal = "Cancers"
+cite = "16(16):2914"
+doi = "10.3390/cancers16162914"
+img = "img/pubs/img3.jpg"
+summary = "Uses drug response modelling to find dose ranges of panRAF and MEK inhibitor combinations that work for specific melanoma mutations."
+methods = ["Processing of high-throughput combination screens with the gDR R package", "Dose-response fitting and Bliss synergy scores"]
+tags = ["Drug combinations", "Synergy", "R", "gDR"]
+
+[[pub]]
+type = "article"
+year = 2023
+title = "Feline sperm head morphometry in relation to male pedigree and fertility"
+authors = "Prochowska S, Napierkowska S, Czech B, Niżański W"
+journal = "Theriogenology"
+cite = "208:119–125"
+doi = "10.1016/j.theriogenology.2023.06.006"
+img = "img/pubs/img4.jpg"
+summary = "Compares sperm head shape between pedigree and non-pedigree cats and relates it to fertility."
+methods = ["PCA and k-means clustering of sperm subpopulations", "Group comparisons with ANOVA or Kruskal–Wallis tests"]
+tags = ["PCA", "Clustering", "ANOVA", "R"]
+
+[[pub]]
+type = "article"
+year = 2023
+title = "Protein-coding region derived small RNA in exosomes from influenza A virus–infected cells"
+authors = "Kwasnik M, Socha W, Czech B, Wasiak M, Rola J, Rozek W"
+journal = "International Journal of Molecular Sciences"
+cite = "24(1):867"
+doi = "10.3390/ijms24010867"
+img = "img/pubs/img5.jpg"
+summary = "Looks at small RNA fragments that come from protein-coding genes and are packed into exosomes during influenza A infection."
+methods = ["Alignment to the dog and influenza genomes with BWA-MEM", "Differential expression with DESeq2", "Functional annotation with PANTHER and STRING"]
+tags = ["Small RNA-seq", "Exosomes", "DESeq2", "STRING"]
+
+[[pub]]
+type = "article"
+year = 2022
+first = true
+title = "Host transcriptome and microbiome interactions in Holstein cattle under heat stress condition"
+authors = "Czech B, Wang Y, Wang K, Luo H, Hu L, Szyda J"
+journal = "Frontiers in Microbiology"
+cite = "13:998093"
+doi = "10.3389/fmicb.2022.998093"
+img = "img/pubs/img6.webp"
+summary = "Links gene expression in the host to gut microbiota composition in dairy cows under heat stress."
+methods = ["Host RNA-seq alignment with STAR", "16S rRNA processing with QIIME2 and DADA2", "Co-expression modules (WGCNA) linked to bacterial taxa"]
+tags = ["RNA-seq", "16S rRNA", "WGCNA", "Multi-omics"]
+
+[[pub]]
+type = "article"
+year = 2022
+first = true
+title = "Fecal microbiota and their association with heat stress in Bos taurus"
+authors = "Czech B, Szyda J, Wang K, Luo H, Wang Y"
+journal = "BMC Microbiology"
+cite = "22:171"
+doi = "10.1186/s12866-022-02576-0"
+img = "img/pubs/img7.png"
+summary = "Identifies gut bacteria whose abundance is associated with heat stress indicators in dairy cattle."
+methods = ["16S rRNA quality control and denoising (DADA2, QIIME2)", "Alpha and beta diversity, PERMANOVA", "Differential abundance with edgeR"]
+tags = ["16S rRNA", "Microbiome", "PERMANOVA", "edgeR"]
+
+[[pub]]
+type = "article"
+year = 2021
+title = "SNP prioritization in targeted sequencing data associated with humoral immune responses in chicken"
+authors = "Suchocki T, Czech B, Dunislawska A, Slawinska A, Derebecka N, Wesoly J, Siwek M, Szyda J"
+journal = "Poultry Science"
+cite = "100(11):101433"
+doi = "10.1016/j.psj.2021.101433"
+img = "img/pubs/img8.jpg"
+summary = "Ranks variants from targeted sequencing by their likely link to antibody response in chickens."
+methods = ["Alignment with BWA-MEM and variant calling with GATK", "Variant annotation with Ensembl VEP", "Association tests and linkage disequilibrium"]
+tags = ["Variant calling", "GATK", "Ensembl VEP", "Association tests"]
+
+[[pub]]
+type = "article"
+year = 2020
+title = "Extraordinary command line: basic data editing tools for biologists dealing with sequence data"
+authors = "Mielczarek M, Czech B, Stańczyk J, Szyda J, Guldbrandtsen B"
+journal = "The Open Bioinformatics Journal"
+cite = "13(1):137–145"
+doi = "10.2174/1875036202013010137"
+summary = "A tutorial on Unix command-line tools for editing FASTA, FASTQ and GFF files."
+methods = ["sed, awk, grep and Bash scripting"]
+tags = ["Unix", "Bash", "Tutorial"]
+
+[[pub]]
+type = "article"
+year = 2020
+title = "The application of deep learning for the classification of correct and incorrect SNP genotypes from whole-genome DNA sequencing pipelines"
+authors = "Kotlarz K, Mielczarek M, Suchocki T, Czech B, Guldbrandtsen B, Szyda J"
+journal = "Journal of Applied Genetics"
+cite = "61(4):607–616"
+doi = "10.1007/s13353-020-00586-0"
+img = "img/pubs/img9.png"
+summary = "Trains neural networks to separate true from false SNP calls in whole-genome sequencing data."
+methods = ["Quality features extracted from alignments", "Deep learning in Keras and TensorFlow", "ROC curves and cross-validation"]
+tags = ["Deep learning", "Variant calling", "Python"]
+
+[[pub]]
+type = "article"
+year = 2020
+first = true
+title = "Patterns of DNA variation between the autosomes, the X chromosome and the Y chromosome in Bos taurus genome"
+authors = "Czech B, Guldbrandtsen B, Szyda J"
+journal = "Scientific Reports"
+cite = "10:13641"
+doi = "10.1038/s41598-020-70380-9"
+img = "img/pubs/img10.webp"
+summary = "Compares the amount and type of DNA variation on autosomes and sex chromosomes in cattle whole-genome data."
+methods = ["Alignment with BWA-MEM, variant calling with GATK and SAMtools", "Annotation with snpEff and SIFT4G", "Diversity statistics with VCFtools"]
+tags = ["Whole-genome sequencing", "Sex chromosomes", "Population genetics"]
+
+[[pub]]
+type = "article"
+year = 2018
+first = true
+title = "Identification and annotation of breed-specific single nucleotide polymorphisms in Bos taurus genomes"
+authors = "Czech B, Frąszczak M, Mielczarek M, Szyda J"
+journal = "PLOS ONE"
+cite = "13(6):e0198419"
+doi = "10.1371/journal.pone.0198419"
+img = "img/pubs/img11.png"
+summary = "Finds SNPs specific to individual cattle breeds and describes the genes and traits they affect."
+methods = ["Alignment with BWA-MEM, filtering with VCFtools", "Functional analysis with KOBAS, OMIA and Cattle QTLdb"]
+tags = ["Whole-genome sequencing", "SNP", "Cattle breeds"]
+
+[[pub]]
+type = "preprint"
+year = 2023
+first = true
+title = "Genome-wide association study of heat stress response in Bos taurus"
+authors = "Czech B, Wang Y"
+journal = "bioRxiv"
+doi = "10.1101/2023.06.05.543663"

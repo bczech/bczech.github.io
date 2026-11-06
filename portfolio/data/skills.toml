@@ -1,0 +1,59 @@
+# Skills shown on index.qmd (cards with chips) and cv.qmd (one line per group).
+# scripts/gen_content.py reads this file before each render.
+#
+#   name    group title
+#   icon    Bootstrap icon name (https://icons.getbootstrap.com), used on the web page
+#   items   chips, in the order they should appear
+
+[[group]]
+name = "Sequencing and omics data"
+icon = "body-text"
+items = [
+  "WGS and WES", "Variant calling", "Structural variants and gene fusions",
+  "Bulk RNA-seq", "Single-cell RNA-seq", "Spatial transcriptomics (Visium HD)",
+  "Small RNA-seq", "ChIP-seq", "ATAC-seq and scATAC-seq", "Epigenomics",
+  "16S rRNA and metagenomics", "Genome annotation", "Comparative and population genomics",
+]
+
+[[group]]
+name = "Drug discovery and proteomics"
+icon = "capsule"
+items = [
+  "Dose-response modelling", "Drug combinations and synergy", "High-throughput screens",
+  "CRISPR screens", "MS phosphoproteomics", "Kinase activity (KSEA)",
+  "Pathway and enrichment analysis", "Network biology", "Structural biology",
+]
+
+[[group]]
+name = "Statistics and machine learning"
+icon = "graph-up"
+items = [
+  "Linear and mixed models", "GWAS and statistical genetics", "Study design and power analysis",
+  "Multi-omics integration", "Exploratory data analysis", "Supervised and unsupervised learning",
+  "Deep learning", "Feature engineering", "scikit-learn", "caret", "TensorFlow and Keras", "PyTorch",
+]
+
+[[group]]
+name = "Programming and visualisation"
+icon = "code-slash"
+items = [
+  "R", "R packages (Bioconductor)", "Shiny", "Python", "Bash, sed, AWK", "SQL",
+  "Git, GitHub, GitLab", "ggplot2", "Plotly", "Seaborn", "Dash",
+  "R Markdown and Quarto", "Jupyter", "LaTeX", "REST APIs",
+]
+
+[[group]]
+name = "Pipelines, infrastructure and data"
+icon = "hdd-network"
+items = [
+  "WDL pipelines", "HPC and Slurm", "Linux", "AWS", "Docker", "Kubernetes", "Conda",
+  "Snowflake", "MySQL and SQLite", "Database design", "FAIR data", "Metadata management",
+]
+
+[[group]]
+name = "Collaboration and delivery"
+icon = "people"
+items = [
+  "Scrum", "Product ownership", "Jira", "Trello", "Reports for non-specialists",
+  "Scientific writing", "Technical documentation", "Teaching and training",
+]

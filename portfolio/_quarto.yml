@@ -1,0 +1,80 @@
+# Portfolio site, served at https://bczech.github.io/ (root of the master branch).
+# The teaching site (../_quarto.yml) is a separate Quarto project under /teaching/.
+#
+# Build:   cd portfolio && quarto render      -> portfolio/_site/
+# Edit data/publications.toml and data/skills.toml; scripts/gen_content.py runs first.
+
+project:
+  type: website
+  output-dir: _site
+  pre-render: python3 scripts/gen_content.py
+  render:
+    - index.qmd
+    - research.qmd
+    - software.qmd
+    - cv.qmd
+    - 404.qmd
+  resources:
+    - img/
+
+website:
+  title: "Bartosz Czech"
+  description: "Bartosz Czech, PhD, Eng. Bioinformatician and computational biologist at Wrocław University of Environmental and Life Sciences."
+  site-url: "https://bczech.github.io/"
+  favicon: img/favicon.svg
+  image: img/og-card.png
+  open-graph:
+    image: img/og-card.png
+    image-width: 1200
+    image-height: 630
+  twitter-card:
+    card-style: summary_large_image
+    image: img/og-card.png
+  navbar:
+    pinned: true
+    left:
+      - href: index.qmd
+        text: "About"
+      - href: research.qmd
+        text: "Research"
+      - href: software.qmd
+        text: "Software"
+      - text: "Teaching"
+        href: https://bczech.github.io/teaching/
+      - href: cv.qmd
+        text: "CV"
+    right:
+      - icon: envelope
+        href: mailto:bartosz.w.czech@gmail.com
+        aria-label: Email
+      - icon: github
+        href: https://github.com/bczech
+        aria-label: GitHub
+      - icon: linkedin
+        href: https://www.linkedin.com/in/bczech
+        aria-label: LinkedIn
+  page-footer:
+    border: true
+    left: "© 2026 Bartosz Czech"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: [flatly, ../brand.scss, portfolio.scss]
+      dark: [darkly, portfolio-dark-defaults.scss, ../brand.scss, portfolio.scss, portfolio-dark.scss]
+    respect-user-color-scheme: true
+    toc: false
+    grid:
+      body-width: 940px
+    anchor-sections: false
+    smooth-scroll: true
+    code-copy: true
+    highlight-style:
+      light: github
+      dark: github-dark
+    link-external-newwindow: true
+    include-after-body: assets/effects.html
+    include-in-header:
+      text: '<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">'
+    link-external-filter: '^(?:http:|https:)\/\/bczech\.github\.io'

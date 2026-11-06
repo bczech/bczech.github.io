@@ -1,0 +1,28 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+
+// Dark theme, rules. Listed LAST in _quarto.yml so they override brand.scss and portfolio.scss.
+
+
+:root {
+  --pf-surface: #1b2733; --pf-surface-2: #213040;
+  --pf-ink: #eef3f8; --pf-text-strong: #d5dde6; --pf-text: #b4c1ce; --pf-muted: #93a3b4; --pf-faint: #8395a7;
+  --pf-line: #2c3b4b; --pf-line-soft: #263443; --pf-line-strong: #3a4c5f;
+  --pf-chip: #243444; --pf-accent: #5aaee8; --pf-accent-soft: #1f3447;
+  --pf-ic-a: #1f3447; --pf-ic-b: #1b3a40; --pf-ic: #6cc4ea;
+  --pf-badge-fg: #8ee6dc; --pf-badge-bg: #16403d;
+  --pf-btn-primary: #3498db; --pf-shadow: rgba(0, 0, 0, 0.35);
+  --pf-chart: #3f97d6;   // validated against #1b2733 (dataviz validate_palette.js, dark mode)
+}
+
+// White card from ../brand.scss becomes a dark card.
+#quarto-content.page-columns { background: var(--pf-surface); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+h1.title, main h3 { color: var(--pf-ink); }
+main h2 { color: var(--pf-ink); }
+.subtitle { color: var(--pf-muted); }
+.pf-btn:hover { color: #ffffff !important; }
+.pf-chart .pf-hit:hover, .pf-chart .pf-hit:focus-visible { fill: rgba(90, 174, 232, 0.10); }
+.table { --bs-table-bg: transparent; color: var(--pf-text-strong); border-color: var(--pf-line); }
+.pf-404 .pf-eyebrow { color: #6cc4ea; }
+.pf-tip { background: #eef3f8; color: #121a22; }

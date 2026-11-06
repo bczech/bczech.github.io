@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Source of img/og-card.png (1200x630), the preview shown when the site link is shared.
+     Rebuild: bash scripts/make_og_card.sh -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: Inter, sans-serif; color: #fff; position: relative;
+    background: radial-gradient(120% 140% at 0% 0%, #34506b 0%, #243444 45%, #1a2733 100%);
+  }
+  .art { position: absolute; left: 0; right: 0; bottom: 0; height: 330px; opacity: 0.3;
+         background: url("../img/hero_manhattan.svg") center bottom / cover no-repeat;
+         -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%); }
+  .glow { position: absolute; width: 640px; height: 640px; right: -200px; top: -260px;
+          background: radial-gradient(circle, rgba(78,192,198,0.32), transparent 65%); }
+  .wrap { position: absolute; left: 80px; top: 120px; right: 80px; display: flex; gap: 40px; align-items: center; }
+  .photo { width: 180px; height: 180px; flex: none; border-radius: 50%; object-fit: cover;
+           border: 5px solid rgba(255,255,255,0.92); box-shadow: 0 0 0 9px rgba(78,192,198,0.35); }
+  .eyebrow { font-size: 22px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #7fdde2; margin: 0 0 14px; }
+  h1 { font-size: 52px; font-weight: 800; margin: 0 0 12px; letter-spacing: -1px; white-space: nowrap; }
+  .role { font-size: 28px; font-weight: 600; color: #e2e8f0; margin: 0 0 10px; }
+  .roles { font-size: 20px; white-space: nowrap; color: #a9b8c8; margin: 0; line-height: 1.45; }
+  .foot { position: absolute; left: 80px; bottom: 54px; display: flex; align-items: center; gap: 16px;
+          font-size: 26px; font-weight: 600; color: #e2e8f0; }
+  .foot img { width: 46px; height: 46px; }
+</style></head>
+<body>
+  <div class="glow"></div><div class="art"></div>
+  <div class="wrap">
+    <img class="photo" src="../img/photo.png" alt="">
+    <div>
+      <p class="eyebrow">Bioinformatics · Computational biology</p>
+      <h1>Bartosz Czech, PhD, Eng.</h1>
+      <p class="role">Bioinformatician and computational biologist</p>
+      <p class="roles">Assistant Professor, Wrocław University of Environmental and Life Sciences<br>Pharmaceutical R&amp;D · Founder of GeneStat</p>
+    </div>
+  </div>
+  <div class="foot"><img src="../img/favicon.svg" alt="">bczech.github.io</div>
+</body></html>

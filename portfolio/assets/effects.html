@@ -1,0 +1,114 @@
+<script>
+// Chart tooltips (Research page). Independent of the motion setting; values are also in the table.
+(function () {
+  var hits = document.querySelectorAll(".pf-chart .pf-hit");
+  if (!hits.length) return;
+  var tip = document.createElement("div");
+  tip.className = "pf-tip";
+  tip.setAttribute("role", "status");
+  document.body.appendChild(tip);
+  function show(el, x, y) {
+    tip.textContent = el.getAttribute("data-tip"); // textContent: never parse as HTML
+    tip.style.left = (x + 12) + "px";
+    tip.style.top = (y - 36) + "px";
+    tip.classList.add("pf-show");
+  }
+  function hide() { tip.classList.remove("pf-show"); }
+  hits.forEach(function (el) {
+    var t = el.querySelector("title");
+    if (t) t.remove(); // avoid a second, native tooltip on top of ours
+    el.addEventListener("pointermove", function (e) { show(el, e.clientX, e.clientY); });
+    el.addEventListener("pointerleave", hide);
+    el.addEventListener("focus", function () {
+      var r = el.getBoundingClientRect();
+      show(el, r.left + r.width / 2, r.top + 20);
+    });
+    el.addEventListener("blur", hide);
+  });
+})();
+</script>
+<script>
+// Small visual effects for the portfolio. Content stays fully visible without JavaScript:
+// the hidden "before" state is only applied by this script.
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce || !("IntersectionObserver" in window)) return;
+
+  // 0. Hero: load the Manhattan-plot SVG inline, let the points appear from left to right
+  //    (higher points a little later, so the peaks "grow"), then light up points near the pointer.
+  var art = document.querySelector(".pf-hero2-art");
+  if (art && window.fetch) {
+    fetch("/img/hero_manhattan.svg").then(function (r) { return r.ok ? r.text() : ""; }).then(function (txt) {
+      if (!txt) return;
+      art.innerHTML = txt;
+      var svg = art.querySelector("svg");
+      if (!svg) return;
+      var vb = svg.viewBox.baseVal, dots = Array.prototype.slice.call(svg.querySelectorAll("circle"));
+      dots.forEach(function (c) {
+        var x = +c.getAttribute("cx"), y = +c.getAttribute("cy");
+        var d = (x / vb.width) * 1.3 + (1 - y / vb.height) * 0.35 + Math.random() * 0.12;
+        c.style.setProperty("--d", d.toFixed(2) + "s");
+      });
+      art.classList.add("pf-live", "pf-anim");
+      setTimeout(function () { art.classList.remove("pf-anim"); }, 2600); // hand transforms back to hover
+
+      var hero = document.querySelector(".pf-hero2"), hot = [], pending = null, R = 70;
+      function light(evt) {
+        var m = svg.getScreenCTM();
+        if (!m) return;
+        var pt = svg.createSVGPoint();
+        pt.x = evt.clientX; pt.y = evt.clientY;
+        var p = pt.matrixTransform(m.inverse());
+        hot.forEach(function (c) { c.classList.remove("pf-hot"); });
+        hot = dots.filter(function (c) {
+          var dx = c.cx.baseVal.value - p.x, dy = c.cy.baseVal.value - p.y;
+          return dx * dx + dy * dy < R * R;
+        });
+        hot.forEach(function (c) { c.classList.add("pf-hot"); });
+      }
+      hero.addEventListener("pointermove", function (evt) {
+        if (pending) return;
+        pending = requestAnimationFrame(function () { pending = null; light(evt); });
+      });
+      hero.addEventListener("pointerleave", function () {
+        hot.forEach(function (c) { c.classList.remove("pf-hot"); }); hot = [];
+      });
+    }).catch(function () {});
+  }
+
+  // 1. Fade and slide in cards, timeline steps and section titles when they scroll into view.
+  var targets = document.querySelectorAll(
+    "main .pf-card, main .pf-stat, main .pf-tl li, main details.pf-pub, main .pf-gallery figure, main h2"
+  );
+  targets.forEach(function (el, i) {
+    el.classList.add("pf-reveal");
+    el.style.transitionDelay = (i % 3) * 70 + "ms"; // cards in one row appear one after another
+  });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("pf-in"); io.unobserve(e.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  targets.forEach(function (el) { io.observe(el); });
+
+  // 2. Count the numbers in the stat tiles up from zero the first time they are seen.
+  var counters = document.querySelectorAll(".pf-stat strong");
+  var co = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var el = e.target, end = parseInt(el.textContent, 10);
+      co.unobserve(el);
+      if (isNaN(end)) return;
+      var t0 = null, dur = 1100;
+      function step(t) {
+        if (!t0) t0 = t;
+        var p = Math.min((t - t0) / dur, 1);
+        el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))); // ease-out
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.6 });
+  counters.forEach(function (el) { co.observe(el); });
+})();
+</script>

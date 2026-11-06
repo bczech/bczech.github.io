@@ -1,0 +1,33 @@
+---
+title: "Research"
+---
+
+::: {.pf-lead}
+I work with genomic data and statistics. Most of my projects start with sequencing data (DNA, RNA, small RNA or 16S rRNA) and end with a statistical model that answers a biological question. I have published {{< var pubs.articles >}} peer-reviewed articles, {{< var pubs.first >}} of them as first author.
+:::
+
+::: {.pf-links}
+[<i class="bi bi-mortarboard"></i> Google Scholar](https://scholar.google.com/citations?user=JYaz528AAAAJ&hl=en){.pf-btn}
+[<i class="bi bi-person-badge"></i> ORCID](https://orcid.org/0000-0002-9908-3007){.pf-btn}
+[<i class="bi bi-journal-text"></i> Scopus](https://www.scopus.com/authid/detail.uri?authorId=57202362761){.pf-btn}
+[<i class="bi bi-globe"></i> Web of Science](https://www.webofscience.com/wos/author/record/AAZ-4115-2020){.pf-btn}
+[<i class="bi bi-people"></i> ResearchGate](https://www.researchgate.net/profile/Bartosz-Czech){.pf-btn}
+:::
+
+## Publications and citations
+
+{{< include _charts_web.md >}}
+
+## What I do
+
+**Sequencing data analysis.** I analyse whole-genome, targeted and RNA sequencing data, including single-cell RNA-seq, small RNA-seq and 16S rRNA amplicons. I have built and run pipelines for variant calling, differential expression and small RNA annotation in many species: human cancer cells, cattle, chickens, cats, and dog cells infected with influenza A virus.
+
+**Multi-omics and microbiome data.** I combine data types when one of them cannot explain a process alone, for example host RNA-seq with the gut microbiome. I also analyse mass spectrometry phosphoproteomics.
+
+**Statistical modelling and machine learning.** I fit dose-response models to high-throughput drug screens, including drug combinations, run association studies with mixed models, and use machine learning for classification, such as separating true from false SNP calls or predicting semen quality after freezing.
+
+**Analysis choices and reproducibility.** Reference genomes, pipelines and parameters can change the results of an analysis. I test how much they do, for example the effect of the reference transcriptome on cancer RNA-seq, and I package repeated analyses as R libraries and workflows.
+
+{{< include _pubs_web.md >}}
+
+Conference talks and posters are listed in the [CV](cv.qmd#conference-presentations).

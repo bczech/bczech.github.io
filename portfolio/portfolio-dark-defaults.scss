@@ -1,0 +1,12 @@
+/*-- scss:defaults --*/
+
+// Dark theme, variables only. Listed BEFORE ../brand.scss in _quarto.yml: for Sass
+// variables the file listed first wins, so these replace the light brand values.
+$body-bg:            #121a22;
+$body-color:         #d5dde6;
+$headings-color:     #eef3f8;
+$link-color:         #5aaee8;
+$link-hover-color:   #8cc8f0;
+$table-color:        #d5dde6;
+
+/*-- scss:rules --*/

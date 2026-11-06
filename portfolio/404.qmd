@@ -1,0 +1,21 @@
+---
+pagetitle: "Page not found · Bartosz Czech"
+---
+
+```{=html}
+<section class="pf-404">
+  <img class="pf-404-helix" src="/img/favicon.svg" alt="">
+  <p class="pf-eyebrow">Error 404</p>
+  <h1>Sequence not found</h1>
+  <p class="pf-404-lead">This address does not align to any page on the site. It may have moved, or the link may contain a typo.</p>
+  <div class="pf-links">
+    <a class="pf-btn pf-primary" href="/"><i class="bi bi-house"></i> Home</a>
+    <a class="pf-btn" href="/research.html"><i class="bi bi-journal-text"></i> Research</a>
+    <a class="pf-btn" href="/software.html"><i class="bi bi-code-slash"></i> Software</a>
+    <a class="pf-btn" href="/teaching/"><i class="bi bi-easel"></i> Teaching</a>
+  </div>
+  <pre class="pf-404-align" aria-hidden="true">query   GATTACA-PAGE-NOT-FOUND
+        ||||||| ·  ·  ·  ·
+subject GATTACA</pre>
+</section>
+```
