@@ -19,6 +19,7 @@ budowa modelu i jego ocena.
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 2: Przygotowanie danych[68 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-02-przygotowanie-danych.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 3: Uczenie nienadzorowane[85 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-03-uczenie-nienadzorowane.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 4: Uczenie nadzorowane[90 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-04-uczenie-nadzorowane.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 5: Ocena modelu[51 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-05-ocena-modelu.pdf){.mat-item}
 :::
 
 ### Ćwiczenia {.mat-sub}
