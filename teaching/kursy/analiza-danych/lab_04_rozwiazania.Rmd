@@ -1,0 +1,376 @@
+---
+title: "Ćwiczenia 4 — Podział danych, potok i pierwszy model (wersja R, z rozwiązaniami)"
+subtitle: "Dane demo: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Model uczenia maszynowego ma działać na próbkach, których nie widział podczas uczenia.
+Żeby to sprawdzić, część próbek odkłada się na bok jako zbiór testowy, a model uczy się
+wyłącznie na pozostałych, czyli na zbiorze treningowym. Na tym spotkaniu przechodzimy po
+raz pierwszy cały ten cykl: podział danych, przygotowanie danych na treningu, dopasowanie
+prostego modelu i ocena na teście. Na końcu sprawdzamy, jak bardzo wynik zależy od tego,
+które próbki trafiły do testu.
+
+Arkusz najlepiej uruchamiać w nowej sesji R (w RStudio: *Session → Restart R*), blok po
+bloku od początku: obiekty pozostawione w pamięci przez wcześniejszy kod mogą mieć te same
+nazwy i inną zawartość.
+
+# Wczytanie danych
+
+Wczytujemy te same pliki CSV co na Ćwiczeniach 2 i 3: `X` to cechy (próbki × taksony,
+liczebności względne w procentach), `y` to klasa każdej próbki. Metadane nie są dziś
+potrzebne. Arkusz trzeba zapisać w tym samym katalogu co arkusze z poprzednich ćwiczeń, czyli
+obok katalogu `dane/`.
+
+Pakiet caret pojawia się na tych zajęciach po raz pierwszy. Instaluje się go jednorazowo
+(jeśli `library(caret)` zgłasza błąd `there is no package called ...`):
+
+```{r instalacja, eval=FALSE}
+install.packages("caret")               # jednorazowo, potem tylko library()
+```
+
+```{r dane}
+library(caret)                          # podział danych, przygotowanie i modele
+library(ggplot2)                        # wykresy
+
+# row.names = 1: pierwsza kolumna pliku to nazwy próbek; check.names = FALSE: nazwy taksonów bez zmian
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+# factor(): zmienna kategoryczna; levels ustala kolejność klas (najpierw control, potem T2D)
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+dim(X)                                  # liczba próbek i cech
+table(y)                                # liczba próbek w każdej klasie
+```
+
+# 1. Podział na zbiór treningowy i testowy
+
+Zbiór testowy odkłada się przed jakimkolwiek przygotowaniem danych i używa się go tylko do
+oceny gotowego modelu. Dzięki temu ocena odpowiada sytuacji, w której model dostaje nowe
+próbki. Podział jest **warstwowy** (ang. *stratified split*): próbki losuje się osobno
+w każdej klasie, więc udziały klas w treningu i w teście są takie same jak w całym zbiorze.
+Bez tego test mógłby przez przypadek zawierać na przykład wyraźnie więcej próbek T2D,
+a dokładność zmierzona na takim teście dotyczyłaby innej proporcji klas niż w danych.
+Do treningu trafia 75% próbek, do testu 25%.
+
+Podział jest losowy. **Ziarno** (ang. *seed*) generatora liczb losowych ustala, które próbki
+zostaną wylosowane: to samo ziarno daje przy każdym uruchomieniu ten sam podział. W całym
+kursie używamy ziarna 42. R i Python mają różne generatory liczb losowych, więc dzielą
+dane inaczej i część liczb różni się między wersjami arkusza.
+
+```{r podzial}
+set.seed(42)                            # ziarno: ten sam podział przy każdym uruchomieniu
+# createDataPartition(): numery próbek do treningu, losowane osobno w każdej klasie y;
+# p = 0.75: 75% próbek; list = FALSE i [, 1] dają zwykły wektor numerów
+idx_tr <- createDataPartition(y, p = 0.75, list = FALSE)[, 1]
+X_tr <- X[idx_tr, ]                     # cechy próbek treningowych
+X_te <- X[-idx_tr, ]                    # minus: wszystkie wiersze poza treningowymi, czyli test
+y_tr <- y[idx_tr]                       # klasy próbek treningowych
+y_te <- y[-idx_tr]                      # klasy próbek testowych
+
+c(train = length(y_tr), test = length(y_te))   # liczba próbek w każdym zbiorze
+# udziały klas w całym zbiorze, w treningu i w teście; rbind() skleja wiersze w tabelę
+round(rbind(all = prop.table(table(y)),
+            train = prop.table(table(y_tr)),
+            test = prop.table(table(y_te))), 3)
+```
+
+**Na co patrzeć.** Trzy wiersze tabeli są prawie takie same: trening i test mają tę samą
+strukturę klas co cały zbiór. Przy podziale warstwowym tak jest przy każdym ziarnie:
+`createDataPartition()` bierze do treningu 75% próbek każdej klasy osobno, więc w teście
+zawsze są 43 próbki control i 42 próbki T2D.
+
+Dla porównania wykonujemy podział **zwykły**: losujemy 85 próbek testowych bez względu
+na klasę.
+
+```{r zwykly}
+set.seed(1)                             # ziarno zwykłego podziału
+# sample(n, m): losuje m różnych liczb spośród 1, ..., n, czyli numery próbek testowych
+idx_random <- sample(length(y), length(y_te))
+table(y[idx_random])                    # liczba próbek każdej klasy w takim teście
+mean(y[idx_random] == "T2D")            # odsetek T2D w teście; mean() z TRUE/FALSE to odsetek TRUE
+```
+
+Przy innym ziarnie wynik byłby inny. Żeby sprawdzić, jak bardzo, powtarzamy ostatnie
+losowanie 200 razy. Funkcja `replicate(200, polecenie)` wykonuje polecenie 200 razy i zbiera
+200 wyników w jeden wektor; to pętla zapisana w jednej linijce.
+
+```{r zwykly-200, fig.width=7, fig.height=3.5}
+set.seed(42)                            # ziarno: te same 200 losowań przy każdym uruchomieniu
+# 200 razy: wylosuj numery 85 próbek testowych i policz odsetek T2D wśród nich
+share_random <- replicate(200, mean(y[sample(length(y), length(y_te))] == "T2D"))
+length(share_random)                    # 200 wyników, po jednym na podział
+range(share_random)                     # najmniejszy i największy odsetek T2D w teście
+
+# histogram 200 odsetków; linia przerywana = odsetek T2D w teście przy podziale warstwowym
+ggplot(data.frame(share = share_random), aes(x = share)) +
+  geom_histogram(bins = 25, fill = "grey70", colour = "grey30") +   # słupki: liczba podziałów
+  geom_vline(xintercept = mean(y_te == "T2D"), linetype = "dashed", colour = "#2C5F7C") +
+  labs(x = "Odsetek próbek T2D w zbiorze testowym (podział zwykły)",
+       y = "Liczba podziałów") +        # podpisy osi
+  theme_bw()                            # jasne tło z siatką
+```
+
+**Na co patrzeć.** Linia przerywana to odsetek T2D w teście przy podziale warstwowym; przy
+każdym ziarnie wynosi tyle samo. Przy zwykłym podziale odsetek zmienia się od podziału do
+podziału, czasem wyraźnie.
+
+> **✏️ Zadanie 1.** Policzyć, w ilu z 200 zwykłych podziałów odsetek T2D w teście jest
+> mniejszy niż 0,40 (w całym zbiorze wynosi 0,494). Jaką dokładność miałby na takim teście
+> model, który zawsze wskazuje control?
+
+```{r zad-1}
+sum(share_random < 0.40)                # liczba zwykłych podziałów z odsetkiem T2D w teście poniżej 0,40
+# klasyfikator bazowy zawsze wskazuje control, więc trafia tyle, ile jest w teście próbek control:
+1 - share_random[share_random < 0.40]   # jego dokładność na każdym z tych testów
+```
+
+**Rozwiązanie.** W 5 z 200 zwykłych podziałów test ma mniej niż 40% próbek T2D. Model, który
+zawsze wskazuje control, trafia wtedy w każdą próbkę control, więc jego dokładność to 1 minus
+odsetek T2D: na tych pięciu testach od 0,612 do 0,659, zamiast około 0,51 przy podziale
+warstwowym. Model, który niczego się nie nauczył, wyglądałby na takim teście na całkiem dobry.
+Wynik na zwykłym podziale zależy więc częściowo od proporcji klas, która akurat trafiła do
+testu; podział warstwowy usuwa to źródło zmienności.
+
+# 2. Przygotowanie danych na treningu
+
+Przygotowanie danych składa się z kroków, które mają **parametry** wyznaczane z danych:
+filtr cech ma listę zachowanych cech, standaryzacja ma średnią i odchylenie standardowe
+każdej cechy. Parametry wyznacza się wyłącznie na treningu, a do testu stosuje się je bez
+zmian. Gdyby wyznaczyć je na całym zbiorze, informacja o próbkach testowych przeszłaby do
+przygotowania danych, a ocena na teście byłaby zawyżona. Takie zjawisko nazywa się
+**przeciekiem danych** (ang. *data leakage*); omówimy je dokładnie na Ćwiczeniach 5.
+Ciąg kroków dopasowanych na treningu i stosowanych w tej samej kolejności do nowych próbek
+nazywa się **potokiem** (ang. *pipeline*).
+
+Pierwszy krok to filtr częstości występowania z Ćwiczeń 2: zostają cechy obecne
+w co najmniej 10% próbek, tym razem liczonych tylko w treningu.
+
+```{r filtr}
+prevalence_tr <- colMeans(X_tr > 0)       # częstość występowania każdej cechy w treningu
+keep <- names(prevalence_tr)[prevalence_tr >= 0.10]   # parametr kroku: nazwy zachowanych cech
+length(keep)                              # liczba zachowanych cech
+X_tr_f <- X_tr[, keep]                    # trening: tylko zachowane cechy
+X_te_f <- X_te[, keep]                    # test: te same cechy, bez sprawdzania wartości w teście
+```
+
+**Na co patrzeć.** Test dostaje dokładnie te kolumny, które wybrano na treningu, niezależnie
+od tego, jak często cechy występują w samym teście.
+
+Drugi krok to przekształcenie CLR z Ćwiczeń 3: logarytm każdej wartości minus średnia
+logarytmów tej samej próbki, z dodaniem `1e-6` do zer. CLR liczy się w każdej próbce
+osobno, więc nie ma parametrów szacowanych z innych próbek. Zależy jednak od zestawu cech,
+dlatego stosuje się je po filtrze.
+
+```{r clr}
+# własna funkcja: CLR dla każdego wiersza (próbki) macierzy M
+clr <- function(M) {
+  L <- log(as.matrix(M) + 1e-6)           # logarytm naturalny; 1e-6 zastępuje zera
+  L - rowMeans(L)                         # od każdego wiersza odejmujemy jego średnią
+}
+Z_tr <- clr(X_tr_f)                       # trening po CLR
+Z_te <- clr(X_te_f)                       # test po CLR
+dim(Z_tr)                                 # liczba próbek treningowych i cech
+```
+
+Trzeci krok to **standaryzacja** (ang. *standardization*): od każdej cechy odejmuje się jej
+średnią i dzieli się ją przez odchylenie standardowe, więc wszystkie cechy mają tę samą
+skalę. Na Ćwiczeniach 2 i 3 okazało się, że bez wspólnej skali odległości między próbkami
+wyznacza kilka cech o największym rozrzucie; dlatego przed modelem opartym na
+odległościach, użytym w sekcji 3, cechy zwykle się standaryzuje. Funkcja `preProcess()` z pakietu caret wyznacza
+średnie i odchylenia na treningu, a `predict()` stosuje je do dowolnego zbioru.
+
+```{r standaryzacja, fig.width=8, fig.height=3.5}
+pp <- preProcess(Z_tr, method = c("center", "scale"))   # center: średnia, scale: odchylenie; z treningu
+S_tr <- predict(pp, Z_tr)                 # trening po standaryzacji
+S_te <- predict(pp, Z_te)                 # test po standaryzacji tymi samymi parametrami
+
+round(range(colMeans(S_tr)), 3)           # średnie cech w treningu: najmniejsza i największa
+round(range(colMeans(S_te)), 3)           # średnie cech w teście
+
+# histogram średnich wszystkich cech w teście
+ggplot(data.frame(mean = colMeans(S_te)), aes(x = mean)) +
+  geom_histogram(bins = 30, fill = "grey70", colour = "grey30") +
+  geom_vline(xintercept = 0, linetype = "dashed") +      # w treningu każda średnia jest równa 0
+  labs(x = "Średnia cechy w teście po standaryzacji", y = "Liczba cech") +   # podpisy osi
+  theme_bw()   # jasne tło z siatką
+```
+
+**Na co patrzeć.** W treningu średnie wszystkich cech są równe zeru, bo parametry policzono
+na tych samych próbkach. W teście są bliskie zeru, ale nie równe: test to inne próbki.
+Tak ma być, bo model w praktyce dostaje nowe próbki przekształcone parametrami z treningu.
+
+🔧 **Do sprawdzenia.** Wyznaczyć standaryzację na samym teście
+(`predict(preProcess(Z_te, method = c("center", "scale")), Z_te)`) i wypisać zakres średnich
+cech. Dlaczego są wtedy równe zeru i dlaczego tak się nie postępuje?
+
+> **✏️ Zadanie 2.** Policzyć, ile cech z listy `keep` występuje w teście w mniej niż 10%
+> próbek. Czy należy je usunąć z testu?
+
+```{r zad-2}
+# colMeans(X_te[, keep] > 0): częstość występowania cech z listy keep, policzona w teście
+sum(colMeans(X_te[, keep] > 0) < 0.10)  # ile z nich występuje w teście w mniej niż 10% próbek
+```
+
+**Rozwiązanie.** 9 ze 195 cech zachowanych na treningu występuje w teście w mniej niż
+10% próbek; gdyby filtr policzyć na teście, te cechy by odpadły. Nie usuwa się ich jednak
+z testu. Lista cech jest parametrem przygotowania danych, wyznaczonym na treningu, a test
+przekształca się dokładnie tak jak każdą nową próbkę. Pojedyncza nowa próbka nie ma „swojej”
+częstości występowania, a model oczekuje tych samych kolumn, na których go dopasowano.
+Wybieranie cech na podstawie testu oznaczałoby korzystanie z próbek testowych przy
+przygotowaniu danych.
+
+# 3. Klasyfikator bazowy i k najbliższych sąsiadów
+
+Zanim oceni się model, trzeba wiedzieć, z czym porównać jego wynik. **Klasyfikator bazowy**
+(ang. *baseline*, ten sam co na Wykładzie 4) zawsze wskazuje klasę liczniejszą w treningu i w ogóle nie patrzy na
+cechy. Model, który nie wypada lepiej od niego, niczego się z cech nie nauczył. Wynik
+modeli opisujemy **dokładnością** (ang. *accuracy*): odsetkiem próbek testowych, którym
+przypisano właściwą klasę.
+
+Pierwszym prawdziwym modelem jest klasyfikator **k najbliższych sąsiadów** (ang. *k-nearest
+neighbours*, k-NN). Dla próbki testowej znajduje k najbliższych próbek treningowych
+(odległość euklidesowa, jak na Ćwiczeniach 2) i przypisuje jej klasę, która przeważa wśród
+tych sąsiadów. Bierzemy k = 5. k-NN nie ma innych parametrów dopasowywanych do danych:
+„uczenie” polega na zapamiętaniu próbek treningowych.
+
+Oba modele dopasowujemy jedną funkcją `train()` z pakietu caret; o rodzaju modelu decyduje
+argument `method`. Argument `preProcess = c("center", "scale")` dołącza do modelu
+standaryzację z sekcji 2: `train()` wyznacza jej parametry na treningu i zapamiętuje je
+razem z modelem, a `predict()` stosuje je do testu przed przewidywaniem. Standaryzacja
+i model tworzą więc jeden obiekt, czyli potok, i nie trzeba ręcznie przekształcać testu.
+Jako dane podajemy `Z_tr` i `Z_te` (po filtrze i CLR, przed standaryzacją).
+
+```{r modele}
+none <- trainControl(method = "none")   # bez walidacji: model dopasowany raz, na całym treningu
+# method = "null": klasyfikator bazowy, zawsze wskazuje klasę liczniejszą w treningu
+base <- train(x = Z_tr, y = y_tr, method = "null", trControl = none)
+acc_base <- mean(predict(base, Z_te) == y_te)   # dokładność: odsetek zgodnych klas
+acc_base   # wypisanie dokładności klasyfikatora bazowego
+
+knn <- train(x = Z_tr, y = y_tr,        # cechy i klasy treningowe
+             method = "knn",            # model k-NN
+             preProcess = c("center", "scale"),   # standaryzacja wyznaczona na treningu, zapamiętana w modelu
+             tuneGrid = data.frame(k = 5),        # liczba sąsiadów
+             trControl = none)          # bez walidacji
+pred_knn <- predict(knn, Z_te)          # standaryzacja testu parametrami z treningu, potem klasa każdej próbki
+acc_knn <- mean(pred_knn == y_te)       # dokładność k-NN: odsetek zgodnych klas
+acc_knn   # wypisanie dokładności k-NN
+table(predicted = pred_knn, true = y_te)    # które klasy model myli: wiersze = przewidziane, kolumny = prawdziwe
+```
+
+**Na co patrzeć.** Dokładność k-NN porównuje się z dokładnością klasyfikatora bazowego, a nie
+z zerem. Tabela pokazuje, w ilu próbkach testowych model wskazał każdą klasę i ile z nich
+trafił; przy około 85 próbkach jedna pomyłka więcej lub mniej zmienia dokładność o około 0,01.
+
+🔧 **Do sprawdzenia.** Usunąć z `train()` dla k-NN wiersz z `preProcess` (model dostaje wtedy
+cechy bez standaryzacji) albo zmienić `k = 5` na `k = 25` i uruchomić blok ponownie. Jak
+zmienia się dokładność? Na koniec przywrócić blok do pierwotnej postaci.
+
+> **✏️ Zadanie 3.** Dopasować k-NN z `k = 1` (skopiować `train()` z bloku `modele`
+> i nazwać model `knn1`). Policzyć jego dokładność na teście i na treningu. Skąd różnica?
+
+```{r zad-3}
+knn1 <- train(x = Z_tr, y = y_tr,       # cechy i klasy treningowe
+              method = "knn",           # model k-NN
+              preProcess = c("center", "scale"),   # standaryzacja wyznaczona na treningu
+              tuneGrid = data.frame(k = 1),        # jeden sąsiad
+              trControl = none)         # bez walidacji
+mean(predict(knn1, Z_te) == y_te)       # dokładność na teście
+mean(predict(knn1, Z_tr) == y_tr)       # dokładność na treningu
+```
+
+**Rozwiązanie.** Na treningu k-NN z jednym sąsiadem ma dokładność 1: najbliższą próbką
+treningową każdej próbki treningowej jest ona sama, z własną klasą, więc model zawsze trafia.
+Na teście dokładność wynosi 0,576, czyli niewiele więcej niż klasyfikator bazowy (0,506).
+Dokładność na treningu mówi tylko, że model zapamiętał próbki, na których go dopasowano, a nie
+jak poradzi sobie z nowymi. Do oceny modelu nadaje się wyłącznie wynik na próbkach, których
+model nie widział.
+
+# 4. Jak bardzo wynik zależy od podziału
+
+Dokładność z sekcji 3 pochodzi z jednego podziału i jednego zbioru testowego. Inny podział
+dałby inne próbki testowe, a więc inną liczbę. Żeby sprawdzić, jak duże są te różnice,
+powtarzamy cały cykl z sekcji 1–3 (podział, filtr, CLR, oba modele) na 20 podziałach
+warstwowych. Robimy to w trzech krokach.
+
+**Krok 1: 20 podziałów naraz.** Argument `times` w `createDataPartition()` losuje kilka
+podziałów jednocześnie. Wynikiem jest **lista**: 20 wektorów numerów próbek treningowych,
+po jednym na podział. Element listy wybiera się podwójnym nawiasem, np. `splits[[1]]`.
+
+```{r podzialy-20}
+set.seed(42)                            # ziarno: te same 20 podziałów przy każdym uruchomieniu
+splits <- createDataPartition(y, p = 0.75, times = 20)   # lista 20 podziałów warstwowych
+length(splits)                          # liczba elementów listy
+length(splits[[1]])                     # pierwszy podział: liczba próbek treningowych
+```
+
+**Krok 2: cały cykl jako funkcja.** **Funkcja** to nazwany fragment kodu, który można
+wywoływać wiele razy z różnymi danymi. `function(idx)` oznacza, że przy wywołaniu podaje
+się numery próbek treningowych. W środku są te same kroki co w sekcjach 1–3; zamiast `X_tr`
+jest `X[idx, ]`, a zamiast `X_te` jest `X[-idx, ]`. Wynikiem funkcji jest jej ostatnia
+linijka. Najpierw sprawdzamy funkcję na jednym podziale. Pierwszy z 20 podziałów powstał
+z tym samym ziarnem 42 co podział z sekcji 1, więc jest z nim identyczny: funkcja powinna
+zwrócić te same dokładności co blok `modele`.
+
+```{r funkcja-cyklu}
+run_cycle <- function(idx) {            # idx: numery próbek treningowych jednego podziału
+  cols <- names(which(colMeans(X[idx, ] > 0) >= 0.10))   # filtr wyznaczony na treningu (sekcja 2)
+  Za <- clr(X[idx, cols])               # CLR treningu
+  Zb <- clr(X[-idx, cols])              # CLR testu, te same cechy
+  base <- train(x = Za, y = y[idx], method = "null", trControl = none)   # klasyfikator bazowy (sekcja 3)
+  knn <- train(x = Za, y = y[idx], method = "knn", preProcess = c("center", "scale"),
+               tuneGrid = data.frame(k = 5), trControl = none)   # k-NN ze standaryzacją (sekcja 3)
+  c(baseline = mean(predict(base, Zb) == y[-idx]),   # wynik funkcji: dokładność klasyfikatora bazowego
+    knn = mean(predict(knn, Zb) == y[-idx]))         # i dokładność k-NN na teście
+}
+
+run_cycle(splits[[1]])                  # jedno wywołanie: te same liczby co acc_base i acc_knn z sekcji 3
+```
+
+**Krok 3: funkcja dla każdego podziału.** `sapply(lista, funkcja)` wywołuje funkcję po
+kolei dla każdego elementu listy i składa wyniki w macierz, w której kolumna odpowiada
+podziałowi. `t()` obraca macierz, tak by wiersz odpowiadał podziałowi.
+
+```{r cykle, fig.width=7, fig.height=4}
+results <- t(sapply(splits, run_cycle))   # 20 wierszy (podziały) × 2 kolumny (modele)
+head(results)                             # pierwsze wiersze wyniku
+round(apply(results, 2, range), 3)        # najmniejsza i największa dokładność każdego modelu
+round(colMeans(results), 3)               # średnia dokładność z 20 podziałów
+
+# jeden punkt = dokładność k-NN w jednym podziale; linia przerywana = klasyfikator bazowy
+ggplot(data.frame(split = 1:20, knn = results[, "knn"]), aes(x = split, y = knn)) +
+  geom_point(size = 2, colour = "#2C5F7C") +                        # punkty k-NN
+  geom_hline(yintercept = mean(results[, "baseline"]), linetype = "dashed") +   # klasyfikator bazowy
+  labs(x = "Numer podziału", y = "Dokładność k-NN na teście") +    # podpisy osi
+  theme_bw()                                                        # jasne tło z siatką
+```
+
+**Na co patrzeć.** Klasyfikator bazowy ma w każdym podziale tę samą dokładność, bo podział
+warstwowy zachowuje proporcje klas. Dokładność k-NN zmienia się wyraźnie między podziałami,
+choć dane i model są te same; zmieniają się tylko próbki, które trafiły do testu.
+
+> **✏️ Zadanie 4.** Przewagę k-NN nad klasyfikatorem bazowym w każdym podziale daje
+> `results[, "knn"] - results[, "baseline"]`. W którym podziale przewaga jest najmniejsza
+> i ilu próbkom testowym odpowiada?
+
+```{r zad-4}
+gain <- results[, "knn"] - results[, "baseline"]   # przewaga k-NN w każdym z 20 podziałów
+min(gain)                               # najmniejsza przewaga
+which.min(gain)                         # numer podziału, w którym wystąpiła
+min(gain) * length(y_te)                # ta przewaga w liczbie próbek testowych
+```
+
+**Rozwiązanie.** Najmniejsza przewaga wynosi 0,024 i występuje w podziale 4 (k-NN 0,529 wobec
+0,506), co odpowiada 2 próbkom testowym. Ktoś, kto dostałby tylko ten podział, uznałby, że
+model prawie niczego się z cech nie nauczył; przy najlepszym podziale ten sam model ma
+dokładność 0,706. Oba wnioski dotyczą tych samych danych i tego samego modelu, różnią się
+tylko próbki w teście. Wynik z jednego podziału jest więc mało wiarygodny, a różnice kilku
+punktów procentowych, np. między wartościami k, mieszczą się w tym rozrzucie.
