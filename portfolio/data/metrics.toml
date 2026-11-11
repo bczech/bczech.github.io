@@ -1,7 +1,7 @@
 # Written by scripts/update_metrics.py from OpenAlex. Do not edit by hand.
 source = "OpenAlex"
-updated = "2026-11-06"
-citations = 134
+updated = "2026-11-11"
+citations = 138
 h_index = 7
 
 # citations received in each calendar year
@@ -12,5 +12,5 @@ h_index = 7
 2022 = 9
 2023 = 15
 2024 = 19
-2025 = 27
-2026 = 50
+2025 = 28
+2026 = 53

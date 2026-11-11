@@ -18,6 +18,10 @@ I work with genomic data and statistics. Most of my projects start with sequenci
 
 {{< include _charts_web.md >}}
 
+## Collaborators
+
+{{< include _network_web.md >}}
+
 ## What I do
 
 **Sequencing data analysis.** I analyse whole-genome, targeted and RNA sequencing data, including single-cell RNA-seq, small RNA-seq and 16S rRNA amplicons. I have built and run pipelines for variant calling, differential expression and small RNA annotation in many species: human cancer cells, cattle, chickens, cats, and dog cells infected with influenza A virus.

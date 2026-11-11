@@ -1,5 +1,6 @@
 ---
 pagetitle: "Bartosz Czech, PhD, Eng."
+include-in-header: assets/person-jsonld.html   # schema.org Person, for search engines
 ---
 
 ```{=html}

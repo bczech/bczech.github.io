@@ -28,6 +28,40 @@
 })();
 </script>
 <script>
+// Co-author network: while a dot is hovered or focused, keep its links and neighbours bright.
+(function () {
+  var svg = document.querySelector(".pf-net-svg");
+  if (!svg) return;
+  var box = svg.parentElement; // on phones the graph scrolls sideways: start at the centre ("me")
+  if (box.scrollWidth > box.clientWidth) box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
+  var edges = svg.querySelectorAll(".pf-net-edge, .pf-net-spoke");
+  function on(node) {
+    var i = node.getAttribute("data-i");
+    var nb = (node.getAttribute("data-n") || "").split(" ").filter(Boolean);
+    svg.classList.add("pf-net-focus");
+    node.classList.add("pf-on");
+    nb.forEach(function (j) {
+      var m = svg.querySelector('.pf-net-node[data-i="' + j + '"]');
+      if (m) m.classList.add("pf-on");
+    });
+    edges.forEach(function (e) {
+      if (e.getAttribute("data-a") === i || e.getAttribute("data-b") === i) e.classList.add("pf-on");
+    });
+  }
+  function off() {
+    svg.classList.remove("pf-net-focus");
+    svg.querySelectorAll(".pf-on").forEach(function (e) { e.classList.remove("pf-on"); });
+  }
+  svg.querySelectorAll(".pf-net-node").forEach(function (node) {
+    var hit = node.querySelector(".pf-hit");
+    hit.addEventListener("pointerenter", function () { on(node); });
+    hit.addEventListener("pointerleave", off);
+    hit.addEventListener("focus", function () { on(node); });
+    hit.addEventListener("blur", off);
+  });
+})();
+</script>
+<script>
 // Small visual effects for the portfolio. Content stays fully visible without JavaScript:
 // the hidden "before" state is only applied by this script.
 (function () {

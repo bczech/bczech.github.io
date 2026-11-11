@@ -8,6 +8,7 @@ _quarto.yml). Writes the files that the pages include:
   _skills_web.md    skill cards with chips for index.qmd
   _skills_cv.md     one line per skill group for cv.qmd
   _charts_web.md    "articles per year" and "citations per year" charts for research.qmd
+  _network_web.md   co-author network for research.qmd (scripts/coauthors.py)
   _variables.yml    numbers used in the text, e.g. {{< var pubs.articles >}}
 
 Only the Python standard library is needed (tomllib, Python 3.11+).
@@ -17,6 +18,8 @@ Run by hand from portfolio/:  python3 scripts/gen_content.py
 import html
 import tomllib
 from pathlib import Path
+
+from coauthors import network_web
 
 ROOT = Path(__file__).resolve().parent.parent
 ME = "Czech B"
@@ -227,6 +230,7 @@ def main():
     with open(ROOT / "data" / "metrics.toml", "rb") as f:
         metrics = tomllib.load(f)
     (ROOT / "_charts_web.md").write_text(charts_web(pubs, metrics), encoding="utf-8")
+    (ROOT / "_network_web.md").write_text(network_web(pubs), encoding="utf-8")
     groups = load("skills.toml", "group")
     (ROOT / "_skills_web.md").write_text(skills_web(groups), encoding="utf-8")
     (ROOT / "_skills_cv.md").write_text(skills_cv(groups), encoding="utf-8")

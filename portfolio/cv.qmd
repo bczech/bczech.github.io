@@ -11,7 +11,8 @@ format:
     margin:
       x: 2cm
       y: 1.8cm
-    mainfont: "Helvetica Neue"
+    mainfont: "Inter"
+    font-paths: [fonts]   # bundled Inter (SIL OFL), so the PDF looks the same locally and on GitHub Actions
     fontsize: 9.5pt
 ---
 

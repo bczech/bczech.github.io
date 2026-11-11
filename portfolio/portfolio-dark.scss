@@ -26,3 +26,7 @@ main h2 { color: var(--pf-ink); }
 .table { --bs-table-bg: transparent; color: var(--pf-text-strong); border-color: var(--pf-line); }
 .pf-404 .pf-eyebrow { color: #6cc4ea; }
 .pf-tip { background: #eef3f8; color: #121a22; }
+
+// Co-author network: dark steps of the same categorical slots, validated on #1b2733.
+:root { --pf-a-genomics: #3987e5; --pf-a-drug: #d95926; --pf-a-virology: #199e70; --pf-a-other: #6b7d90; }
+.pf-net-me circle { fill: #3498db; }
