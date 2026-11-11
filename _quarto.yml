@@ -4,6 +4,7 @@ project:
   render:
     - "*.qmd"
     - "kursy/*.qmd"
+    - "!portfolio/"   # separate Quarto project (the portfolio at the site root)
 
 website:
   title: "dr inż. Bartosz Czech"
