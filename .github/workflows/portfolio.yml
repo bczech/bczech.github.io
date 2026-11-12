@@ -1,0 +1,123 @@
+# Builds the portfolio (portfolio/ on the quarto-site branch) and publishes it
+# to the root of this branch, next to teaching/, which it never touches.
+#
+# Runs every Monday, when portfolio/ changes on quarto-site (through
+# portfolio-trigger.yml there) and by hand: Actions > Portfolio > Run workflow.
+#
+# Each run:
+#   1. fetches citation counts from OpenAlex (scripts/update_metrics.py);
+#   2. opens an issue for each new work in OpenAlex that is not on the site
+#      (scripts/check_new_works.py, label "new-publication");
+#   3. renders the site with Quarto and copies it here;
+#   4. checks the links and opens or updates a "Broken links" issue if any fail.
+# The new citation counts are used for the build only; they are not committed
+# back to quarto-site.
+
+name: Portfolio
+
+on:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: portfolio
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out the sources (quarto-site)
+        uses: actions/checkout@v4
+        with:
+          ref: quarto-site
+          path: src
+
+      - name: Check out the published site (master)
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          path: site
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.10.18
+
+      - name: Create issue labels
+        run: |
+          gh label create new-publication --color 0e8a16 --description "Work found in OpenAlex, not on the site yet" --force -R "$GITHUB_REPOSITORY"
+          gh label create broken-links --color d93f0b --description "Found by the weekly link check" --force -R "$GITHUB_REPOSITORY"
+
+      - name: Update citation counts
+        working-directory: src/portfolio
+        continue-on-error: true   # if OpenAlex is down, build with the last numbers
+        run: python3 scripts/update_metrics.py
+
+      - name: Look for new publications
+        working-directory: src/portfolio
+        continue-on-error: true
+        run: python3 scripts/check_new_works.py --issue
+
+      - name: Render
+        working-directory: src/portfolio
+        run: quarto render
+
+      - name: Copy the site next to teaching/
+        run: |
+          rsync -a --delete \
+            --exclude '/teaching/' --exclude '/.git' --exclude '/.github/' \
+            --exclude '/.nojekyll' --exclude '/README.md' --exclude '/.gitignore' \
+            src/portfolio/_site/ site/
+          touch site/.nojekyll
+
+      - name: Check links
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: false
+          output: lychee.md
+          token: ${{ github.token }}
+          # LinkedIn, Scholar, ResearchGate, Scopus and Web of Science block automated checks.
+          # 403/429: some publishers refuse bots behind doi.org but the page is fine for readers.
+          args: >-
+            --no-progress --max-retries 2 --accept '200..=299,403,429'
+            --root-dir ${{ github.workspace }}/site
+            --exclude 'linkedin\.com' --exclude 'scholar\.google' --exclude 'researchgate\.net'
+            --exclude 'scopus\.com' --exclude 'webofscience\.com'
+            site/index.html site/research.html site/software.html site/cv.html site/404.html
+
+      - name: Report broken links
+        if: steps.lychee.outputs.exit_code != '0'
+        run: |
+          n=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --label broken-links --json number -q '.[0].number')
+          if [ -n "$n" ]; then
+            gh issue edit "$n" -R "$GITHUB_REPOSITORY" --body-file lychee.md
+          else
+            gh issue create -R "$GITHUB_REPOSITORY" --title "Broken links on the portfolio" --label broken-links --body-file lychee.md
+          fi
+
+      - name: Publish
+        working-directory: site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Nothing changed."; exit 0; fi
+          git commit -m "chore: rebuild portfolio"
+          # teaching/ may have been pushed in the meantime: rebase and retry
+          for i in 1 2 3; do
+            git pull --rebase origin master && git push origin HEAD:master && exit 0
+            sleep 10
+          done
+          exit 1
