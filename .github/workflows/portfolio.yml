@@ -71,7 +71,11 @@ jobs:
 
       - name: Render
         working-directory: src/portfolio
-        run: quarto render
+        # Quarto resolves {{< include >}} before the pre-render hook runs, so on a
+        # fresh checkout the generated files must exist first.
+        run: |
+          python3 scripts/gen_content.py
+          quarto render
 
       - name: Copy the site next to teaching/
         run: |
