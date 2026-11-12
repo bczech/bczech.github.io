@@ -1,0 +1,22 @@
+# When portfolio/ changes on this branch, start the "Portfolio" workflow on master,
+# which builds the site and publishes it (see .github/workflows/portfolio.yml there).
+# Scheduled workflows only run from the default branch (master), so the build lives there.
+
+name: Portfolio trigger
+
+on:
+  push:
+    branches: [quarto-site]
+    paths: ["portfolio/**"]
+
+permissions:
+  actions: write
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start the build on master
+        run: gh workflow run portfolio.yml --ref master -R "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
