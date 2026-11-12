@@ -6,8 +6,8 @@ straight axis that is tilted a little. Where a strand is behind the axis
 are drawn last, in a light colour. Base pairs are short rungs between the
 strands, each split in two colours (one base from each strand).
 
-Run from portfolio/:  python3 scripts/make_favicon.py [d|e]  -> img/favicon.svg
-Then:  rsvg-convert -w 180 img/favicon.svg -o img/apple-touch-icon.png
+Run from portfolio/:  python3 scripts/make_favicon.py [d|e]  -> img/favicon-dna.svg
+Then:  rsvg-convert -w 180 img/favicon-dna.svg -o img/apple-touch-icon-dna.png
 """
 
 import math
@@ -91,7 +91,7 @@ def build(v):
 
 def main():
     name = sys.argv[1] if len(sys.argv) > 1 else "d"
-    out = Path(__file__).resolve().parent.parent / "img" / "favicon.svg"
+    out = Path(__file__).resolve().parent.parent / "img" / "favicon-dna.svg"
     if len(sys.argv) > 2:
         out = Path(sys.argv[2])
     out.write_text(build(VARIANTS[name]), encoding="utf-8")

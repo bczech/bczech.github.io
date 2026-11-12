@@ -21,7 +21,7 @@ website:
   title: "Bartosz Czech"
   description: "Bartosz Czech, PhD, Eng. Bioinformatician and computational biologist at Wrocław University of Environmental and Life Sciences."
   site-url: "https://bczech.github.io/"
-  favicon: img/favicon.svg
+  favicon: img/favicon-dna.svg
   image: img/og-card.png
   open-graph:
     image: img/og-card.png
@@ -76,5 +76,5 @@ format:
     link-external-newwindow: true
     include-after-body: assets/effects.html
     include-in-header:
-      text: '<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">'
+      text: '<link rel="apple-touch-icon" href="/img/apple-touch-icon-dna.png">'
     link-external-filter: '^(?:http:|https:)\/\/bczech\.github\.io'

@@ -4,7 +4,7 @@ pagetitle: "Page not found · Bartosz Czech"
 
 ```{=html}
 <section class="pf-404">
-  <img class="pf-404-helix" src="/img/favicon.svg" alt="">
+  <img class="pf-404-helix" src="/img/favicon-dna.svg" alt="">
   <p class="pf-eyebrow">Error 404</p>
   <h1>Sequence not found</h1>
   <p class="pf-404-lead">This address does not align to any page on the site. It may have moved, or the link may contain a typo.</p>
