@@ -57,6 +57,12 @@ budowa modelu i jego ocena.
 [[Z rozwiązaniami]{.lab-lbl} [[]{.bi .bi-file-earmark-check} R · .Rmd](analiza-danych/lab_04_rozwiazania.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-check} Python · .ipynb](analiza-danych/lab_04_rozwiazania.ipynb){.lab-btn}]{.lab-row .sol}
 :::
 
+::: {.lab-card}
+[[]{.bi .bi-journal-code}[Ćwiczenia 5: walidacja krzyżowa i przeciek danych[arkusz w R lub w Pythonie — do wyboru]{.lab-meta}]{}]{.lab-tt}
+
+[[Arkusz do pracy]{.lab-lbl} [[]{.bi .bi-file-earmark-code} R · .Rmd](analiza-danych/lab_05.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-code} Python · .ipynb](analiza-danych/lab_05.ipynb){.lab-btn}]{.lab-row}
+:::
+
 :::
 
 Kolejne materiały pojawią się wkrótce.

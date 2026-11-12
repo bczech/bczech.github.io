@@ -1,0 +1,283 @@
+---
+title: "Ćwiczenia 5 — Walidacja krzyżowa i przeciek (wersja R)"
+subtitle: "Dane demo: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Na Ćwiczeniach 4 model k najbliższych sąsiadów (k-NN) oceniono na jednym zbiorze
+testowym, a dokładność zmieniała się wyraźnie po zmianie ziarna podziału. Przy kilkudziesięciu
+próbkach testowych jedna liczba zależy więc w dużej mierze od tego, które próbki trafiły do
+testu. Na tym spotkaniu poznajemy sposób oceny, który wykorzystuje wszystkie próbki
+treningowe i mniej zależy od przypadku: walidację krzyżową. Na koniec omawiamy przeciek
+danych, czyli najczęstszy błąd, który zawyża ocenę modelu.
+
+Przez całe spotkanie model jest ten sam co na Ćwiczeniach 4: k-NN na standaryzowanych
+cechach CLR. Zmienia się tylko sposób jego oceny. Zbiór testowy odkładamy i nie używamy
+go: wszystkie oceny pochodzą z walidacji krzyżowej na zbiorze treningowym.
+
+# Punkt wyjścia
+
+Blok odtwarza przygotowanie danych z Ćwiczeń 4: podział warstwowy z ziarnem 42, filtr
+częstości występowania wyznaczony na treningu (zostają cechy obecne w co najmniej 10% próbek
+treningowych) i przekształcenie CLR. Arkusz najlepiej uruchamiać w nowej sesji R
+(w RStudio: *Session → Restart R*), blok po bloku od początku: obiekty pozostawione
+w pamięci przez wcześniejszy kod mogą mieć te same nazwy i inną zawartość.
+
+```{r dane}
+library(caret)                          # podział danych, walidacja krzyżowa, modele
+library(ggplot2)                        # wykresy
+
+# row.names = 1: pierwsza kolumna pliku to nazwy próbek; check.names = FALSE: nazwy taksonów bez zmian
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+# factor(): zmienna kategoryczna; levels ustala kolejność klas (najpierw control, potem T2D)
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+set.seed(42)                            # ziarno kursu: ten sam podział co na Ćwiczeniach 4
+# createDataPartition(): numery 75% próbek do treningu, losowane osobno w każdej klasie
+idx_tr <- createDataPartition(y, p = 0.75, list = FALSE)[, 1]
+X_tr <- X[idx_tr, ]                     # cechy próbek treningowych
+y_tr <- y[idx_tr]                       # klasy próbek treningowych
+X_te <- X[-idx_tr, ]                    # TEST: pozostałe 25% próbek (minus = wszystkie poza treningowymi)
+y_te <- y[-idx_tr]                      # klasy próbek testowych; test odkładamy i nie używamy do Ćwiczeń 9
+
+prevalence_tr <- colMeans(X_tr > 0)     # częstość występowania każdej cechy w treningu
+keep <- names(prevalence_tr)[prevalence_tr >= 0.10]   # nazwy cech obecnych w co najmniej 10% próbek
+X_tr_f <- X_tr[, keep]                  # trening: tylko zachowane cechy
+
+# CLR: logarytm (z dodaną stałą 1e-6, bo log(0) nie istnieje) minus średnia logarytmów w próbce
+clr <- function(M) {
+  L <- log(as.matrix(M) + 1e-6)         # logarytm każdej wartości
+  L - rowMeans(L)                       # od każdego wiersza (próbki) odejmujemy jego średnią
+}
+Z_tr <- clr(X_tr_f)                     # cechy treningowe po przekształceniu CLR
+
+dim(Z_tr)                               # liczba próbek treningowych i liczba cech
+length(y_te)                            # liczba próbek odłożonych do testu
+table(y_tr)                             # liczba próbek każdej klasy w treningu
+baseline <- max(prop.table(table(y_tr)))   # klasyfikator bazowy: udział klasy najliczniejszej
+baseline                                # dokładność klasyfikatora bazowego
+```
+
+**Na co patrzeć.** Klasyfikator bazowy, który każdej próbce przypisuje klasę najliczniejszą,
+osiąga dokładność około 0,5. Każdy wynik walidacji krzyżowej porównujemy z tą liczbą.
+
+# 1. Walidacja krzyżowa k-krotna
+
+Walidacja krzyżowa (ang. *cross-validation*, CV) dzieli zbiór treningowy na k równych
+części (ang. *folds*). Każda część raz pełni rolę części sprawdzającej, a model uczy się
+wtedy na pozostałych k − 1 częściach (część ucząca). Oceną modelu jest średnia z k wyników.
+W porównaniu z jednym zbiorem testowym każda próbka treningowa raz służy do oceny, więc
+wynik opiera się na wszystkich próbkach, a nie na kilkudziesięciu. Części losuje się osobno
+w każdej klasie (podział warstwowy, ang. *stratified*), żeby proporcje klas były w nich takie
+jak w całym zbiorze.
+
+Często spotyka się też podział na trzy zbiory: treningowy, walidacyjny (do wyboru
+hiperparametrów) i testowy. Walidacja krzyżowa zastępuje jeden zbiór walidacyjny: każda część
+sprawdzająca jest po kolei takim zbiorem walidacyjnym. Przy kilkuset próbkach jeden zbiór
+walidacyjny liczyłby około 50 próbek, a wynik zależałby od tego, które trafiły do niego
+(jak na Ćwiczeniach 4); stały zbiór walidacyjny stosuje się przy dużych zbiorach danych.
+
+Najpierw wykonujemy ręcznie jedno powtórzenie, żeby było widać, co się w nim dzieje:
+część 1 jest sprawdzająca, a model uczy się na pozostałych czterech. Model dopasowujemy tak
+samo jak na Ćwiczeniach 4, funkcją `train()` bez walidacji.
+
+```{r cv-jedna-czesc}
+set.seed(42)                            # ziarno: ten sam podział na części przy każdym uruchomieniu
+# createFolds(): 5 części warstwowych; returnTrain = TRUE: dla każdej części numery próbek części UCZĄCEJ
+parts <- createFolds(y_tr, k = 5, returnTrain = TRUE)
+sapply(parts, length)                   # liczba próbek uczących w każdym powtórzeniu
+
+fit_idx <- parts[[1]]                   # powtórzenie 1: numery próbek części uczącej
+table(y_tr[-fit_idx])                   # część sprawdzająca (pozostałe próbki): obie klasy prawie po równo
+
+none <- trainControl(method = "none")   # bez walidacji: model dopasowany raz, na podanych próbkach
+knn_1 <- train(x = Z_tr[fit_idx, ], y = y_tr[fit_idx],   # uczymy tylko na części uczącej
+               method = "knn",                           # model k-NN
+               preProcess = c("center", "scale"),        # standaryzacja wyznaczona na części uczącej
+               tuneGrid = data.frame(k = 5),             # 5 sąsiadów
+               trControl = none)                        # bez walidacji
+pred_1 <- predict(knn_1, Z_tr[-fit_idx, ])   # przewidywania dla części sprawdzającej
+mean(pred_1 == y_tr[-fit_idx])          # dokładność w części 1
+```
+
+**Na co patrzeć.** Proporcji nie podaje się, bo wynika z liczby części: przy k = 5 każda
+część to jedna piąta treningu, więc w każdym powtórzeniu model uczy się na 80% próbek
+treningowych (około 207) i jest sprawdzany na pozostałych 20% (około 52). Zbiór testowy
+z Ćwiczeń 4 nie bierze w tym udziału: wszystkie części powstają z samego treningu. Standaryzację wyznaczamy tylko na części uczącej: część sprawdzająca
+ma udawać nowe próbki, więc nie może wpływać na żaden krok uczenia.
+
+To samo dla wszystkich pięciu części robi jedno wywołanie `train()`. `trainControl()` określa
+sposób walidacji, a argument `index` przekazuje części z bloku powyżej:
+
+```{r cv-caret}
+ctrl <- trainControl(method = "cv", index = parts)   # walidacja krzyżowa na 5 częściach z bloku wyżej
+cv_model <- train(x = Z_tr, y = y_tr,             # cały zbiór treningowy
+                  method = "knn",                 # model k-NN
+                  preProcess = c("center", "scale"),   # standaryzacja wyznaczana osobno w każdej części
+                  tuneGrid = data.frame(k = 5),   # jedna wartość k: oceniamy model, niczego nie dobieramy
+                  trControl = ctrl)               # sposób walidacji
+cv_model$resample                                 # dokładność w każdej części (kolumnę Kappa pomijamy)
+cv_model$results[, c("k", "Accuracy", "AccuracySD")]   # średnia z 5 części i odchylenie standardowe
+```
+
+**Na co patrzeć.** `train()` dopasował model pięć razy, za każdym razem na innych czterech
+częściach, i sprawdził go na piątej. Wynik dla `Fold1` jest taki sam jak w ręcznym powtórzeniu.
+Na koniec `train()` dopasowuje model jeszcze raz, na całym treningu (`cv_model$finalModel`):
+tego modelu używa się potem do przewidywań, a pięć modeli z walidacji służy tylko do oceny. Pięć dokładności
+różni się między sobą, choć model i dane są te same, bo każda część liczy tylko około 52 próbek.
+`Accuracy` w `results` to średnia z pięciu części, a `AccuracySD` to ich odchylenie standardowe,
+czyli miara rozrzutu.
+
+🔧 **Do sprawdzenia.** Zmienić ziarno przed `createFolds()` (np. `set.seed(1)`) i uruchomić
+oba bloki ponownie. Jak zmieniają się dokładności w częściach i ich średnia?
+
+> **✏️ Zadanie 1.** Policzyć różnicę między największą a najmniejszą dokładnością
+> w częściach (`max()` i `min()` na kolumnie `cv_model$resample$Accuracy`). Dlaczego jakość
+> modelu opisuje się średnią z części, a nie wynikiem najlepszej części?
+
+```{r zadanie-1}
+# miejsce na kod do Zadania 1
+
+```
+
+# 2. Liczba części
+
+Liczba części wpływa na to, z ilu próbek liczy się pojedynczy wynik. Walidacja k-krotna to
+walidacja na k częściach: model dopasowuje się k razy, za każdym razem uczy się na k − 1
+częściach i jest sprawdzany na pozostałej. Przy około 259 próbkach treningowych:
+
+| Walidacja | Część ucząca | Część sprawdzająca | Liczba wyników |
+|-----------|--------------|--------------------|----------------|
+| 3-krotna  | 2/3 (około 173 próbki) | 1/3 (około 86) | 3 |
+| 5-krotna  | 4/5 (około 207) | 1/5 (około 52) | 5 |
+| 10-krotna | 9/10 (około 233) | 1/10 (około 26) | 10 |
+
+Porównujemy te trzy warianty dla tego samego modelu. Gdy nie podajemy części przez `index`, `train()`
+losuje je sam, dlatego przed każdym wywołaniem ustawiamy ziarno.
+
+```{r cv-liczba-czesci}
+set.seed(42)                            # ziarno: powtarzalny podział na 3 części
+cv_3 <- train(x = Z_tr, y = y_tr, method = "knn", preProcess = c("center", "scale"),   # k-NN ze standaryzacją w każdej części
+              tuneGrid = data.frame(k = 5),                                       # 5 sąsiadów
+              trControl = trainControl(method = "cv", number = 3))    # walidacja 3-krotna
+set.seed(42)                            # ziarno: powtarzalny podział na 10 części
+cv_10 <- train(x = Z_tr, y = y_tr, method = "knn", preProcess = c("center", "scale"),   # ten sam model
+               tuneGrid = data.frame(k = 5),                                       # 5 sąsiadów
+               trControl = trainControl(method = "cv", number = 10))  # walidacja 10-krotna
+
+acc_parts <- list("3 części" = cv_3$resample$Accuracy,       # dokładności z 3 części
+                  "5 części" = cv_model$resample$Accuracy,   # dokładności z 5 części (sekcja 1)
+                  "10 części" = cv_10$resample$Accuracy)     # dokładności z 10 części
+# tabela: dla każdego wariantu liczba wyników, ich średnia i odchylenie standardowe
+data.frame(results = sapply(acc_parts, length),       # liczba wyników (części)
+           mean = round(sapply(acc_parts, mean), 3),   # średnia dokładność
+           sd = round(sapply(acc_parts, sd), 3))       # odchylenie standardowe
+
+```
+
+**Na co patrzeć.** Średnie są podobne, bo model jest wszędzie ten sam. Przy 10 częściach
+każda część sprawdzająca liczy około 26 próbek, więc pojedynczy wynik jest mniej dokładny
+niż przy 3 częściach (około 86 próbek), a wyniki z części bardziej się rozrzucają.
+
+Wynik zależy też od tego, jak wylosowano części. Walidacja powtarzana (ang. *repeated
+cross-validation*) losuje podział na części kilka razy i uśrednia wszystkie wyniki, więc
+średnia mniej zależy od jednego losowania. W caret służy do tego
+`trainControl(method = "repeatedcv", number = 5, repeats = 3)`. Skrajny wariant to
+LOOCV (ang. *leave-one-out*, `method = "LOOCV"`): każda część to jedna próbka, więc model
+dopasowuje się tyle razy, ile jest próbek; stosuje się go tylko dla szybkich modeli.
+
+> **✏️ Zadanie 2.** Ocenić ten sam model walidacją 5-krotną powtórzoną 3 razy (wywołanie
+> `train()` jak dla `cv_3`, z `trainControl()` podanym wyżej). Ile wyników uśredniono
+> (`nrow()` na `$resample`) i jaka jest średnia dokładność? Czy różni się wyraźnie od
+> walidacji 5-krotnej z sekcji 1?
+
+```{r zadanie-2}
+# miejsce na kod do Zadania 2
+
+```
+
+# 3. Dobór liczby sąsiadów
+
+Liczba sąsiadów k w k-NN to hiperparametr (ang. *hyperparameter*): ustala się go przed
+uczeniem, a model sam go nie wyznacza. Walidacja krzyżowa pozwala porównać kilka wartości
+k na tych samych częściach i wybrać tę, która daje najlepszą średnią dokładność. Takie
+porównywanie nazywa się strojeniem (ang. *tuning*). Wystarczy podać w `tuneGrid` kilka
+wartości k.
+
+```{r strojenie, fig.width=6, fig.height=4}
+tune_model <- train(x = Z_tr, y = y_tr, method = "knn",   # k-NN oceniany dla wielu wartości k
+                    preProcess = c("center", "scale"),     # standaryzacja w każdej części
+                    tuneGrid = data.frame(k = seq(1, 31, by = 2)),   # k = 1, 3, 5, ..., 31
+                    trControl = ctrl)              # te same 5 części co w sekcji 1
+round(tune_model$results[, c("k", "Accuracy", "AccuracySD")], 3)   # wynik dla każdej wartości k
+tune_model$bestTune                               # k o największej średniej dokładności
+
+ggplot(tune_model) +                              # gotowy wykres caret: średnia dokładność dla każdego k
+  geom_hline(yintercept = baseline, linetype = "dashed")   # linia przerywana: klasyfikator bazowy
+```
+
+**Na co patrzeć.** Wiersz dla k = 5 daje prawie ten sam wynik co w sekcji 1, bo części są te
+same; drobna różnica bierze się z losowego rozstrzygania remisów w odległościach między próbkami.
+Krzywa jest nieregularna, a różnice między sąsiednimi wartościami k są rzędu kilku punktów
+procentowych. Najlepsze k wybrano spośród 16 kandydatów, więc jego wynik jest nieco zbyt
+optymistyczny: część przewagi wynika z przypadku. Do tego problemu wracamy na Ćwiczeniach 9.
+
+> **✏️ Zadanie 3.** Wypisać z `tune_model$results` wiersze dla k = 5 i dla najlepszego k
+> (np. `res[res$k == 5, ]`, gdzie `res <- tune_model$results`) i policzyć różnicę średnich
+> dokładności. Czy jest większa od odchylenia standardowego wyników z części (`AccuracySD`)?
+> Czy najlepsze k jest wyraźnie lepsze od k = 5?
+
+```{r zadanie-3}
+# miejsce na kod do Zadania 3
+
+```
+
+# 4. Przeciek danych
+
+Przeciek danych (ang. *data leakage*) zachodzi, gdy informacja z próbek, na których
+oceniamy model, wpływa na jego uczenie. Ocena jest wtedy zawyżona, a model na nowych danych
+działa gorzej, niż obiecuje walidacja. Zasada jest jedna: każdy krok, który wyznacza coś na
+podstawie wielu próbek albo etykiet, należy do modelu i musi być wykonywany w każdej części
+walidacji od nowa, tylko na części uczącej. Dla każdego kroku przygotowania danych należy
+zapytać, czy jego wynik zależy od innych próbek niż ta, którą przekształca.
+
+| Krok | Czy wyznacza coś z danych? | Miejsce |
+|------|---------------------------|---------|
+| podział na zbiór treningowy i testowy | — | na samym początku |
+| CLR, logarytm ze stałą | nie (każda próbka osobno) | może poprzedzać walidację |
+| filtr częstości występowania | tak, bez etykiet | wewnątrz każdej części |
+| standaryzacja, imputacja braków | tak, bez etykiet | wewnątrz każdej części (`preProcess` w `train()`) |
+| wybór cech według związku z klasą | tak, z etykietami | wewnątrz każdej części |
+| dobór hiperparametrów (sekcja 3) | tak, z etykietami | wewnątrz walidacji; ocena wybranego modelu na Ćwiczeniach 9 |
+
+Najgroźniejszy jest wybór cech według etykiet wykonany przed walidacją, np. wybranie 20
+taksonów najbardziej różniących klasy na całym zbiorze treningowym, a dopiero potem walidacja
+krzyżowa na tych taksonach. Części sprawdzające brały wtedy udział w wyborze cech, więc model
+„widział” je wcześniej. Przy setkach cech i kilkuset próbkach zawsze znajdzie się kilka cech,
+które przypadkiem dobrze różnicują klasy, i taka procedura daje wynik wyraźnie powyżej
+klasyfikatora bazowego nawet wtedy, gdy etykiety nie mają żadnego związku z cechami.
+
+Kroki, które nie korzystają z etykiet, dają przeciek znacznie mniejszy. W tym arkuszu filtr
+częstości występowania wyznaczono raz, na całym zbiorze treningowym; w pełni poprawna
+procedura umieszcza go wewnątrz każdej części. Jeśli kilka próbek pochodzi od tej samej
+osoby, wszystkie muszą trafić do tej samej części; inaczej model jest oceniany na osobie,
+którą już widział (w caret służy do tego `groupKFold()`).
+
+> **✏️ Zadanie 4.** Sprawdzić, jak duży jest przeciek przy standaryzacji. Wystandaryzować
+> cały zbiór treningowy przed walidacją (`Z_std <- scale(Z_tr)`), a potem ocenić k-NN na
+> `Z_std` bez argumentu `preProcess`, na tych samych częściach (`trControl = ctrl`).
+> Porównać średnią dokładność z wynikiem z sekcji 1. Czy różnica jest duża w porównaniu
+> z odchyleniem standardowym wyników z części? Dlaczego przeciek jest tu niewielki?
+
+```{r zadanie-4}
+# miejsce na kod do Zadania 4
+
+```
