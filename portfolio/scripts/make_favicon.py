@@ -1,82 +1,101 @@
-"""Draw the site icon: an alpha helix (protein ribbon) on a dark rounded square.
+"""Draw the site icon: a DNA double helix on a dark rounded square.
 
-The helix is a parametric coil x = r*cos(t), y = pitch*t, z = r*sin(t),
-projected on the screen and drawn as a flat band (the "cartoon" ribbon used by
-PyMOL or ChimeraX). Band segments behind the axis (z < 0) are drawn first in a
-darker colour (the inner face of the ribbon), segments in front on top in a
-light colour. The whole helix is tilted a little.
+Two strands follow x = cx + R*sin(t + phase), with phase 0 and pi, along a
+straight axis that is tilted a little. Where a strand is behind the axis
+(cos(t + phase) < 0) it is drawn first, in a darker colour; the parts in front
+are drawn last, in a light colour. Base pairs are short rungs between the
+strands, each split in two colours (one base from each strand).
 
-Run from portfolio/:  python3 scripts/make_favicon.py   -> img/favicon.svg
+Run from portfolio/:  python3 scripts/make_favicon.py [d|e]  -> img/favicon.svg
+Then:  rsvg-convert -w 180 img/favicon.svg -o img/apple-touch-icon.png
 """
 
 import math
+import sys
 from pathlib import Path
 
 SIZE = 64
 BG = "#2c3e50"
-BACK = "#23757b"   # inner face of the ribbon, behind the axis
-FRONT = "#5fd3d9"  # outer face, in front of the axis
-WIDTH = 7.5         # ribbon width in px
-TILT = -18          # degrees
-TURNS = 3.25
-R = 15             # helix radius in px
-TOP, BOTTOM = 13, 51
-STEPS = 360
+STRAND_FRONT = ("#5fd3d9", "#6cb8f0")   # strand 1, strand 2 in front of the axis
+STRAND_BACK = ("#2b8a92", "#2f6fa8")    # the same strands behind the axis
+RUNG = ("#5fd3d9", "#6cb8f0")           # the two halves of a base pair
+VARIANTS = {
+    # d: the site icon (diagonal, like the DNA emoji); e: an upright alternative
+    "d": dict(tilt=-28, turns=1.5, r=12, length=54, w=4.6, rungs=3, rung_op=1.0),
+    "e": dict(tilt=0, turns=1.5, r=14, length=48, w=4.6, rungs=3, rung_op=1.0),
+}
 
 
-def point(t):
-    y = TOP + (BOTTOM - TOP) * t / (2 * math.pi * TURNS)
-    x = SIZE / 2 + R * math.cos(t)
-    z = math.sin(t)
-    return x, y, z
+def build(v):
+    cx = cy = SIZE / 2
+    a = math.radians(v["tilt"])
+    ux, uy = math.sin(-a), math.cos(-a)   # axis direction (down the helix)
+    px, py = math.cos(-a), -math.sin(-a)  # sideways direction (across the helix)
+    tmax = 2 * math.pi * v["turns"]
+    steps = 240
 
+    def at(t, phase):
+        s = (t / tmax - 0.5) * v["length"]          # position along the axis
+        off = v["r"] * math.sin(t + phase)          # sideways offset
+        return cx + ux * s + px * off, cy + uy * s + py * off, math.cos(t + phase)
 
-def segments(front):
-    """Split the coil into continuous runs that are all in front or all behind."""
-    runs, cur = [], []
-    for i in range(STEPS + 1):
-        t = 2 * math.pi * TURNS * i / STEPS
-        x, y, z = point(t)
-        if (z >= 0) == front:
-            cur.append((x, y, t))
-        elif cur:
-            runs.append(cur)
-            cur = []
-    if cur:
-        runs.append(cur)
-    return runs
+    def runs(phase):
+        """Split one strand into pieces that are all in front or all behind."""
+        out, cur, front = [], [], None
+        for i in range(steps + 1):
+            t = tmax * i / steps
+            x, y, z = at(t, phase)
+            f = z >= 0
+            if front is None or f == front:
+                cur.append((x, y))
+            else:
+                cur.append((x, y))
+                out.append((front, cur))
+                cur = [(x, y)]
+            front = f
+        out.append((front, cur))
+        return out
 
+    def path(pts):
+        return "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in pts)
 
-def half_width(t):
-    """Half of the ribbon width; narrows to a thin loop over the first and last 0.45 turn."""
-    t_end = 2 * math.pi * TURNS
-    ramp = 2 * math.pi * 0.45
-    k = min(1.0, t / ramp, (t_end - t) / ramp)
-    k = 0.5 - 0.5 * math.cos(math.pi * max(k, 0.0))  # smooth step
-    return (0.9 + (WIDTH - 0.9) * k) / 2
+    w = v["w"]
+    back, front = [], []
+    for k, phase in enumerate((0.0, math.pi)):
+        for is_front, pts in runs(phase):
+            col = STRAND_FRONT[k] if is_front else STRAND_BACK[k]
+            el = (f'<path d="{path(pts)}" fill="none" stroke="{col}" stroke-width="{w}" '
+                  f'stroke-linecap="round" stroke-linejoin="round"/>')
+            (front if is_front else back).append(el)
 
+    # Base pairs: evenly spaced, skipping the points where the strands cross.
+    rungs = []
+    n = int(round(v["turns"] * 2 * v["rungs"]))
+    for i in range(n):
+        t = tmax * (i + 0.5) / n
+        x1, y1, _ = at(t, 0.0)
+        x2, y2, _ = at(t, math.pi)
+        if math.hypot(x2 - x1, y2 - y1) < 2.2 * w:
+            continue
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        for (xa, ya), col in (((x1, y1), RUNG[0]), ((x2, y2), RUNG[1])):
+            rungs.append(f'<line x1="{xa:.2f}" y1="{ya:.2f}" x2="{mx:.2f}" y2="{my:.2f}" '
+                         f'stroke="{col}" stroke-width="{w * 0.55:.2f}" stroke-linecap="round" opacity="{v.get('rung_op', 0.8)}"/>')
 
-def band(run):
-    """Closed polygon: upper edge left to right, lower edge back."""
-    top = [(x, y - half_width(t)) for x, y, t in run]
-    bottom = [(x, y + half_width(t)) for x, y, t in reversed(run)]
-    return "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in top + bottom) + "Z"
+    body = "\n  ".join(back + rungs + front)
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}">\n'
+            f'  <rect width="{SIZE}" height="{SIZE}" rx="14" fill="{BG}"/>\n'
+            f'  <clipPath id="c"><rect x="3" y="3" width="{SIZE - 6}" height="{SIZE - 6}" rx="11"/></clipPath>\n'
+            f'  <g clip-path="url(#c)">\n  {body}\n  </g>\n</svg>\n')
 
 
 def main():
-    back = "".join(f'<path d="{band(r)}"/>' for r in segments(False))
-    front = "".join(f'<path d="{band(r)}"/>' for r in segments(True))
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}">'
-        f'<rect width="{SIZE}" height="{SIZE}" rx="14" fill="{BG}"/>'
-        f'<g transform="rotate({TILT} {SIZE / 2} {SIZE / 2})" stroke-linejoin="round">'
-        f'<g fill="{BACK}" stroke="{BACK}" stroke-width="0.6">{back}</g>'
-        f'<g fill="{FRONT}" stroke="{BG}" stroke-width="0.8">{front}</g>'
-        "</g></svg>"
-    )
+    name = sys.argv[1] if len(sys.argv) > 1 else "d"
     out = Path(__file__).resolve().parent.parent / "img" / "favicon.svg"
-    out.write_text(svg, encoding="utf-8")
-    print(f"wrote {out}")
+    if len(sys.argv) > 2:
+        out = Path(sys.argv[2])
+    out.write_text(build(VARIANTS[name]), encoding="utf-8")
+    print(f"wrote {out} (variant {name})")
 
 
 if __name__ == "__main__":
