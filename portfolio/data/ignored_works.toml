@@ -8,3 +8,7 @@ note = "Correction to the 2020 Journal of Applied Genetics article (no new conte
 [[work]]
 doi = "10.5281/zenodo.20795549"
 note = "Zenodo record of gwasplot v0.99.1, the earlier name of ggwas (software, shown on the Software page)"
+
+[[work]]
+doi = "10.1097/01.hjh.0001195704.50252.c4"
+note = "Not my work: Journal of Hypertension 2026 abstract wrongly attributed to me in OpenAlex"
