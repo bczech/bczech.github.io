@@ -46,9 +46,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3c731f4bfc89ced1a01a8cfe847cd92e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-499a370f6d9f283d920fd00cb6e91c6e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-3c731f4bfc89ced1a01a8cfe847cd92e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-0759f165534252b2ec44534586f2584d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-d5b01e719e43e70923e8b7a513be3a73.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-0759f165534252b2ec44534586f2584d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,6 +77,31 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Bartosz Czech",
+  "honorificSuffix": "PhD, Eng.",
+  "jobTitle": "Assistant Professor",
+  "description": "Bioinformatician and computational biologist.",
+  "url": "https://bczech.github.io/",
+  "image": "https://bczech.github.io/img/photo.png",
+  "email": "mailto:bartosz.w.czech@gmail.com",
+  "worksFor": {
+    "@type": "CollegeOrUniversity",
+    "name": "Wrocław University of Environmental and Life Sciences",
+    "department": { "@type": "Organization", "name": "Department of Genetics" }
+  },
+  "knowsAbout": ["Bioinformatics", "Computational biology", "Biostatistics", "Genomics", "Multi-omics", "Drug response modelling"],
+  "sameAs": [
+    "https://orcid.org/0000-0002-9908-3007",
+    "https://scholar.google.com/citations?user=JYaz528AAAAJ",
+    "https://github.com/bczech",
+    "https://www.linkedin.com/in/bczech"
+  ]
+}
+</script>
 <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
 
 
@@ -365,7 +390,7 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>14</strong> <span>peer-reviewed articles</span></p>
 </div>
 <div class="pf-stat">
-<p><strong>134</strong> <span>citations</span></p>
+<p><strong>138</strong> <span>citations</span></p>
 </div>
 <div class="pf-stat">
 <p><strong>7</strong> <span>h-index</span></p>
@@ -374,7 +399,7 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>7</strong> <span>years in pharma R&amp;D</span></p>
 </div>
 </div>
-<p><span class="pf-note">Citation counts from OpenAlex, updated 2026-11-06. Google Scholar counts are usually higher.</span></p>
+<p><span class="pf-note">Citation counts from OpenAlex, updated 2026-11-12. Google Scholar counts are usually higher.</span></p>
 <section id="about" class="level2">
 <h2 data-anchor-id="about">About</h2>
 <p>I am a bioinformatician and computational biologist. I analyse sequencing, mass spectrometry and drug screening data, build statistical models that answer biological questions, and write R packages and pipelines that make these analyses repeatable. My methods do not depend on the organism: I have worked with data from human cancer cell lines, cattle, chickens, cats, dog cells infected with influenza virus, and gut bacteria.</p>
@@ -538,6 +563,40 @@ ul.task-list li input[type="checkbox"] {
       show(el, r.left + r.width / 2, r.top + 20);
     });
     el.addEventListener("blur", hide);
+  });
+})();
+</script>
+<script>
+// Co-author network: while a dot is hovered or focused, keep its links and neighbours bright.
+(function () {
+  var svg = document.querySelector(".pf-net-svg");
+  if (!svg) return;
+  var box = svg.parentElement; // on phones the graph scrolls sideways: start at the centre ("me")
+  if (box.scrollWidth > box.clientWidth) box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
+  var edges = svg.querySelectorAll(".pf-net-edge, .pf-net-spoke");
+  function on(node) {
+    var i = node.getAttribute("data-i");
+    var nb = (node.getAttribute("data-n") || "").split(" ").filter(Boolean);
+    svg.classList.add("pf-net-focus");
+    node.classList.add("pf-on");
+    nb.forEach(function (j) {
+      var m = svg.querySelector('.pf-net-node[data-i="' + j + '"]');
+      if (m) m.classList.add("pf-on");
+    });
+    edges.forEach(function (e) {
+      if (e.getAttribute("data-a") === i || e.getAttribute("data-b") === i) e.classList.add("pf-on");
+    });
+  }
+  function off() {
+    svg.classList.remove("pf-net-focus");
+    svg.querySelectorAll(".pf-on").forEach(function (e) { e.classList.remove("pf-on"); });
+  }
+  svg.querySelectorAll(".pf-net-node").forEach(function (node) {
+    var hit = node.querySelector(".pf-hit");
+    hit.addEventListener("pointerenter", function () { on(node); });
+    hit.addEventListener("pointerleave", off);
+    hit.addEventListener("focus", function () { on(node); });
+    hit.addEventListener("blur", off);
   });
 })();
 </script>

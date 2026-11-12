@@ -46,9 +46,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="/site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="/site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="/site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="/site_libs/bootstrap/bootstrap-3c731f4bfc89ced1a01a8cfe847cd92e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="/site_libs/bootstrap/bootstrap-dark-499a370f6d9f283d920fd00cb6e91c6e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="/site_libs/bootstrap/bootstrap-3c731f4bfc89ced1a01a8cfe847cd92e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="/site_libs/bootstrap/bootstrap-0759f165534252b2ec44534586f2584d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="/site_libs/bootstrap/bootstrap-dark-d5b01e719e43e70923e8b7a513be3a73.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="/site_libs/bootstrap/bootstrap-0759f165534252b2ec44534586f2584d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -384,6 +384,40 @@ subject GATTACA</pre>
       show(el, r.left + r.width / 2, r.top + 20);
     });
     el.addEventListener("blur", hide);
+  });
+})();
+</script>
+<script>
+// Co-author network: while a dot is hovered or focused, keep its links and neighbours bright.
+(function () {
+  var svg = document.querySelector(".pf-net-svg");
+  if (!svg) return;
+  var box = svg.parentElement; // on phones the graph scrolls sideways: start at the centre ("me")
+  if (box.scrollWidth > box.clientWidth) box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
+  var edges = svg.querySelectorAll(".pf-net-edge, .pf-net-spoke");
+  function on(node) {
+    var i = node.getAttribute("data-i");
+    var nb = (node.getAttribute("data-n") || "").split(" ").filter(Boolean);
+    svg.classList.add("pf-net-focus");
+    node.classList.add("pf-on");
+    nb.forEach(function (j) {
+      var m = svg.querySelector('.pf-net-node[data-i="' + j + '"]');
+      if (m) m.classList.add("pf-on");
+    });
+    edges.forEach(function (e) {
+      if (e.getAttribute("data-a") === i || e.getAttribute("data-b") === i) e.classList.add("pf-on");
+    });
+  }
+  function off() {
+    svg.classList.remove("pf-net-focus");
+    svg.querySelectorAll(".pf-on").forEach(function (e) { e.classList.remove("pf-on"); });
+  }
+  svg.querySelectorAll(".pf-net-node").forEach(function (node) {
+    var hit = node.querySelector(".pf-hit");
+    hit.addEventListener("pointerenter", function () { on(node); });
+    hit.addEventListener("pointerleave", off);
+    hit.addEventListener("focus", function () { on(node); });
+    hit.addEventListener("blur", off);
   });
 })();
 </script>
