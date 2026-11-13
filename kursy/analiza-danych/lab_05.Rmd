@@ -213,6 +213,7 @@ porównywanie nazywa się strojeniem (ang. *tuning*). Wystarczy podać w `tuneGr
 wartości k.
 
 ```{r strojenie, fig.width=6, fig.height=4}
+set.seed(42)                            # ziarno: k-NN rozstrzyga remisy losowo, a tak wynik jest powtarzalny
 tune_model <- train(x = Z_tr, y = y_tr, method = "knn",   # k-NN oceniany dla wielu wartości k
                     preProcess = c("center", "scale"),     # standaryzacja w każdej części
                     tuneGrid = data.frame(k = seq(1, 31, by = 2)),   # k = 1, 3, 5, ..., 31
