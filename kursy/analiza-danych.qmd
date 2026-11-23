@@ -21,6 +21,7 @@ budowa modelu i jego ocena.
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 4: Uczenie nadzorowane[90 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-04-uczenie-nadzorowane.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 5: Ocena modelu[51 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-05-ocena-modelu.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 6: Modele złożone i cechy[57 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-06-modele-zlozone-i-cechy.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 7: Wiarygodność modelu[43 slajdy · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](analiza-danych/wyklad-07-wiarygodnosc-modelu.pdf){.mat-item}
 :::
 
 ### Ćwiczenia {.mat-sub}
