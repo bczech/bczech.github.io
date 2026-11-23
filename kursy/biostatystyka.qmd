@@ -20,6 +20,8 @@ testowanie hipotez i interpretacja wyników.
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 3: Testowanie hipotez i estymacja[49 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-03-testowanie-hipotez-i-estymacja.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 4: Testy statystyczne I (testy t)[39 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-04-testy-t.pdf){.mat-item}
 [[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 5: Testy statystyczne II[44 slajdy · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-05-testy-statystyczne-ii.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 6: Regresja liniowa[39 slajdów · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-06-regresja-liniowa.pdf){.mat-item}
+[[]{.mat-ic .bi .bi-file-earmark-pdf-fill}[Wykład 7: Regresja nieliniowa[44 slajdy · PDF]{.mat-meta}]{.mat-tt}[Pobierz]{.mat-dl}](biostatystyka/wyklad-07-regresja-nieliniowa.pdf){.mat-item}
 :::
 
 Kolejne wykłady pojawią się wkrótce.
