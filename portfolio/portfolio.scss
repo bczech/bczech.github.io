@@ -132,6 +132,7 @@ details.pf-pub[open] .pf-pub-arrow { transform: rotate(180deg); }
 
 .pf-software-head { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
 .pf-software-head img { height: 120px; }
+.pf-software-head img.pf-badge { height: 20px; }
 .pf-software-head > div { flex: 1; min-width: min(280px, 100%); }
 
 .pf-lead { font-size: 1.08rem; color: var(--pf-text); max-width: 760px; }

@@ -69,7 +69,7 @@ ORCID [0000-0002-9908-3007](https://orcid.org/0000-0002-9908-3007) · [github.co
 
 ## Software
 
-- **ggwas**: ggplot2 plots for GWAS summary statistics (R; under review at Bioconductor). [github.com/bczech/ggwas](https://github.com/bczech/ggwas)
+- **ggwas**: ggplot2 plots for GWAS summary statistics (R; Bioconductor). [github.com/bczech/ggwas](https://github.com/bczech/ggwas)
 - **BRASSVis**: plots of gene fusions and structural variants from BRASS (R). [github.com/bczech/BRASSVis](https://github.com/bczech/BRASSVis)
 - **gDR**: co-author of the R suite for drug response screens (Bioconductor). [github.com/gdrplatform](https://github.com/gdrplatform)
 

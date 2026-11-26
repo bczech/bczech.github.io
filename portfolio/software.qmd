@@ -12,9 +12,12 @@ I write R packages for analyses that I run often, so that other people can repea
 ![](img/ggwas/logo.png){fig-alt="ggwas logo"}
 
 ::: {}
-**ggwas** draws plots for genome-wide association studies with ggplot2. It covers the usual steps from quality control to figures for a paper: Manhattan, QQ, Miami and locus zoom plots, PheWAS, fine-mapping, colocalization and genetic correlations. It includes journal themes and colour-blind-safe palettes, and it downsamples points so that biobank-sized files still plot quickly. The package is under review at Bioconductor.
+**ggwas** draws plots for genome-wide association studies with ggplot2. It covers the usual steps from quality control to figures for a paper: Manhattan, QQ, Miami and locus zoom plots, PheWAS, fine-mapping, colocalization and genetic correlations. It includes journal themes and colour-blind-safe palettes, and it downsamples points so that biobank-sized files still plot quickly. It was accepted into Bioconductor in November 2026 and will be in the 3.25 release.
+
+<a href="https://bioconductor.org/packages/devel/bioc/html/ggwas.html"><img class="pf-badge" src="https://img.shields.io/badge/Bioconductor-devel-1A81C2" alt="Bioconductor badge"></a>
 
 ::: {.pf-links}
+[<i class="bi bi-box-seam"></i> Bioconductor](https://bioconductor.org/packages/devel/bioc/html/ggwas.html){.pf-btn}
 [<i class="bi bi-github"></i> Code](https://github.com/bczech/ggwas){.pf-btn}
 [<i class="bi bi-book"></i> Documentation](https://bczech.github.io/ggwas/){.pf-btn}
 [<i class="bi bi-archive"></i> Zenodo DOI](https://doi.org/10.5281/zenodo.20815110){.pf-btn}

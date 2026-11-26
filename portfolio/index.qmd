@@ -116,7 +116,7 @@ Dose-response models for drug screens and drug combinations, mixed models and as
     <div class="pf-card-img"><img src="img/ggwas/example_manhattan.png" alt="Manhattan plot made with ggwas"></div>
     <div class="pf-kicker">R package</div>
     <h3>ggwas</h3>
-    <p>ggplot2 plots for GWAS summary statistics: Manhattan, QQ, Miami, locus zoom, PheWAS and more. Submitted to Bioconductor.</p>
+    <p>ggplot2 plots for GWAS summary statistics: Manhattan, QQ, Miami, locus zoom, PheWAS and more. Part of Bioconductor.</p>
   </a>
   <a class="pf-card" href="https://doi.org/10.1038/s41467-025-56634-y">
     <div class="pf-card-img"><img src="img/pubs/img1.png" alt="Figure from Paul et al. 2025"></div>
