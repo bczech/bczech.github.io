@@ -11,7 +11,7 @@
     "href": "software.html#ggwas",
     "title": "Software",
     "section": "ggwas",
-    "text": "ggwas\n\n\n\nggwas draws plots for genome-wide association studies with ggplot2. It covers the usual steps from quality control to figures for a paper: Manhattan, QQ, Miami and locus zoom plots, PheWAS, fine-mapping, colocalization and genetic correlations. It includes journal themes and colour-blind-safe palettes, and it downsamples points so that biobank-sized files still plot quickly. The package is under review at Bioconductor.\n\n Code  Documentation  Zenodo DOI\n\n\n\n\nggwas in a few lines\n\n\npak::pak(\"bczech/ggwas\")\n\nlibrary(ggwas)\ndata(example_gwas)  # columns CHR, BP, SNP, P\n\nmanhattan_plot(example_gwas)\nqq_plot(example_gwas, show_lambda = TRUE)\n\n\n\n\n\nManhattan plot of the bundled example data, from the ggwas documentation.\n\n\n\n\n\n\nGallery\n\n  Manhattan plot\n  Miami plot: two traits\n  QQ plot\n  PheWAS\n  Genetic correlations\n  Circular Manhattan plot"
+    "text": "ggwas\n\n\n\nggwas draws plots for genome-wide association studies with ggplot2. It covers the usual steps from quality control to figures for a paper: Manhattan, QQ, Miami and locus zoom plots, PheWAS, fine-mapping, colocalization and genetic correlations. It includes journal themes and colour-blind-safe palettes, and it downsamples points so that biobank-sized files still plot quickly. It was accepted into Bioconductor in November 2026 and will be in the 3.25 release.\n\n\n Bioconductor  Code  Documentation  Zenodo DOI\n\n\n\n\nggwas in a few lines\n\n\npak::pak(\"bczech/ggwas\")\n\nlibrary(ggwas)\ndata(example_gwas)  # columns CHR, BP, SNP, P\n\nmanhattan_plot(example_gwas)\nqq_plot(example_gwas, show_lambda = TRUE)\n\n\n\n\n\nManhattan plot of the bundled example data, from the ggwas documentation.\n\n\n\n\n\n\nGallery\n\n  Manhattan plot\n  Miami plot: two traits\n  QQ plot\n  PheWAS\n  Genetic correlations\n  Circular Manhattan plot"
   },
   {
     "objectID": "software.html#brassvis",
@@ -39,7 +39,7 @@
     "href": "index.html",
     "title": "Bartosz Czech, PhD, Eng.",
     "section": "",
-    "text": "Bioinformatics · Computational biology · Biostatistics\n      \n      Bioinformatician and computational biologist\n      Assistant Professor at Wrocław University of Environmental and Life Sciences · Senior Bioinformatician in pharmaceutical R&D · Founder of GeneStat\n       Wrocław, Poland\n      \n         CV\n         Email\n         GitHub\n         Google Scholar\n         ORCID\n         LinkedIn\nCitation counts from OpenAlex, updated 2026-11-23. Google Scholar counts are usually higher."
+    "text": "Bioinformatics · Computational biology · Biostatistics\n      \n      Bioinformatician and computational biologist\n      Assistant Professor at Wrocław University of Environmental and Life Sciences · Senior Bioinformatician in pharmaceutical R&D · Founder of GeneStat\n       Wrocław, Poland\n      \n         CV\n         Email\n         GitHub\n         Google Scholar\n         ORCID\n         LinkedIn\nCitation counts from OpenAlex, updated 2026-11-26. Google Scholar counts are usually higher."
   },
   {
     "objectID": "index.html#about",
@@ -67,7 +67,7 @@
     "href": "index.html#selected-work",
     "title": "Bartosz Czech, PhD, Eng.",
     "section": "Selected work",
-    "text": "Selected work\n\n  \n    \n    R package\n    ggwas\n    ggplot2 plots for GWAS summary statistics: Manhattan, QQ, Miami, locus zoom, PheWAS and more. Submitted to Bioconductor.\n  \n  \n    \n    Nature Communications · 2025\n    Resistance to TEAD inhibitors\n    Joint activation of the Hippo and MAPK pathways makes cancer cells resistant to TEAD inhibition. I processed the drug screen data with the gDR package.\n  \n  \n    \n    Frontiers in Microbiology · 2022 · first author\n    Host transcriptome and microbiome integration\n    Co-expression networks connect host RNA-seq with 16S rRNA profiles of gut bacteria to describe the response to heat stress."
+    "text": "Selected work\n\n  \n    \n    R package\n    ggwas\n    ggplot2 plots for GWAS summary statistics: Manhattan, QQ, Miami, locus zoom, PheWAS and more. Part of Bioconductor.\n  \n  \n    \n    Nature Communications · 2025\n    Resistance to TEAD inhibitors\n    Joint activation of the Hippo and MAPK pathways makes cancer cells resistant to TEAD inhibition. I processed the drug screen data with the gDR package.\n  \n  \n    \n    Frontiers in Microbiology · 2022 · first author\n    Host transcriptome and microbiome integration\n    Co-expression networks connect host RNA-seq with 16S rRNA profiles of gut bacteria to describe the response to heat stress."
   },
   {
     "objectID": "index.html#skills",
@@ -109,7 +109,7 @@
     "href": "research.html#publications-and-citations",
     "title": "Research",
     "section": "Publications and citations",
-    "text": "Publications and citations\n\nPeer-reviewed articles per year012320181 article in 201820190 articles in 2019320203 articles in 202020211 article in 202120222 articles in 202220232 articles in 202320242 articles in 202420251 article in 2025220262 articles in 2026\nCitations per year020406020180 citations in 201820190 citations in 2019202012 citations in 202020215 citations in 202120229 citations in 2022202316 citations in 2023202419 citations in 2024202534 citations in 202559202659 citations in 2026\n\nArticles from the list below; citations from OpenAlex, updated 2026-11-23. The current year is not complete.\nShow the numbers as a table\n\n\n\nYear\nArticles\nCitations\n\n\n\n\n2018\n1\n0\n\n\n2019\n0\n0\n\n\n2020\n3\n12\n\n\n2021\n1\n5\n\n\n2022\n2\n9\n\n\n2023\n2\n16\n\n\n2024\n2\n19\n\n\n2025\n1\n34\n\n\n2026\n2\n59"
+    "text": "Publications and citations\n\nPeer-reviewed articles per year012320181 article in 201820190 articles in 2019320203 articles in 202020211 article in 202120222 articles in 202220232 articles in 202320242 articles in 202420251 article in 2025220262 articles in 2026\nCitations per year02040608020180 citations in 201820190 citations in 2019202012 citations in 202020216 citations in 2021202210 citations in 2022202316 citations in 2023202420 citations in 2024202535 citations in 202561202661 citations in 2026\n\nArticles from the list below; citations from OpenAlex, updated 2026-11-26. The current year is not complete.\nShow the numbers as a table\n\n\n\nYear\nArticles\nCitations\n\n\n\n\n2018\n1\n0\n\n\n2019\n0\n0\n\n\n2020\n3\n12\n\n\n2021\n1\n6\n\n\n2022\n2\n10\n\n\n2023\n2\n16\n\n\n2024\n2\n20\n\n\n2025\n1\n35\n\n\n2026\n2\n61"
   },
   {
     "objectID": "research.html#collaborators",
@@ -172,7 +172,7 @@
     "href": "cv.html#software",
     "title": "Bartosz Czech, PhD, Eng.",
     "section": "Software",
-    "text": "Software\n\nggwas: ggplot2 plots for GWAS summary statistics (R; under review at Bioconductor). github.com/bczech/ggwas\nBRASSVis: plots of gene fusions and structural variants from BRASS (R). github.com/bczech/BRASSVis\ngDR: co-author of the R suite for drug response screens (Bioconductor). github.com/gdrplatform"
+    "text": "Software\n\nggwas: ggplot2 plots for GWAS summary statistics (R; Bioconductor). github.com/bczech/ggwas\nBRASSVis: plots of gene fusions and structural variants from BRASS (R). github.com/bczech/BRASSVis\ngDR: co-author of the R suite for drug response screens (Bioconductor). github.com/gdrplatform"
   },
   {
     "objectID": "cv.html#teaching",
