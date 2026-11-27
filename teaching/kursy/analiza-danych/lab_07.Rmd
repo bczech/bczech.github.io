@@ -1,0 +1,201 @@
+---
+title: "Ćwiczenia 7 — Ocena modelu: macierz pomyłek, krzywa ROC, próg (wersja R)"
+subtitle: "Dane przykładowe: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Sama dokładność nie mówi, jakie błędy model popełnia, i zależy od przyjętego progu. Na tym
+spotkaniu oceniamy dwa znane już modele, regresję logistyczną i k-NN, dokładniej: liczymy
+macierz pomyłek i miary z niej, krzywą ROC z polem pod nią (AUC) i sprawdzamy, jak zmiana
+progu przesuwa czułość i swoistość. Nie budujemy nowych modeli.
+
+Pracujemy na przewidywaniach z walidacji krzyżowej na zbiorze treningowym (Ćwiczenia 5).
+Zbiór testowy odkładamy do oceny końcowej na Ćwiczeniach 9. Arkusz najlepiej uruchamiać
+w nowej sesji R (w RStudio: *Session → Restart R*), blok po bloku od początku.
+
+# Punkt wyjścia
+
+Przygotowanie danych i części walidacji jak na Ćwiczeniach 6.
+
+```{r dane}
+library(caret)                          # podział danych, walidacja krzyżowa, modele, macierz pomyłek
+library(pROC)                           # krzywa ROC i pole pod nią
+
+# row.names = 1: pierwsza kolumna pliku to nazwy próbek; check.names = FALSE: nazwy taksonów bez zmian
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+# factor(): zmienna kategoryczna; levels ustala kolejność klas (najpierw control, potem T2D)
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+set.seed(42)                            # ziarno kursu: ten sam podział co na poprzednich ćwiczeniach
+# createDataPartition(): numery 75% próbek do treningu, losowane osobno w każdej klasie
+idx_tr <- createDataPartition(y, p = 0.75, list = FALSE)[, 1]
+X_tr <- X[idx_tr, ]                     # cechy próbek treningowych
+y_tr <- y[idx_tr]                       # klasy próbek treningowych
+X_te <- X[-idx_tr, ]                    # TEST: pozostałe 25% próbek (minus = wszystkie poza treningowymi)
+y_te <- y[-idx_tr]                      # klasy próbek testowych; test odkładamy do Ćwiczeń 9
+
+prevalence_tr <- colMeans(X_tr > 0)     # częstość występowania każdej cechy w treningu
+keep <- names(prevalence_tr)[prevalence_tr >= 0.10]   # nazwy cech obecnych w co najmniej 10% próbek
+
+# CLR: logarytm (z dodaną stałą 1e-6, bo log(0) nie istnieje) minus średnia logarytmów w próbce
+clr <- function(M) {
+  L <- log(as.matrix(M) + 1e-6)         # logarytm każdej wartości
+  L - rowMeans(L)                       # od każdego wiersza (próbki) odejmujemy jego średnią
+}
+Z_tr <- clr(X_tr[, keep])               # cechy treningowe po filtrze i CLR
+
+set.seed(42)                            # ziarno: ten sam podział na części co na Ćwiczeniach 6
+parts <- createFolds(y_tr, k = 5, returnTrain = TRUE)   # 5 części warstwowych
+ctrl <- trainControl(method = "cv", index = parts,      # walidacja na tych częściach
+                     preProcOptions = list(pcaComp = 10),   # krok "pca": 10 składowych
+                     classProbs = TRUE,                 # zapisywanie prawdopodobieństw klas, nie tylko klas
+                     savePredictions = "final")         # zachowanie przewidywań dla części sprawdzających
+```
+
+Oba modele dopasowujemy tak jak na Ćwiczeniach 6. Nowe są dwa ustawienia w `trainControl()`:
+`classProbs = TRUE` i `savePredictions = "final"`. Dzięki nim caret zapisuje, jakie
+prawdopodobieństwo T2D przypisał każdej próbce treningowej model, którego na niej nie uczono
+(bo była wtedy w części sprawdzającej). Na tych prawdopodobieństwach liczymy wszystkie miary.
+
+```{r modele}
+fit_lr <- train(x = Z_tr, y = y_tr, method = "glm",        # regresja logistyczna
+                preProcess = c("center", "scale", "pca"),  # standaryzacja i 10 składowych w każdej części
+                trControl = ctrl)                          # te same części
+fit_knn <- train(x = Z_tr, y = y_tr, method = "knn",       # k-NN
+                 preProcess = c("center", "scale", "pca"), # te same kroki przygotowania
+                 tuneGrid = data.frame(k = 15),            # stałe k = 15
+                 trControl = ctrl)                         # te same części
+
+# $pred: przewidywania dla części sprawdzających; order(rowIndex): w kolejności próbek treningowych
+pred_lr <- fit_lr$pred[order(fit_lr$pred$rowIndex), ]
+pred_knn <- fit_knn$pred[order(fit_knn$pred$rowIndex), ]   # to samo dla k-NN
+head(pred_lr)                           # kolumny: pred (klasa), obs (prawdziwa klasa), control i T2D (prawdopodobieństwa)
+
+obs <- pred_lr$obs                      # prawdziwe klasy
+p_lr <- pred_lr$T2D                     # prawdopodobieństwo T2D z regresji logistycznej
+p_knn <- pred_knn$T2D                   # prawdopodobieństwo T2D z k-NN
+```
+
+# 1. Macierz pomyłek i miary przy jednym progu
+
+Dokładność łączy wszystkie błędy w jedną liczbę, a różne błędy mają różne skutki:
+pominięcie osoby chorej to co innego niż fałszywy alarm u osoby zdrowej. Macierz pomyłek
+(ang. *confusion matrix*) pokazuje oba rodzaje błędów osobno. T2D jest klasą pozytywną
+(ang. *positive class*), czyli tą, którą chcemy wykryć. Z macierzy liczy się:
+
+- **czułość** (*sensitivity*) — odsetek próbek T2D rozpoznanych jako T2D,
+- **swoistość** (*specificity*) — odsetek próbek control rozpoznanych jako control,
+- **precyzja** (*precision*) — odsetek próbek T2D wśród wszystkich wyników dodatnich,
+- **F1** — łączy precyzję i czułość; jest wysoka tylko wtedy, gdy obie są wysokie.
+
+Prawdopodobieństwo zamieniamy na klasę progiem 0,5.
+
+```{r macierz}
+threshold <- 0.5                        # próg: P(T2D) ≥ próg oznacza T2D
+# ifelse(): "T2D", gdy warunek jest spełniony, w pozostałych miejscach "control"
+pred <- factor(ifelse(p_lr >= threshold, "T2D", "control"), levels = c("control", "T2D"))
+cm <- confusionMatrix(pred, obs, positive = "T2D")   # positive: klasa pozytywna
+cm$table                                # wiersze: przewidywanie, kolumny: prawdziwa klasa
+round(cm$byClass[c("Sensitivity", "Specificity", "Precision", "F1", "Balanced Accuracy")], 3)   # miary
+```
+
+**Na co patrzeć.** Na przekątnej `cm$table` leżą poprawne klasyfikacje. Wiersz `T2D`
+w kolumnie `control` to fałszywe alarmy, wiersz `control` w kolumnie `T2D` to pominięte
+próbki T2D. *Balanced Accuracy* (dokładność zbalansowana) to średnia czułości i swoistości;
+przyda się w sekcji 4.
+
+🔧 **Do sprawdzenia.** W `confusionMatrix()` zmienić `positive = "T2D"` na
+`positive = "control"`. Które miary zamieniają się miejscami?
+
+> **✏️ Zadanie 1.** Policzyć macierz pomyłek i miary dla k-NN (te same dwie linijki
+> `pred <- ...` i `confusionMatrix()`, z `p_knn` zamiast `p_lr`). Który model popełnia
+> więcej fałszywych alarmów, a który częściej pomija próbki T2D?
+
+```{r zadanie-1}
+# miejsce na kod do Zadania 1
+
+```
+
+# 2. Krzywa ROC i AUC
+
+Miary z sekcji 1 zależą od progu. Żeby ocenić sam model, sprawdza się wszystkie progi jednocześnie.
+**Krzywa ROC** pokazuje czułość względem odsetka fałszywych alarmów (1 − swoistość) dla
+kolejnych progów. **AUC** (pole pod krzywą ROC) to prawdopodobieństwo, że model przypisze losowo wybranej
+próbce T2D wyższe prawdopodobieństwo T2D niż losowo wybranej próbce
+control: 0,5 oznacza model losowy, 1 idealne uporządkowanie próbek.
+
+```{r roc, fig.width=5, fig.height=5}
+# roc(): levels = najpierw klasa ujemna, potem pozytywna; direction = "<": wyższe P(T2D) oznacza T2D
+roc_lr <- roc(obs, p_lr, levels = c("control", "T2D"), direction = "<")
+auc(roc_lr)                             # pole pod krzywą ROC
+plot(roc_lr, legacy.axes = TRUE)        # krzywa ROC; legacy.axes: oś X jako 1 − swoistość
+```
+
+**Na co patrzeć.** Im bliżej lewego górnego rogu leży krzywa, tym lepiej model porządkuje
+próbki. Przekątna to poziom modelu losowego.
+
+Gdy klasa pozytywna jest rzadka, uzupełnieniem krzywej ROC jest krzywa precyzja–czułość
+(PR); w tej kohorcie klasy są prawie równoliczne, więc wystarcza krzywa ROC.
+
+> **✏️ Zadanie 2.** Policzyć AUC dla k-NN (wywołanie `roc()` z `p_knn`, a potem `auc()`).
+> Który model lepiej porządkuje próbki? Czy różnica między modelami jest duża w porównaniu
+> z odległością obu modeli od poziomu 0,5?
+
+```{r zadanie-2}
+# miejsce na kod do Zadania 2
+
+```
+
+# 3. Wybór progu
+
+Próg 0,5 jest umowny. Obniżenie progu zwiększa czułość kosztem swoistości, podwyższenie
+działa odwrotnie, więc próg dobiera się do celu: w badaniu przesiewowym ważniejsze jest, żeby
+nie pominąć chorych, a przed kosztownym leczeniem, żeby nie leczyć zdrowych. Funkcja
+`coords()` podaje czułość, swoistość i precyzję przy wybranych progach. Jedną z reguł wyboru
+progu jest **indeks Youdena**: wybiera się próg, przy którym suma czułości i swoistości jest
+największa.
+
+```{r progi, fig.width=5, fig.height=5}
+# miary przy trzech progach: wiersz = próg
+coords(roc_lr, x = c(0.3, 0.5, 0.7), input = "threshold",
+       ret = c("threshold", "sensitivity", "specificity", "precision"))   # zwracane miary
+# próg Youdena i miary przy nim
+coords(roc_lr, "best", best.method = "youden", ret = c("threshold", "sensitivity", "specificity"))
+plot(roc_lr, legacy.axes = TRUE, print.thres = "best")   # krzywa ROC z zaznaczonym progiem Youdena
+```
+
+**Na co patrzeć.** Im wyższy próg, tym niższa czułość i wyższa swoistość. Na wykresie przy
+zaznaczonym punkcie podano próg, a w nawiasie swoistość i czułość. Próg wybrany na tych
+samych danych, na których się go ocenia, daje wynik zbyt optymistyczny, dlatego wybiera się
+go na treningu (tu: z walidacji krzyżowej), a sprawdza na zbiorze testowym.
+
+> **✏️ Zadanie 3.** Policzyć macierz pomyłek regresji logistycznej przy progu 0,3 (te same
+> linijki co w sekcji 1, z `threshold <- 0.3`). Ile próbek T2D model teraz pomija, a ile
+> było ich przy progu 0,5? O ile wzrasta przy tym liczba fałszywych alarmów?
+
+```{r zadanie-3}
+# miejsce na kod do Zadania 3
+
+```
+
+# 4. Niezrównoważenie klas
+
+W kohorcie demonstracyjnej klasy są prawie równoliczne, ale w wielu zbiorach (także w części kohort
+projektowych) jedna klasa jest wyraźnie rzadsza. Wtedy model, który zawsze wskazuje klasę
+liczniejszą, ma wysoką dokładność, choć jest bezużyteczny: przy 10% próbek T2D jego dokładność
+wynosi 0,90, a czułość 0. Dlatego przy niezrównoważonych klasach:
+
+- wynik porównuje się z klasyfikatorem bazowym, a obok dokładności podaje czułość,
+  swoistość i dokładność zbalansowaną (`Balanced Accuracy` w `confusionMatrix()`);
+- podział na zbiór treningowy, testowy i części walidacji robi się warstwowo
+  (`createDataPartition()` i `createFolds()` robią to automatycznie);
+- próg dobiera się do celu (sekcja 3) albo nadaje próbkom rzadszej klasy większą wagę podczas
+  uczenia (argument `weights` w `train()`; w scikit-learn `class_weight="balanced"`).
