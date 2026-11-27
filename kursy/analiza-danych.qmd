@@ -73,6 +73,12 @@ budowa modelu i jego ocena.
 [[Arkusz do pracy]{.lab-lbl} [[]{.bi .bi-file-earmark-code} R · .Rmd](analiza-danych/lab_06.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-code} Python · .ipynb](analiza-danych/lab_06.ipynb){.lab-btn}]{.lab-row}
 :::
 
+::: {.lab-card}
+[[]{.bi .bi-journal-code}[Ćwiczenia 7: macierz pomyłek, krzywa ROC i wybór progu[arkusz w R lub w Pythonie — do wyboru]{.lab-meta}]{}]{.lab-tt}
+
+[[Arkusz do pracy]{.lab-lbl} [[]{.bi .bi-file-earmark-code} R · .Rmd](analiza-danych/lab_07.Rmd){.lab-btn} [[]{.bi .bi-file-earmark-code} Python · .ipynb](analiza-danych/lab_07.ipynb){.lab-btn}]{.lab-row}
+:::
+
 :::
 
 Kolejne materiały pojawią się wkrótce.
