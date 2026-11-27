@@ -146,8 +146,8 @@ Gdy klasa pozytywna jest rzadka, uzupełnieniem krzywej ROC jest krzywa precyzja
 (PR); w tej kohorcie klasy są prawie równoliczne, więc wystarcza krzywa ROC.
 
 > **✏️ Zadanie 2.** Policzyć AUC dla k-NN (wywołanie `roc()` z `p_knn`, a potem `auc()`).
-> Który model lepiej porządkuje próbki? Czy różnica między modelami jest duża w porównaniu
-> z odległością obu modeli od poziomu 0,5?
+> Który model lepiej porządkuje próbki? O ile AUC obu modeli przekracza 0,5 (poziom modelu
+> losowego) i czy różnica między modelami jest duża w porównaniu z tą przewagą?
 
 ```{r zadanie-2}
 # miejsce na kod do Zadania 2
