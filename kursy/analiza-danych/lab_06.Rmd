@@ -1,6 +1,6 @@
 ---
 title: "Ćwiczenia 6 — Pierwsze klasyfikatory: regresja logistyczna i naiwny Bayes (wersja R)"
-subtitle: "Dane demo: kohorta T2D (QinJ_2012)"
+subtitle: "Dane przykładowe: kohorta T2D (QinJ_2012)"
 output:
   html_document:
     toc: true
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 Na Ćwiczeniach 4 powstał pierwszy model, k najbliższych sąsiadów (k-NN), porównany
 z klasyfikatorem bazowym, a na Ćwiczeniach 5 nauczyliśmy się oceniać modele w walidacji
-krzyżowej. Na tym spotkaniu dochodzą dwa modele, które decydują inaczej niż k-NN: regresja
+krzyżowej. Na tym spotkaniu dochodzą dwa modele, które klasyfikują próbki inaczej niż k-NN: regresja
 logistyczna i naiwny klasyfikator Bayesa. Wszystkie modele oceniamy w tych samych częściach
 walidacji krzyżowej i porównujemy. Każdy nowy model to w caret to samo wywołanie `train()`,
 w którym zmienia się tylko argument `method`.
@@ -31,7 +31,7 @@ modele korzystają z tych samych części, więc różnice wyników wynikają z 
 z losowania części.
 
 Cech jest prawie tyle, ile próbek treningowych, a przy takim kształcie danych regresja
-logistyczna nie daje stabilnych wyników. Dlatego modele dostają 10 pierwszych składowych PCA
+logistyczna nie daje stabilnych wyników. Dlatego modele otrzymują jako cechy 10 pierwszych składowych PCA
 (Ćwiczenia 3). Standaryzację i PCA caret wyznacza w każdej części uczącej osobno
 (`preProcess`), więc nie ma przecieku (Ćwiczenia 5).
 
@@ -100,7 +100,7 @@ z tą wartością i z wynikiem k-NN.
 
 Regresja logistyczna (ang. *logistic regression*) liczy dla każdej próbki
 prawdopodobieństwo klasy T2D: sumuje cechy pomnożone przez współczynniki (wagi) i zamienia
-tę sumę na liczbę od 0 do 1. Próbka trafia do T2D, gdy prawdopodobieństwo wynosi co najmniej
+tę sumę na liczbę od 0 do 1. Próbkę przypisuje się do T2D, gdy prawdopodobieństwo wynosi co najmniej
 0,5. Względem k-NN w wywołaniu zmienia się tylko `method`; regresja logistyczna nie ma
 hiperparametru, więc nie ma też `tuneGrid`.
 

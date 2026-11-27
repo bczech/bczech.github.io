@@ -1,0 +1,205 @@
+---
+title: "Ćwiczenia 6 — Pierwsze klasyfikatory: regresja logistyczna i naiwny Bayes (wersja R, z rozwiązaniami)"
+subtitle: "Dane przykładowe: kohorta T2D (QinJ_2012)"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Na Ćwiczeniach 4 powstał pierwszy model, k najbliższych sąsiadów (k-NN), porównany
+z klasyfikatorem bazowym, a na Ćwiczeniach 5 nauczyliśmy się oceniać modele w walidacji
+krzyżowej. Na tym spotkaniu dochodzą dwa modele, które klasyfikują próbki inaczej niż k-NN: regresja
+logistyczna i naiwny klasyfikator Bayesa. Wszystkie modele oceniamy w tych samych częściach
+walidacji krzyżowej i porównujemy. Każdy nowy model to w caret to samo wywołanie `train()`,
+w którym zmienia się tylko argument `method`.
+
+Zbiór testowy odkładamy i nie używamy go: zostaje do oceny końcowej na Ćwiczeniach 9.
+Arkusz najlepiej uruchamiać w nowej sesji R (w RStudio: *Session → Restart R*), blok po
+bloku od początku.
+
+# Punkt wyjścia
+
+Przygotowanie danych jak na Ćwiczeniach 4 i 5: podział warstwowy z ziarnem 42, filtr
+częstości występowania i CLR. Potem raz ustalamy pięć części walidacji krzyżowej; wszystkie
+modele korzystają z tych samych części, więc różnice wyników wynikają z modeli, a nie
+z losowania części.
+
+Cech jest prawie tyle, ile próbek treningowych, a przy takim kształcie danych regresja
+logistyczna nie daje stabilnych wyników. Dlatego modele otrzymują jako cechy 10 pierwszych składowych PCA
+(Ćwiczenia 3). Standaryzację i PCA caret wyznacza w każdej części uczącej osobno
+(`preProcess`), więc nie ma przecieku (Ćwiczenia 5).
+
+Naiwny klasyfikator Bayesa w caret korzysta z pakietu naivebayes, który pojawia się na tych
+zajęciach po raz pierwszy. Instaluje się go jednorazowo (jeśli `train()` zgłasza brak pakietu):
+
+```{r instalacja, eval=FALSE}
+install.packages("naivebayes")          # jednorazowo; caret wczytuje go sam przy method = "naive_bayes"
+```
+
+```{r dane}
+library(caret)                          # podział danych, walidacja krzyżowa, modele
+
+# row.names = 1: pierwsza kolumna pliku to nazwy próbek; check.names = FALSE: nazwy taksonów bez zmian
+X <- read.csv("dane/t2d_features.csv", row.names = 1, check.names = FALSE)
+# factor(): zmienna kategoryczna; levels ustala kolejność klas (najpierw control, potem T2D)
+y <- factor(read.csv("dane/t2d_labels.csv")$grupa, levels = c("control", "T2D"))
+
+set.seed(42)                            # ziarno kursu: ten sam podział co na Ćwiczeniach 4 i 5
+# createDataPartition(): numery 75% próbek do treningu, losowane osobno w każdej klasie
+idx_tr <- createDataPartition(y, p = 0.75, list = FALSE)[, 1]
+X_tr <- X[idx_tr, ]                     # cechy próbek treningowych
+y_tr <- y[idx_tr]                       # klasy próbek treningowych
+X_te <- X[-idx_tr, ]                    # TEST: pozostałe 25% próbek (minus = wszystkie poza treningowymi)
+y_te <- y[-idx_tr]                      # klasy próbek testowych; test odkładamy i nie używamy do Ćwiczeń 9
+
+prevalence_tr <- colMeans(X_tr > 0)     # częstość występowania każdej cechy w treningu
+keep <- names(prevalence_tr)[prevalence_tr >= 0.10]   # nazwy cech obecnych w co najmniej 10% próbek
+
+# CLR: logarytm (z dodaną stałą 1e-6, bo log(0) nie istnieje) minus średnia logarytmów w próbce
+clr <- function(M) {
+  L <- log(as.matrix(M) + 1e-6)         # logarytm każdej wartości
+  L - rowMeans(L)                       # od każdego wiersza (próbki) odejmujemy jego średnią
+}
+Z_tr <- clr(X_tr[, keep])               # cechy treningowe po filtrze i CLR
+dim(Z_tr)                               # liczba próbek treningowych i liczba cech
+
+set.seed(42)                            # ziarno: ten sam podział na części przy każdym uruchomieniu
+parts <- createFolds(y_tr, k = 5, returnTrain = TRUE)   # 5 części warstwowych (numery próbek części uczących)
+# walidacja na tych częściach; pcaComp = 10: krok "pca" zachowuje 10 składowych
+ctrl <- trainControl(method = "cv", index = parts, preProcOptions = list(pcaComp = 10))
+```
+
+# 1. Punkty odniesienia: klasyfikator bazowy i k-NN
+
+Nowe modele trzeba z czymś porównać. Klasyfikator bazowy zawsze wskazuje klasę liczniejszą
+i wyznacza poziom, który każdy model musi przekroczyć. k-NN z Ćwiczeń 4 i 5 jest modelem,
+który już znamy; tu dobieramy liczbę sąsiadów tak jak na Ćwiczeniach 5.
+
+```{r odniesienie}
+fit_base <- train(x = Z_tr, y = y_tr, method = "null", trControl = ctrl)   # klasyfikator bazowy
+fit_base$results[, c("Accuracy", "AccuracySD")]   # średnia dokładność z 5 części i odchylenie standardowe
+
+fit_knn <- train(x = Z_tr, y = y_tr, method = "knn",       # k-NN
+                 preProcess = c("center", "scale", "pca"), # standaryzacja i 10 składowych PCA w każdej części
+                 tuneGrid = data.frame(k = seq(1, 25, by = 2)),   # sprawdzane wartości k
+                 trControl = ctrl)                         # te same części
+fit_knn$bestTune                        # k o najwyższej średniej dokładności
+max(fit_knn$results$Accuracy)           # średnia dokładność przy tym k
+```
+
+**Na co patrzeć.** Klasyfikator bazowy osiąga około 0,5. Każdy kolejny wynik porównuje się
+z tą wartością i z wynikiem k-NN.
+
+# 2. Regresja logistyczna
+
+Regresja logistyczna (ang. *logistic regression*) liczy dla każdej próbki
+prawdopodobieństwo klasy T2D: sumuje cechy pomnożone przez współczynniki (wagi) i zamienia
+tę sumę na liczbę od 0 do 1. Próbkę przypisuje się do T2D, gdy prawdopodobieństwo wynosi co najmniej
+0,5. Względem k-NN w wywołaniu zmienia się tylko `method`; regresja logistyczna nie ma
+hiperparametru, więc nie ma też `tuneGrid`.
+
+```{r logistyczna}
+fit_glm <- train(x = Z_tr, y = y_tr, method = "glm",       # regresja logistyczna
+                 preProcess = c("center", "scale", "pca"), # te same 10 składowych
+                 trControl = ctrl)                         # te same części
+fit_glm$results[, c("Accuracy", "AccuracySD")]   # średnia dokładność z 5 części i odchylenie standardowe
+
+# model końcowy (dopasowany na całym treningu): prawdopodobieństwa klas dla pierwszych 6 próbek
+head(predict(fit_glm, Z_tr, type = "prob"))
+head(predict(fit_glm, Z_tr))            # przewidziana klasa: T2D, gdy P(T2D) ≥ 0,5
+```
+
+**Na co patrzeć.** Model zwraca dla każdej próbki dwa prawdopodobieństwa, które sumują się
+do 1, i klasę o większym z nich. Prawdopodobieństwa przydadzą się na Ćwiczeniach 7, gdzie
+próg 0,5 będzie można zmieniać.
+
+🔧 **Do sprawdzenia.** W `ctrl` (punkt wyjścia) zmienić `pcaComp = 10` na `5`, a potem na
+`20`, i ponownie uruchomić punkt wyjścia i blok z `fit_glm`. Jak zmienia się średnia
+dokładność?
+
+> **✏️ Zadanie 1.** Policzyć dokładność regresji logistycznej na zbiorze treningowym
+> (`predict()` na `Z_tr` i `mean()` porównania z `y_tr`) i porównać ją z wynikiem walidacji
+> krzyżowej. Który wynik jest wyższy i dlaczego do oceny modelu nadaje się tylko drugi?
+
+```{r zadanie-1}
+mean(predict(fit_glm, Z_tr) == y_tr)    # dokładność na treningu: odsetek zgodnych klas
+```
+
+**Rozwiązanie.** Dokładność na treningu wynosi 0,660, a w walidacji krzyżowej 0,653: wynik na treningu
+jest wyższy, ale tylko o około 1 punkt procentowy. Na treningu model ocenia się na tych samych próbkach, na których go
+uczono, więc wynik jest zawyżony. Walidacja krzyżowa sprawdza model na próbkach, których w danym
+powtórzeniu nie użyto do uczenia, i tylko ona mówi, jak model poradzi sobie z nowymi danymi. Tu różnica
+jest mała, bo regresja logistyczna na 10 składowych jest prostym modelem i w niewielkim stopniu ulega
+przeuczeniu (inaczej niż k-NN z jednym sąsiadem na Ćwiczeniach 4, który na treningu miał dokładność 1).
+
+# 3. Naiwny klasyfikator Bayesa
+
+Naiwny klasyfikator Bayesa (ang. *naive Bayes*) opisuje każdą cechę w każdej klasie osobno
+(tu rozkładem normalnym: średnia i odchylenie standardowe w klasie) i przypisuje nową próbkę
+do klasy, do której jej cechy pasują lepiej. „Naiwność” polega na założeniu, że cechy w obrębie
+klasy są od siebie niezależne. Składowe PCA są ze sobą nieskorelowane, więc dla nich
+założenie jest mniej naruszone niż dla surowych cech.
+
+```{r bayes}
+# naive_bayes w caret wymaga trzech ustawień: laplace = 0 i adjust = 1 nie mają tu znaczenia,
+# usekernel = FALSE: rozkład normalny w każdej klasie
+nb_grid <- data.frame(laplace = 0, usekernel = FALSE, adjust = 1)
+fit_nb <- train(x = Z_tr, y = y_tr, method = "naive_bayes",   # naiwny Bayes
+                preProcess = c("center", "scale", "pca"),     # te same 10 składowych
+                tuneGrid = nb_grid, trControl = ctrl)         # ustawienia modelu i te same części
+fit_nb$results[, c("Accuracy", "AccuracySD")]   # średnia dokładność z 5 części i odchylenie standardowe
+```
+
+> **✏️ Zadanie 2.** Ocenić naiwny Bayes na wszystkich cechach CLR, bez PCA (to samo
+> wywołanie z `preProcess = c("center", "scale")`). Jak zmienia się średnia dokładność?
+> Założenie o niezależności cech jest wtedy mocniej naruszone; czy to musi pogarszać wynik?
+
+```{r zadanie-2}
+fit_nb_all <- train(x = Z_tr, y = y_tr, method = "naive_bayes", preProcess = c("center", "scale"),   # bez PCA
+                    tuneGrid = nb_grid, trControl = ctrl)   # te same ustawienia i części
+fit_nb_all$results[, c("Accuracy", "AccuracySD")]           # średnia dokładność i odchylenie standardowe
+```
+
+**Rozwiązanie.** Na wszystkich cechach CLR średnia dokładność wynosi 0,680 (SD 0,029), a na 10 składowych PCA
+0,637 (SD 0,033): bez PCA wynik jest wyższy o około 4 punkty procentowe, choć cechy CLR są ze sobą skorelowane i założenie
+o niezależności jest mocniej naruszone. Naruszenie założenia nie musi pogarszać klasyfikacji: model źle
+szacuje prawdopodobieństwa, ale klasa o większym prawdopodobieństwie bywa nadal właściwa. Poza tym
+10 składowych PCA pomija część informacji, którą naiwny Bayes może wykorzystać na pełnych cechach.
+O wyborze modelu decyduje wynik walidacji, a nie samo spełnienie założeń.
+
+# 4. Porównanie modeli
+
+Cztery modele oceniano na tych samych pięciu częściach, więc można porównać ich wyniki część
+po części. Jeśli jeden model jest lepszy w każdej części, przewaga jest wiarygodna; jeśli
+jest lepszy tylko średnio, różnica może wynikać z przypadku. Funkcja `resamples()` zbiera wyniki
+części z obiektów utworzonych przez `train()`.
+
+```{r porownanie, fig.width=6, fig.height=3.5}
+res <- resamples(list(bazowy = fit_base, kNN = fit_knn, logistyczna = fit_glm, Bayes = fit_nb))   # wyniki 5 części
+summary(res, metric = "Accuracy")       # dla każdego modelu: najmniejsza, średnia, największa dokładność w części
+res$values[, c("Resample", "kNN~Accuracy", "logistyczna~Accuracy")]   # k-NN i regresja część po części
+bwplot(res, metric = "Accuracy")        # wykres pudełkowy dokładności w częściach dla każdego modelu
+```
+
+**Na co patrzeć.** Każde pudełko to pięć wyników jednego modelu. Różnica średnich mniejsza od
+rozrzutu wyników między częściami nie wskazuje jednoznacznie lepszego modelu.
+
+> **✏️ Zadanie 3.** Policzyć, w ilu z pięciu części regresja logistyczna ma wyższą
+> dokładność niż k-NN (`sum()` na porównaniu dwóch kolumn `res$values`). Czy na tej
+> podstawie można wskazać lepszy model?
+
+```{r zadanie-3}
+sum(res$values[["logistyczna~Accuracy"]] > res$values[["kNN~Accuracy"]])   # części, w których regresja jest lepsza
+```
+
+**Rozwiązanie.** Regresja logistyczna ma wyższą dokładność w trzech częściach z pięciu, a średnie
+obu modeli są prawie równe (0,653 wobec 0,652). Różnica średnich jest dużo mniejsza niż rozrzut
+wyników między częściami (odchylenie standardowe 0,05–0,06), a lepszy model zmienia się z częścią.
+Nie można więc wskazać lepszego modelu. Przy podobnym wyniku wybiera się model prostszy albo
+łatwiejszy do interpretacji.
